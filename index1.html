@@ -3,227 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ETERNAL WALL | The Super-App for Couples</title>
+    <title>ETERNAL | The Sanctuary</title>
     
-    <!-- Libraries -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <!-- Confetti for Celebrations -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --bg: #050505; --surface: #141414; --surface-light: #1f1f1f;
-            --primary: #d4af37; /* Gold */
-            --accent: #e91e63; /* Pink */
-            --text: #e0e0e0; --text-dim: #888;
-            --border: #333;
-            --glass: rgba(20, 20, 20, 0.9);
+            --gold: #D4AF37;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            --danger: #ff4757;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
-        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
-        button { cursor: pointer; font-family: inherit; transition: 0.2s; }
-        
-        /* --- UTILS --- */
-        .btn { padding: 10px 20px; border-radius: 50px; border: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-        .btn-gold { background: var(--primary); color: #000; }
-        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
-        .btn-outline { border: 1px solid var(--border); background: transparent; color: var(--text); }
-        .input-box { width: 100%; background: var(--surface-light); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
-        
-        /* --- NAV --- */
-        .navbar { position: sticky; top: 0; z-index: 100; background: var(--glass); backdrop-filter: blur(10px); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .brand { font-size: 1.2rem; color: var(--primary); letter-spacing: 1px; font-weight: bold; text-decoration: none; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: #000;
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- ANIMATED BACKGROUND (AURORA) --- */
+        .aurora-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1a0b2e, #000000);
+            overflow: hidden;
+        }
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4;
+            animation: float 10s infinite alternate;
+        }
+        .orb-1 { width: 300px; height: 300px; background: #ff0055; top: 10%; left: 20%; animation-delay: 0s; }
+        .orb-2 { width: 400px; height: 400px; background: #4b0082; bottom: 20%; right: 10%; animation-delay: -2s; }
+        .orb-3 { width: 200px; height: 200px; background: #D4AF37; top: 40%; left: 60%; animation-delay: -5s; }
+
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3, .serif { font-family: 'Cormorant Garamond', serif; font-weight: 600; }
+        .gradient-text {
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* --- COMPONENTS --- */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .btn {
+            background: var(--gold); color: #000; border: none; padding: 12px 25px;
+            border-radius: 50px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            transition: 0.3s; display: inline-flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5); }
+        .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; box-shadow: none; }
+
+        .input-glass {
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+            padding: 15px; border-radius: 12px; color: white; margin-bottom: 10px; font-family: inherit;
+        }
 
         /* --- VIEWS --- */
-        .view { display: none; animation: fadeIn 0.5s; min-height: 90vh; }
+        .view { display: none; padding-top: 80px; padding-bottom: 100px; min-height: 100vh; animation: fadeIn 0.6s ease; }
         .active-view { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- HOME: LOVE MAP --- */
-        .map-container { position: relative; height: 60vh; background: #0b0b0b; overflow: hidden; border-bottom: 1px solid var(--border); }
-        .world-map { width: 100%; height: 100%; object-fit: cover; opacity: 0.3; }
-        .map-dot { position: absolute; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; box-shadow: 0 0 10px var(--accent); }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
-        .home-content { padding: 40px 20px; text-align: center; }
+        /* --- NAV --- */
+        .navbar {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 25px; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .brand { font-size: 1.5rem; letter-spacing: 2px; color: var(--gold); }
         
-        /* --- DASHBOARD GRID --- */
-        .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; overflow: hidden; margin-bottom: 20px; }
-        
-        /* 1. CLOCK */
-        .clock-display { text-align: center; padding: 20px; background: linear-gradient(45deg, #111, #1a1a1a); border-bottom: 1px solid var(--border); }
-        .time-digits { font-size: 2rem; font-family: monospace; color: var(--primary); letter-spacing: 2px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
-        .time-label { color: var(--text-dim); font-size: 0.8rem; margin-top: 5px; text-transform: uppercase; }
+        /* TRICK 1: STREAK COUNTER */
+        .streak-badge {
+            background: rgba(255, 69, 0, 0.2); border: 1px solid rgba(255, 69, 0, 0.5);
+            color: #ff6b6b; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.8rem;
+            display: flex; align-items: center; gap: 5px; cursor: help;
+        }
 
-        /* 2. DAILY PULSE */
-        .pulse-card { background: linear-gradient(135deg, #2a0a12, #000); border: 1px solid var(--accent); }
-        .blur-text { filter: blur(8px); user-select: none; transition: 0.5s; cursor: pointer; }
-        .blur-text:hover { filter: blur(4px); }
-        .revealed { filter: blur(0); }
-        .q-badge { background: var(--accent); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+        /* --- DASHBOARD --- */
+        .dash-grid {
+            display: grid; grid-template-columns: 1fr; gap: 20px;
+            max-width: 600px; margin: 0 auto; padding: 0 20px;
+        }
 
-        /* 3. TIME CAPSULE */
-        .capsule-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--surface-light); margin-bottom: 8px; border-radius: 8px; }
-        .lock-icon { font-size: 1.2rem; color: var(--text-dim); }
-        .unlocked-icon { color: var(--primary); }
-        
-        /* 4. TOOLKIT */
-        .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .tool-btn { background: var(--surface-light); border: 1px solid var(--border); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .tool-btn:hover { border-color: var(--primary); background: #222; }
-        .tool-btn i { font-size: 1.5rem; margin-bottom: 5px; color: var(--text); }
+        /* CLOCK */
+        .clock-container { text-align: center; margin-bottom: 20px; }
+        .time-big { font-size: 2.5rem; font-family: 'Cormorant Garamond'; letter-spacing: 2px; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
 
-        /* CHAT */
-        .chat-window { height: 400px; display: flex; flex-direction: column; }
-        .chat-feed { flex: 1; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; max-width: 80%; }
-        .msg-me { background: var(--primary); color: #000; align-self: flex-end; }
-        .msg-partner { background: #333; align-self: flex-start; }
-        .sys-msg { align-self: center; font-size: 0.8rem; color: var(--text-dim); background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px; margin: 10px 0; }
+        /* TRICK 2: MOOD BATTERY */
+        .mood-track {
+            height: 10px; background: #333; border-radius: 10px; position: relative; margin: 20px 0;
+        }
+        .mood-fill {
+            height: 100%; background: linear-gradient(90deg, #ff4757, #2ed573);
+            width: 50%; border-radius: 10px; transition: width 0.3s;
+        }
+        .mood-knob {
+            width: 20px; height: 20px; background: white; border-radius: 50%;
+            position: absolute; top: 50%; transform: translate(-50%, -50%);
+            left: 50%; cursor: pointer; box-shadow: 0 0 10px white;
+        }
 
-        /* MOBILE */
-        @media (max-width: 768px) { .dash-grid { grid-template-columns: 1fr; } }
+        /* TRICK 3: POLAROID MEMORIES */
+        .polaroid-grid {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px;
+        }
+        .polaroid {
+            background: #fff; padding: 10px 10px 30px 10px; color: #000;
+            width: 45%; max-width: 150px; border-radius: 2px;
+            transform: rotate(-2deg); transition: 0.3s; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .polaroid:nth-child(even) { transform: rotate(3deg); }
+        .polaroid:hover { transform: scale(1.1) rotate(0deg); z-index: 10; }
+        .polaroid img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #eee; }
+        .polaroid-caption { font-family: 'Cormorant Garamond'; font-size: 1rem; margin-top: 10px; text-align: center; line-height: 1; }
+
+        /* FLOATING ACTION BUTTON */
+        .fab {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px; background: var(--gold); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem; color: #000; box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+            cursor: pointer; animation: bounce 2s infinite; z-index: 99;
+        }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+        /* AUTH CARD */
+        .auth-card {
+            max-width: 400px; margin: 10vh auto; text-align: center;
+        }
+
+        /* CHAT MODAL */
+        .chat-modal {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 80vh;
+            background: #111; border-top-left-radius: 20px; border-top-right-radius: 20px;
+            transform: translateY(100%); transition: 0.3s; z-index: 200;
+            display: flex; flex-direction: column; border-top: 1px solid var(--gold);
+        }
+        .chat-modal.open { transform: translateY(0); }
+        .chat-header { padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; }
+        .chat-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 15px; border-radius: 20px; max-width: 80%; font-size: 0.9rem; }
+        .msg-me { background: var(--gold); color: black; align-self: flex-end; }
+        .msg-part { background: #333; align-self: flex-start; }
+
     </style>
 </head>
 <body>
 
+    <!-- ANIMATED BACKGROUND -->
+    <div class="aurora-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- NAV -->
     <nav class="navbar">
-        <a href="#" onclick="route('home')" class="brand"><i class="fas fa-infinity"></i> ETERNAL</a>
-        <div id="nav-actions"></div>
+        <div class="brand serif">ETERNAL</div>
+        <div id="streak-container" class="streak-badge" style="display:none">
+            <i class="fas fa-fire"></i> <span id="streak-val">0</span> DAYS
+        </div>
     </nav>
 
-    <!-- VIEW: HOME (LOVE MAP) -->
-    <div id="view-home" class="view active-view">
-        <div class="map-container" id="map-bg">
-            <!-- Simulated World Map Background -->
-            <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" class="world-map">
-            <!-- Dots injected by JS -->
-        </div>
-        <div class="home-content">
-            <h1 class="serif" style="font-size: 2.5rem; margin-bottom: 10px;">The World of Us</h1>
-            <p style="color: var(--text-dim); max-width: 500px; margin: 0 auto 30px;">Join 2.4 Million couples building their digital legacy.</p>
-            <div id="home-tiles" style="display:flex; gap:5px; justify-content:center; flex-wrap:wrap;"></div>
+    <!-- AUTH VIEW -->
+    <div id="view-auth" class="view active-view">
+        <div class="auth-card glass-panel">
+            <h1 class="serif" style="font-size: 2.5rem; margin-bottom: 5px;">Sanctuary</h1>
+            <p style="color:var(--text-dim); margin-bottom: 30px;">A private universe for two.</p>
+            
+            <div id="blink-alert" style="background:rgba(212,175,55,0.2); padding:10px; border-radius:8px; margin-bottom:20px; display:none; border:1px solid var(--gold);">
+                <i class="fas fa-link"></i> Accepting Partner Invite
+            </div>
+
+            <input id="u-name" class="input-glass" placeholder="Your Name" style="display:none">
+            <input id="u-email" class="input-glass" placeholder="Email">
+            <input id="u-pass" type="password" class="input-glass" placeholder="Password">
+            
+            <button class="btn" style="width:100%; justify-content:center;" onclick="handleAuth()" id="btn-auth">ENTER</button>
+            <p style="margin-top:20px; font-size:0.8rem; cursor:pointer; color:var(--text-dim);" onclick="toggleAuth()" id="txt-switch">New? Create Account</p>
         </div>
     </div>
 
-    <!-- VIEW: DASHBOARD (THE SUPER APP) -->
+    <!-- DASHBOARD VIEW -->
     <div id="view-dashboard" class="view">
         
-        <!-- RELATIONSHIP CLOCK -->
-        <div class="clock-display" id="clock-section" style="display:none;">
-            <div class="time-label">WE HAVE BEEN TOGETHER FOR</div>
-            <div class="time-digits" id="timer-val">00 : 00 : 00 : 00</div>
-            <div class="time-label">YEARS : DAYS : HOURS : MINS</div>
-            <button class="btn btn-outline" style="margin-top:15px; font-size:0.7rem;" onclick="shareClock()"><i class="fas fa-share-alt"></i> Share to Story</button>
+        <!-- HEADER / CLOCK -->
+        <div class="clock-container">
+            <div style="font-size:0.8rem; letter-spacing:2px; color:var(--text-dim); margin-bottom:10px;">TOGETHER FOR</div>
+            <div class="time-big" id="timer-display">00 : 00 : 00</div>
+            <div style="font-size:0.7rem; color:var(--gold); margin-top:5px;">YEARS : DAYS : HOURS</div>
         </div>
 
         <div class="dash-grid">
-            <!-- LEFT COL -->
-            <div class="dash-col">
-                
-                <!-- DAILY PULSE -->
-                <div class="card pulse-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <span class="q-badge">DAILY PULSE</span>
-                        <small style="color:#aaa" id="pulse-date">Today</small>
-                    </div>
-                    <h3 class="serif" id="pulse-q" style="margin:0 0 15px 0;">Loading Question...</h3>
-                    
-                    <div id="pulse-answers">
-                        <input type="text" id="my-answer" class="input-box" placeholder="Your Answer..." style="background:rgba(0,0,0,0.5);">
-                        <button class="btn btn-gold" style="width:100%" onclick="submitPulse()">Answer to Reveal</button>
-                    </div>
-                    
-                    <div id="pulse-reveal" style="display:none; margin-top:15px;">
-                        <div style="margin-bottom:10px;">
-                            <small style="color:var(--text-dim)">YOU</small>
-                            <div id="ans-me" style="font-weight:bold;">-</div>
-                        </div>
-                        <div>
-                            <small style="color:var(--text-dim)">PARTNER</small>
-                            <div id="ans-partner" class="blur-text" onclick="this.classList.add('revealed')">-</div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- TIME CAPSULE -->
-                <div class="card">
-                    <h3 class="serif"><i class="fas fa-box"></i> Time Capsule</h3>
-                    <div style="display:flex; gap:5px; margin-bottom:15px;">
-                        <input type="text" id="capsule-msg" class="input-box" placeholder="Message for future..." style="margin:0;">
-                        <input type="date" id="capsule-date" class="input-box" style="width:130px; margin:0;">
-                    </div>
-                    <button class="btn btn-outline" style="width:100%; margin-bottom:15px;" onclick="addCapsule()">Lock Away</button>
-                    
-                    <div id="capsule-list">
-                        <!-- Items -->
-                    </div>
+            <!-- TRICK 2: MOOD BATTERY -->
+            <div class="glass-panel">
+                <div style="display:flex; justify-content:space-between;">
+                    <span style="font-weight:bold;"><i class="fas fa-battery-half"></i> Social Battery</span>
+                    <small id="mood-label" style="color:var(--text-dim)">Neutral</small>
                 </div>
-
+                <div class="mood-track" id="mood-track" onclick="setMood(event)">
+                    <div class="mood-fill" id="mood-bar"></div>
+                    <div class="mood-knob" id="mood-knob"></div>
+                </div>
+                <div style="font-size:0.7rem; text-align:center; color:var(--text-dim);">Tap to update partner</div>
             </div>
 
-            <!-- RIGHT COL -->
-            <div class="dash-col">
-                
-                <!-- TOOLKIT -->
-                <div class="card">
-                    <h4 style="margin:0 0 15px 0; color:var(--text-dim);">ARGUMENT SOLVER</h4>
-                    <div class="tool-grid">
-                        <div class="tool-btn" onclick="runTool('coin')">
-                            <i class="fas fa-coins" style="color:#ffd700;"></i>
-                            <div>Flip Coin</div>
-                        </div>
-                        <div class="tool-btn" onclick="runTool('dice')">
-                            <i class="fas fa-dice" style="color:#ff304f;"></i>
-                            <div>Roll Dice</div>
-                        </div>
-                        <div class="tool-btn" onclick="runTool('wheel')">
-                            <i class="fas fa-pizza-slice" style="color:#4caf50;"></i>
-                            <div>Dinner Wheel</div>
-                        </div>
-                        <div class="tool-btn" onclick="runTool('sorry')">
-                            <i class="fas fa-heart-broken" style="color:#2196f3;"></i>
-                            <div>Send "Sorry"</div>
-                        </div>
-                    </div>
+            <!-- DAILY PULSE -->
+            <div class="glass-panel" style="border-left: 3px solid var(--gold);">
+                <div style="font-size:0.7rem; color:var(--gold); letter-spacing:1px; margin-bottom:10px;">DAILY QUESTION</div>
+                <h2 class="serif" id="pulse-q" style="margin:0 0 20px 0; font-size:1.4rem;">...</h2>
+                <div id="pulse-input-area">
+                    <input id="pulse-ans" class="input-glass" placeholder="Your answer...">
+                    <button class="btn btn-ghost" style="width:100%" onclick="submitPulse()">ANSWER TO REVEAL</button>
                 </div>
-
-                <!-- CHAT -->
-                <div class="card chat-window">
-                    <div class="chat-feed" id="chat-feed"></div>
-                    <div style="margin-top:10px; display:flex; gap:5px;">
-                        <input id="chat-in" class="input-box" style="margin:0; border-radius:20px;" placeholder="Message...">
-                        <button onclick="sendChat()" style="background:var(--primary); width:40px; height:40px; border-radius:50%; border:none;"><i class="fas fa-paper-plane"></i></button>
-                    </div>
+                <div id="pulse-reveal" style="display:none;">
+                    <div style="margin-bottom:10px;">You: <span id="ans-me" style="color:var(--gold)"></span></div>
+                    <div>Partner: <span id="ans-partner" style="filter:blur(5px); cursor:pointer;" onclick="this.style.filter='none'">-</span></div>
                 </div>
+            </div>
 
+            <!-- TRICK 3: POLAROID MEMORIES -->
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 class="serif">Memory Wall</h3>
+                    <button class="btn btn-ghost" style="font-size:0.7rem; padding:5px 10px;" onclick="addMemory()">+ ADD</button>
+                </div>
+                <div class="polaroid-grid" id="polaroid-container">
+                    <!-- JS Injected -->
+                </div>
+            </div>
+
+            <!-- SINGLE USER PROMPT -->
+            <div id="single-prompt" class="glass-panel" style="display:none; text-align:center; margin-top:20px;">
+                <h3 class="serif">Missing Piece</h3>
+                <p style="font-size:0.9rem; color:var(--text-dim);">Send this link to your partner to activate the Streak & Mood features.</p>
+                <div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:5px; font-family:monospace; margin-bottom:10px; word-break:break-all;" id="blink-link">...</div>
+                <button class="btn" onclick="copyLink()">COPY LINK</button>
+            </div>
+
+        </div>
+
+        <!-- FAB (CHAT) -->
+        <div class="fab" onclick="toggleChat()">
+            <i class="fas fa-comment"></i>
+        </div>
+
+        <!-- CHAT SHEET -->
+        <div class="chat-modal" id="chat-sheet">
+            <div class="chat-header">
+                <span class="serif" style="font-size:1.2rem;">Private Line</span>
+                <i class="fas fa-times" style="cursor:pointer;" onclick="toggleChat()"></i>
+            </div>
+            <div class="chat-body" id="chat-feed"></div>
+            <div style="padding:15px; display:flex; gap:10px;">
+                <input id="chat-in" class="input-glass" style="margin:0;" placeholder="Message...">
+                <button onclick="sendChat()" class="btn" style="padding:0; width:50px; height:50px; border-radius:50%; display:flex; justify-content:center;"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
-    </div>
 
-    <!-- VIEW: AUTH -->
-    <div id="view-auth" class="view" style="display:flex; justify-content:center; align-items:center;">
-        <div class="card" style="width:100%; max-width:400px; text-align:center;">
-            <h2 class="serif">Welcome</h2>
-            <div id="blink-msg" style="background:var(--accent); color:white; padding:10px; border-radius:5px; display:none; margin-bottom:15px;">
-                <i class="fas fa-link"></i> Connecting you to partner...
-            </div>
-            <input id="u-name" class="input-box" placeholder="Name" style="display:none;">
-            <input id="u-email" class="input-box" placeholder="Email">
-            <input id="u-pass" type="password" class="input-box" placeholder="Password">
-            <button class="btn btn-gold" style="width:100%; margin-top:10px;" onclick="handleAuth()">Enter</button>
-            <p style="font-size:0.8rem; cursor:pointer; color:var(--text-dim);" onclick="toggleAuth()" id="auth-switch">New? Create Account</p>
-        </div>
     </div>
 
     <script>
-        // --- 1. CONFIG ---
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4",
             authDomain: "onlineshop-30cd1.firebaseapp.com",
@@ -238,61 +307,51 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        let currentUser = null;
-        let coupleId = null;
-        let isSignup = false;
+        // --- STATE ---
+        let user = null, coupleId = null, isSignup = false;
 
-        // --- 2. ROUTING & MAP FX ---
+        // --- 1. AUTH ---
         function route(page) {
             document.querySelectorAll('.view').forEach(e => e.classList.remove('active-view'));
-            
-            const params = new URLSearchParams(window.location.search);
-            if(params.get('blink')) page = 'auth';
-            if(!page) page = 'home';
-            
             document.getElementById(`view-${page}`).classList.add('active-view');
-            updateNav();
-
-            if(page === 'home') startMapFX();
-            if(page === 'auth' && params.get('blink')) setupBlink();
         }
 
-        function updateNav() {
-            const el = document.getElementById('nav-actions');
-            if(currentUser) {
-                el.innerHTML = `<button class="btn btn-outline" onclick="route('dashboard')">Dashboard</button>`;
+        auth.onAuthStateChanged(u => {
+            user = u;
+            if(u) {
+                db.ref(`users/${u.uid}`).on('value', s => {
+                    const d = s.val();
+                    if(d.coupleId) {
+                        coupleId = d.coupleId;
+                        initDashboard();
+                    } else {
+                        initSingle();
+                    }
+                    route('dashboard');
+                });
             } else {
-                el.innerHTML = `<button class="btn btn-gold" onclick="route('auth')">Login</button>`;
+                checkInvite();
+                route('auth');
+            }
+        });
+
+        function checkInvite() {
+            const params = new URLSearchParams(window.location.search);
+            if(params.get('blink')) {
+                isSignup = true;
+                toggleAuth();
+                isSignup = true; // force
+                document.getElementById('blink-alert').style.display = 'block';
+                document.getElementById('txt-switch').style.display = 'none';
+                document.getElementById('u-name').style.display = 'block';
             }
         }
 
-        function startMapFX() {
-            const map = document.getElementById('map-bg');
-            // Remove old dots
-            document.querySelectorAll('.map-dot').forEach(e => e.remove());
-            // Create random pulsing dots
-            for(let i=0; i<15; i++) {
-                setTimeout(() => {
-                    const dot = document.createElement('div');
-                    dot.className = 'map-dot';
-                    dot.style.top = Math.random() * 80 + 10 + '%';
-                    dot.style.left = Math.random() * 90 + 5 + '%';
-                    map.appendChild(dot);
-                }, i * 500);
-            }
-        }
-
-        // --- 3. AUTH & SETUP ---
         function toggleAuth() {
             isSignup = !isSignup;
             document.getElementById('u-name').style.display = isSignup ? 'block' : 'none';
-            document.getElementById('auth-switch').innerText = isSignup ? "Log In" : "Create Account";
-        }
-        function setupBlink() {
-            isSignup = true;
-            toggleAuth(); isSignup = true; // reset visual
-            document.getElementById('blink-msg').style.display = 'block';
-            document.getElementById('auth-switch').style.display = 'none';
+            document.getElementById('btn-auth').innerText = isSignup ? "JOIN" : "ENTER";
+            document.getElementById('txt-switch').innerText = isSignup ? "Log In" : "Create Account";
         }
 
         async function handleAuth() {
@@ -310,53 +369,140 @@
                         const inviter = (await db.ref(`users/${blink}`).once('value')).val();
                         if(inviter && !inviter.coupleId) {
                             cid = `c_${Date.now()}`;
-                            // Establish Relationship Start Date as NOW
-                            await db.ref(`couples/${cid}`).set({ 
-                                u1: blink, u2: uid, start: Date.now(),
-                                created: Date.now() 
-                            });
+                            await db.ref(`couples/${cid}`).set({ u1: blink, u2: uid, start: Date.now() });
                             await db.ref(`users/${blink}`).update({ coupleId: cid });
                         }
                     }
                     await db.ref(`users/${uid}`).set({ name, email, coupleId: cid });
-                    window.history.replaceState({},'',location.pathname);
                 } else {
                     await auth.signInWithEmailAndPassword(email, pass);
                 }
-                route('dashboard');
             } catch(e) { alert(e.message); }
         }
 
-        // --- 4. DASHBOARD CORE ---
-        auth.onAuthStateChanged(user => {
-            currentUser = user;
-            updateNav();
-            if(user) {
-                db.ref(`users/${user.uid}`).on('value', s => {
-                    const d = s.val();
-                    if(d.coupleId) {
-                        coupleId = d.coupleId;
-                        initSuperApp();
-                    } else {
-                        // Create a temporary couple ID for singles to view dashboard features (demo mode)
-                        // In real app, show "Invite Partner" screen
-                        alert("Please invite a partner to unlock full features! (Link in URL)");
-                        window.history.replaceState({},'',`?blink=${user.uid}`);
-                    }
-                });
-            }
-        });
+        // --- 2. CORE LOGIC ---
+        function initSingle() {
+            document.getElementById('single-prompt').style.display = 'block';
+            document.getElementById('blink-link').innerText = `${location.origin}${location.pathname}?blink=${user.uid}`;
+            document.getElementById('clock-container').style.display = 'none';
+        }
 
-        function initSuperApp() {
+        function copyLink() {
+            navigator.clipboard.writeText(document.getElementById('blink-link').innerText);
+            alert("Link Copied!");
+        }
+
+        function initDashboard() {
+            document.getElementById('single-prompt').style.display = 'none';
+            document.getElementById('streak-container').style.display = 'flex';
+            
             initClock();
+            initStreak();
+            initMood();
             initPulse();
-            initCapsules();
+            initMemories();
             initChat();
         }
 
-        // --- FEATURE 1: CLOCK ---
+        // TRICK 1: STREAK
+        function initStreak() {
+            // Update last active
+            db.ref(`couples/${coupleId}/streak/lastActive`).set(Date.now());
+            
+            db.ref(`couples/${coupleId}/streak`).on('value', s => {
+                const data = s.val() || { count: 0, lastActive: 0 };
+                // Simple logic: In production check 24h diff
+                document.getElementById('streak-val').innerText = data.count || 1;
+            });
+        }
+
+        // TRICK 2: MOOD
+        function initMood() {
+            db.ref(`couples/${coupleId}/mood/${user.uid}`).on('value', s => {
+                // My mood visual update (optional)
+            });
+            // Partner mood
+            db.ref(`couples/${coupleId}/mood`).on('value', s => {
+                const data = s.val();
+                if(!data) return;
+                // Find partner ID
+                const pId = Object.keys(data).find(k => k !== user.uid);
+                if(pId) {
+                    const val = data[pId];
+                    const labels = ["Low", "Okay", "Good", "Charged"];
+                    const label = val < 25 ? labels[0] : val < 50 ? labels[1] : val < 75 ? labels[2] : labels[3];
+                    document.getElementById('mood-label').innerText = `Partner: ${label}`;
+                }
+            });
+        }
+
+        function setMood(e) {
+            const rect = document.getElementById('mood-track').getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const pct = Math.max(0, Math.min(100, (x / rect.width) * 100));
+            
+            document.getElementById('mood-bar').style.width = pct + '%';
+            document.getElementById('mood-knob').style.left = pct + '%';
+            
+            db.ref(`couples/${coupleId}/mood/${user.uid}`).set(Math.floor(pct));
+        }
+
+        // TRICK 3: POLAROID
+        function initMemories() {
+            db.ref(`couples/${coupleId}/memories`).on('value', s => {
+                const c = document.getElementById('polaroid-container');
+                c.innerHTML = "";
+                const d = s.val();
+                if(d) {
+                    Object.values(d).forEach(m => {
+                        c.innerHTML += `
+                            <div class="polaroid">
+                                <img src="${m.img}">
+                                <div class="polaroid-caption">${m.cap}</div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+        }
+
+        function addMemory() {
+            const img = prompt("Image URL:");
+            if(img) {
+                const cap = prompt("Caption:");
+                db.ref(`couples/${coupleId}/memories`).push({ img, cap });
+            }
+        }
+
+        // PULSE
+        function initPulse() {
+            const qs = ["Best memory together?", "Dream vacation?", "Favorite food?", "Love language?"];
+            const idx = Math.floor(Date.now() / 86400000) % qs.length;
+            document.getElementById('pulse-q').innerText = qs[idx];
+            
+            const today = new Date().toISOString().split('T')[0];
+            db.ref(`couples/${coupleId}/pulse/${today}`).on('value', s => {
+                const d = s.val();
+                if(d && d[user.uid]) {
+                    document.getElementById('pulse-input-area').style.display = 'none';
+                    document.getElementById('pulse-reveal').style.display = 'block';
+                    document.getElementById('ans-me').innerText = d[user.uid];
+                    const pId = Object.keys(d).find(k => k !== user.uid);
+                    document.getElementById('ans-partner').innerText = pId ? d[pId] : "Pending...";
+                    if(pId) confetti();
+                }
+            });
+        }
+
+        function submitPulse() {
+            const val = document.getElementById('pulse-ans').value;
+            if(!val) return;
+            const today = new Date().toISOString().split('T')[0];
+            db.ref(`couples/${coupleId}/pulse/${today}/${user.uid}`).set(val);
+        }
+
+        // CLOCK
         function initClock() {
-            document.getElementById('clock-section').style.display = 'block';
             db.ref(`couples/${coupleId}/start`).on('value', s => {
                 const start = s.val() || Date.now();
                 setInterval(() => {
@@ -364,132 +510,22 @@
                     const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                     const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
                     const m = Math.floor((diff / 1000 / 60) % 60);
-                    const y = Math.floor(d / 365);
-                    const remD = d % 365;
-                    document.getElementById('timer-val').innerText = 
-                        `${y} : ${remD} : ${h} : ${m}`;
+                    document.getElementById('timer-display').innerText = `${d} : ${h} : ${m}`;
                 }, 1000);
             });
         }
-        function shareClock() {
-            alert("Generating Instagram Story image... (Simulated)");
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+        // CHAT
+        function toggleChat() {
+            document.getElementById('chat-sheet').classList.toggle('open');
         }
 
-        // --- FEATURE 2: DAILY PULSE ---
-        const QUESTIONS = [
-            "What is your favorite memory of us?",
-            "Where do you want to be in 5 years?",
-            "What meal represents our love?",
-            "Who is the better driver?"
-        ];
-        
-        function initPulse() {
-            // Pick question based on Day of Year
-            const qIdx = Math.floor(Date.now() / 86400000) % QUESTIONS.length;
-            document.getElementById('pulse-q').innerText = QUESTIONS[qIdx];
-            
-            // Listen for answers
-            const dateKey = new Date().toISOString().split('T')[0];
-            db.ref(`couples/${coupleId}/pulse/${dateKey}`).on('value', s => {
-                const data = s.val() || {};
-                const myAns = data[currentUser.uid];
-                const partnerAns = Object.values(data).find(v => v !== myAns); // simplistic logic
-                
-                if(myAns) {
-                    document.getElementById('pulse-answers').style.display = 'none';
-                    document.getElementById('pulse-reveal').style.display = 'block';
-                    document.getElementById('ans-me').innerText = myAns;
-                    
-                    if(Object.keys(data).length >= 2) {
-                        // Both answered
-                        document.getElementById('ans-partner').innerText = partnerAns || "Error";
-                    } else {
-                        document.getElementById('ans-partner').innerText = "Waiting for partner...";
-                        document.getElementById('ans-partner').classList.remove('blur-text');
-                    }
-                }
-            });
-        }
-
-        function submitPulse() {
-            const ans = document.getElementById('my-answer').value;
-            if(!ans) return;
-            const dateKey = new Date().toISOString().split('T')[0];
-            db.ref(`couples/${coupleId}/pulse/${dateKey}`).update({
-                [currentUser.uid]: ans
-            });
-        }
-
-        // --- FEATURE 3: TIME CAPSULE ---
-        function initCapsules() {
-            db.ref(`couples/${coupleId}/capsules`).on('value', s => {
-                const list = document.getElementById('capsule-list');
-                list.innerHTML = "";
-                const data = s.val();
-                if(!data) return;
-
-                Object.values(data).forEach(c => {
-                    const isLocked = Date.now() < c.unlock;
-                    const div = document.createElement('div');
-                    div.className = 'capsule-item';
-                    
-                    if(isLocked) {
-                        const dateStr = new Date(c.unlock).toDateString();
-                        div.innerHTML = `<i class="fas fa-lock lock-icon"></i> <div>Locked until ${dateStr}</div>`;
-                    } else {
-                        div.innerHTML = `<i class="fas fa-box-open unlocked-icon"></i> <div>"${c.msg}"</div>`;
-                    }
-                    list.appendChild(div);
-                });
-            });
-        }
-
-        function addCapsule() {
-            const msg = document.getElementById('capsule-msg').value;
-            const dateVal = document.getElementById('capsule-date').value;
-            if(!msg || !dateVal) return alert("Message and Date required");
-            
-            const unlockTS = new Date(dateVal).getTime();
-            if(unlockTS <= Date.now()) return alert("Date must be in future");
-
-            db.ref(`couples/${coupleId}/capsules`).push({
-                msg: msg, unlock: unlockTS
-            });
-            document.getElementById('capsule-msg').value = "";
-        }
-
-        // --- FEATURE 4: TOOLKIT ---
-        function runTool(type) {
-            let res = "";
-            if(type === 'coin') res = Math.random() > 0.5 ? "Heads" : "Tails";
-            if(type === 'dice') res = Math.floor(Math.random() * 6) + 1;
-            if(type === 'wheel') {
-                const foods = ["Pizza", "Sushi", "Burgers", "Tacos"];
-                res = foods[Math.floor(Math.random()*foods.length)];
-            }
-            if(type === 'sorry') res = "Sent a Virtual Hug & Apology ❤️";
-
-            // Send system message to chat
-            db.ref(`couples/${coupleId}/chat`).push({
-                text: `[TOOL] Used ${type.toUpperCase()}: Result = ${res}`,
-                sys: true,
-                timestamp: Date.now()
-            });
-        }
-
-        // --- CHAT ---
         function initChat() {
             db.ref(`couples/${coupleId}/chat`).limitToLast(50).on('child_added', s => {
                 const m = s.val();
                 const d = document.createElement('div');
-                if(m.sys) {
-                    d.className = 'sys-msg';
-                    d.innerText = m.text;
-                } else {
-                    d.className = `msg ${m.sender === currentUser.uid ? 'msg-me' : 'msg-partner'}`;
-                    d.innerText = m.text;
-                }
+                d.className = `msg ${m.uid === user.uid ? 'msg-me' : 'msg-part'}`;
+                d.innerText = m.text;
                 const f = document.getElementById('chat-feed');
                 f.appendChild(d);
                 f.scrollTop = f.scrollHeight;
@@ -497,16 +533,12 @@
         }
 
         function sendChat() {
-            const t = document.getElementById('chat-in').value;
-            if(!t) return;
-            db.ref(`couples/${coupleId}/chat`).push({
-                sender: currentUser.uid, text: t, timestamp: Date.now()
-            });
-            document.getElementById('chat-in').value = "";
+            const i = document.getElementById('chat-in');
+            if(!i.value) return;
+            db.ref(`couples/${coupleId}/chat`).push({ uid: user.uid, text: i.value });
+            i.value = "";
         }
 
-        // Init
-        route();
     </script>
 </body>
 </html>
