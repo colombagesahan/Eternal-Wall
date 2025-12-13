@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternal Wall | The Monument of Us</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs (Compat version for ease of use) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --panel: #1f2833;
+            --primary: #66fcf1;
+            --secondary: #45a29e;
+            --text: #c5c6c7;
+            --gold: #ffd700;
+            --love: #ff0055;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Lato', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 { font-family: 'Cinzel', serif; margin: 0; }
+        button { cursor: pointer; font-family: inherit; transition: 0.2s; }
+
+        /* --- NAVIGATION --- */
+        nav {
+            background: rgba(11, 12, 16, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .brand { font-size: 1.5rem; color: var(--primary); letter-spacing: 2px; text-decoration: none; font-weight: bold;}
+        .nav-links button {
+            background: transparent; border: 1px solid var(--primary); color: var(--primary);
+            padding: 8px 16px; margin-left: 10px; border-radius: 4px;
+        }
+        .nav-links button:hover { background: var(--primary); color: #000; }
+
+        /* --- VIEWS --- */
+        .view { display: none; padding: 20px; min-height: 80vh; }
+        .active-view { display: block; }
+
+        /* --- VIEW 1: PUBLIC WALL --- */
+        #search-bar {
+            width: 100%; max-width: 500px; padding: 12px;
+            background: #000; border: 1px solid #333; color: white;
+            border-radius: 30px; margin: 20px auto; display: block; text-align: center;
+        }
+
+        .wall-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 5px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tile {
+            aspect-ratio: 1;
+            background: #151515;
+            border: 1px solid #333;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .tile:hover { transform: scale(1.1); z-index: 10; border-color: var(--primary); }
+        .tile.occupied { background: linear-gradient(135deg, #222, #333); border-color: #555; }
+        .tile-content { 
+            position: absolute; top:0; left:0; width:100%; height:100%; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; font-size: 0.8rem; padding: 5px; box-sizing: border-box;
+        }
+        .tile-names { color: var(--primary); font-weight: bold; font-family: 'Cinzel'; }
+
+        /* --- VIEW 2: AUTH --- */
+        .auth-container {
+            max-width: 400px; margin: 50px auto;
+            background: var(--panel); padding: 30px; border-radius: 10px;
+            text-align: center; box-shadow: 0 0 20px rgba(102, 252, 241, 0.1);
+        }
+        .auth-input {
+            width: 100%; padding: 12px; margin: 10px 0;
+            background: #000; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;
+        }
+        .primary-btn {
+            width: 100%; padding: 12px; background: var(--primary); color: #000;
+            border: none; font-weight: bold; border-radius: 5px; margin-top: 10px;
+        }
+
+        /* --- VIEW 3: COUPLE DASHBOARD --- */
+        .dashboard-layout {
+            display: flex; gap: 20px; max-width: 1200px; margin: 0 auto; height: 80vh;
+        }
+        .dash-panel { flex: 1; background: var(--panel); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* Chat */
+        .chat-area { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 8px 12px; border-radius: 15px; max-width: 80%; font-size: 0.9rem; }
+        .msg-me { background: var(--secondary); align-self: flex-end; color: black; }
+        .msg-partner { background: #333; align-self: flex-start; }
+        
+        /* Proposal Area */
+        .proposal-item {
+            background: #111; padding: 15px; margin: 10px; border-radius: 8px; border-left: 3px solid var(--gold);
+        }
+        .proposal-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-approve { flex:1; background: var(--primary); border:none; padding: 5px; border-radius:3px; }
+        .btn-reject { flex:1; background: var(--love); color:white; border:none; padding: 5px; border-radius:3px; }
+
+        /* Blink Link Box */
+        .blink-box {
+            background: linear-gradient(45deg, var(--love), #ff8800);
+            padding: 15px; margin-bottom: 20px; border-radius: 8px; text-align: center; color: white;
+        }
+        .code-display { font-family: monospace; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 4px; user-select: all; cursor: pointer;}
+
+        /* MODAL */
+        #modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: var(--panel); padding: 30px; border-radius: 10px; max-width: 500px; width: 90%; text-align: center; position: relative; border: 1px solid var(--primary);
+        }
+        .modal-close { position: absolute; top: 10px; right: 15px; color: #fff; cursor: pointer; font-size: 24px; }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .dashboard-layout { flex-direction: column; height: auto; }
+            .dash-panel { height: 50vh; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="#" class="brand" onclick="showView('public-view')">ETERNAL WALL</a>
+        <div class="nav-links" id="nav-actions">
+            <!-- JS will populate Login / Dashboard buttons -->
+        </div>
+    </nav>
+
+    <!-- VIEW: PUBLIC WALL -->
+    <div id="public-view" class="view active-view">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1>The Monument of Us</h1>
+            <p style="color: #888;">Secure your love in the digital universe.</p>
+        </div>
+        
+        <input type="text" id="search-bar" placeholder="🔍 Search by Unique Code (e.g. #EW-102)" onkeyup="filterWall()">
+        
+        <div class="wall-grid" id="public-grid">
+            <!-- Tiles generated by JS -->
+        </div>
+    </div>
+
+    <!-- VIEW: AUTH -->
+    <div id="auth-view" class="view">
+        <div class="auth-container">
+            <h2 id="auth-title">Login</h2>
+            <div id="blink-invite-msg" style="display:none; color: var(--gold); margin-bottom:10px; font-size:0.9rem;">
+                ❤️ You are accepting a Blink Invite!
+            </div>
+            
+            <input type="email" id="email" class="auth-input" placeholder="Email">
+            <input type="password" id="password" class="auth-input" placeholder="Password">
+            
+            <!-- Extra field for Name on Signup -->
+            <input type="text" id="username" class="auth-input" placeholder="Your Name" style="display:none;">
+
+            <button class="primary-btn" onclick="handleAuth()" id="auth-btn">LOGIN</button>
+            <p style="font-size: 0.8rem; margin-top: 15px; cursor: pointer; color: var(--primary);" onclick="toggleAuthMode()" id="toggle-auth-text">
+                Don't have an account? Create one.
+            </p>
+        </div>
+    </div>
+
+    <!-- VIEW: DASHBOARD (PRIVATE) -->
+    <div id="dashboard-view" class="view">
+        <div id="blink-generation-area" class="blink-box" style="display: none;">
+            <h3>🔗 Connect Your Partner</h3>
+            <p>You are currently single on Eternal Wall. Send this Blink Link to your partner to connect.</p>
+            <div class="code-display" onclick="copyBlink()" id="my-blink-link">Loading...</div>
+        </div>
+
+        <div class="dashboard-layout" id="couple-interface" style="display: none;">
+            <!-- Chat Panel -->
+            <div class="dash-panel">
+                <div style="padding: 15px; border-bottom: 1px solid #333; font-weight: bold; background: rgba(0,0,0,0.2);">
+                    💬 Private Chat
+                </div>
+                <div class="chat-area" id="chat-messages">
+                    <!-- Chat messages -->
+                </div>
+                <div style="padding: 10px; display: flex; gap: 5px; border-top: 1px solid #333;">
+                    <input type="text" id="chat-input" class="auth-input" style="margin:0;" placeholder="Say something...">
+                    <button class="primary-btn" style="width: auto; margin:0;" onclick="sendChat()">➤</button>
+                </div>
+            </div>
+
+            <!-- Wall Proposal Panel -->
+            <div class="dash-panel">
+                <div style="padding: 15px; border-bottom: 1px solid #333; font-weight: bold; background: rgba(0,0,0,0.2);">
+                    📝 Wall Proposals (Dual Consent)
+                </div>
+                
+                <!-- New Proposal Form -->
+                <div style="padding: 15px; background: #111;">
+                    <textarea id="prop-text" class="auth-input" rows="2" placeholder="Write a memory for the public wall..."></textarea>
+                    <button class="primary-btn" onclick="submitProposal()">PROPOSE TO WALL</button>
+                </div>
+
+                <!-- List of Pending/Approved -->
+                <div style="flex: 1; overflow-y: auto; padding: 10px;" id="proposal-list">
+                    <!-- Proposals loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TILE MODAL -->
+    <div id="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2 id="m-names" style="color: var(--primary); margin-bottom: 10px;">Names</h2>
+            <div style="font-size: 0.8rem; color: #888; margin-bottom: 20px;" id="m-code">#CODE</div>
+            <p id="m-story" style="font-style: italic; font-size: 1.1rem; line-height: 1.6;">Story</p>
+            <div style="margin-top: 20px; font-size: 0.8rem; color: #555;">ESTABLISHED <span id="m-date">DATE</span></div>
+        </div>
+    </div>
+
+    <!-- FIREBASE LOGIC -->
+    <script>
+        // --- 1. CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4",
+            authDomain: "onlineshop-30cd1.firebaseapp.com",
+            databaseURL: "https://onlineshop-30cd1-default-rtdb.firebaseio.com",
+            projectId: "onlineshop-30cd1",
+            storageBucket: "onlineshop-30cd1.firebasestorage.app",
+            messagingSenderId: "818252574868",
+            appId: "1:818252574868:web:8dd36825db589a886cc481",
+            measurementId: "G-6YLGGH2NDD"
+        };
+
+        // Initialize
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // --- 2. STATE & UTILS ---
+        let currentUser = null;
+        let userProfile = null;
+        let currentCoupleId = null;
+        let isLoginMode = true;
+
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active-view'));
+            document.getElementById(id).classList.add('active-view');
+        }
+
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // --- 3. AUTHENTICATION ---
+        
+        // Listen to Auth State
+        auth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            updateNav();
+            
+            if (user) {
+                // Fetch User Profile
+                const snapshot = await db.ref('users/' + user.uid).once('value');
+                userProfile = snapshot.val();
+                
+                if (userProfile && userProfile.coupleId) {
+                    currentCoupleId = userProfile.coupleId;
+                    initDashboardCouple();
+                } else {
+                    initDashboardSingle();
+                }
+            }
+        });
+
+        function updateNav() {
+            const nav = document.getElementById('nav-actions');
+            if (currentUser) {
+                nav.innerHTML = `
+                    <button onclick="showView('dashboard-view')">MY WALL</button>
+                    <button onclick="auth.signOut(); window.location.reload();">LOGOUT</button>
+                `;
+            } else {
+                nav.innerHTML = `<button onclick="showView('auth-view')">LOGIN</button>`;
+            }
+        }
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').innerText = isLoginMode ? 'Login' : 'Create Account';
+            document.getElementById('auth-btn').innerText = isLoginMode ? 'LOGIN' : 'SIGN UP';
+            document.getElementById('toggle-auth-text').innerText = isLoginMode ? "Don't have an account? Create one." : "Already have an account? Login.";
+            document.getElementById('username').style.display = isLoginMode ? 'none' : 'block';
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const name = document.getElementById('username').value;
+            const inviteCode = getUrlParam('blink');
+
+            try {
+                if (isLoginMode) {
+                    await auth.signInWithEmailAndPassword(email, pass);
+                } else {
+                    if(!name) return alert("Name is required");
+                    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                    const uid = cred.user.uid;
+
+                    // Create User Record
+                    let coupleId = null;
+                    
+                    // IF ACCEPTING INVITE
+                    if (inviteCode) {
+                        // Lookup inviter
+                        const inviterSnap = await db.ref('users/' + inviteCode).once('value');
+                        if (inviterSnap.exists()) {
+                            const inviter = inviterSnap.val();
+                            if (!inviter.coupleId) {
+                                // Create new Couple
+                                coupleId = `couple_${Date.now()}`;
+                                await db.ref('couples/' + coupleId).set({
+                                    user1: inviteCode,
+                                    user2: uid,
+                                    created: Date.now()
+                                });
+                                // Update inviter
+                                await db.ref('users/' + inviteCode).update({ coupleId: coupleId });
+                            }
+                        }
+                    }
+
+                    // Save User
+                    await db.ref('users/' + uid).set({
+                        name: name,
+                        email: email,
+                        coupleId: coupleId // will be null if no invite
+                    });
+                    
+                    // Clear URL params
+                    window.history.replaceState({}, document.title, "/");
+                }
+                showView('dashboard-view');
+            } catch (e) {
+                alert(e.message);
+            }
+        }
+
+        // Handle Blink Invite UI on load
+        if (getUrlParam('blink')) {
+            showView('auth-view');
+            isLoginMode = false;
+            toggleAuthMode(); // Switch to signup
+            document.getElementById('blink-invite-msg').style.display = 'block';
+        }
+
+
+        // --- 4. DASHBOARD LOGIC ---
+
+        function initDashboardSingle() {
+            document.getElementById('blink-generation-area').style.display = 'block';
+            document.getElementById('couple-interface').style.display = 'none';
+            
+            // Blink Link is just the User ID
+            const link = window.location.origin + window.location.pathname + "?blink=" + currentUser.uid;
+            document.getElementById('my-blink-link').innerText = link;
+        }
+
+        function copyBlink() {
+            const text = document.getElementById('my-blink-link').innerText;
+            navigator.clipboard.writeText(text);
+            alert("Blink Link Copied! Send this to your partner.");
+        }
+
+        function initDashboardCouple() {
+            document.getElementById('blink-generation-area').style.display = 'none';
+            document.getElementById('couple-interface').style.display = 'flex';
+
+            // Listen to Chat
+            db.ref('couples/' + currentCoupleId + '/chat').limitToLast(20).on('child_added', snapshot => {
+                const msg = snapshot.val();
+                renderMessage(msg);
+            });
+
+            // Listen to Proposals
+            db.ref('couples/' + currentCoupleId + '/proposals').on('value', snapshot => {
+                renderProposals(snapshot.val());
+            });
+        }
+
+        // CHAT
+        function sendChat() {
+            const txt = document.getElementById('chat-input').value;
+            if(!txt) return;
+            db.ref('couples/' + currentCoupleId + '/chat').push({
+                sender: currentUser.uid,
+                text: txt,
+                timestamp: Date.now()
+            });
+            document.getElementById('chat-input').value = "";
+        }
+
+        function renderMessage(msg) {
+            const div = document.createElement('div');
+            div.className = `msg ${msg.sender === currentUser.uid ? 'msg-me' : 'msg-partner'}`;
+            div.innerText = msg.text;
+            const container = document.getElementById('chat-messages');
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // PROPOSALS (DUAL CONSENT)
+        function submitProposal() {
+            const txt = document.getElementById('prop-text').value;
+            if(!txt) return;
+            
+            db.ref('couples/' + currentCoupleId + '/proposals').push({
+                author: currentUser.uid,
+                content: txt,
+                status: 'pending', // pending, approved
+                timestamp: Date.now()
+            });
+            document.getElementById('prop-text').value = "";
+        }
+
+        function renderProposals(props) {
+            const list = document.getElementById('proposal-list');
+            list.innerHTML = "";
+            if(!props) return;
+
+            Object.keys(props).forEach(key => {
+                const p = props[key];
+                const el = document.createElement('div');
+                el.className = 'proposal-item';
+                
+                let html = `<div style="font-size:0.9rem; margin-bottom:5px;">"${p.content}"</div>`;
+                
+                if (p.status === 'approved') {
+                    html += `<div style="color:var(--primary); font-size:0.8rem;">✅ SEALED & PUBLIC</div>`;
+                } else if (p.status === 'pending') {
+                    // If I am NOT the author, I see approve buttons
+                    if (p.author !== currentUser.uid) {
+                        html += `
+                            <div style="font-size:0.8rem; color:#888;">Partner wants to post this.</div>
+                            <div class="proposal-actions">
+                                <button class="btn-approve" onclick="sealProposal('${key}', '${p.content}')">SEAL IT ❤️</button>
+                                <button class="btn-reject" onclick="deleteProposal('${key}')">VETO</button>
+                            </div>
+                        `;
+                    } else {
+                        html += `<div style="font-size:0.8rem; color:#888;">⏳ Waiting for partner approval...</div>`;
+                    }
+                }
+                
+                el.innerHTML = html;
+                list.prepend(el);
+            });
+        }
+
+        function deleteProposal(key) {
+            db.ref('couples/' + currentCoupleId + '/proposals/' + key).remove();
+        }
+
+        async function sealProposal(key, content) {
+            // 1. Update status to approved
+            await db.ref('couples/' + currentCoupleId + '/proposals/' + key).update({ status: 'approved' });
+            
+            // 2. Push to PUBLIC WALL
+            // Need couple names
+            const coupleSnap = await db.ref('couples/' + currentCoupleId).once('value');
+            const cData = coupleSnap.val();
+            
+            const u1Snap = await db.ref('users/' + cData.user1).once('value');
+            const u2Snap = await db.ref('users/' + cData.user2).once('value');
+            const names = `${u1Snap.val().name} & ${u2Snap.val().name}`;
+
+            // Unique Code (Simple hash of key)
+            const uniqueCode = "#EW-" + Math.floor(1000 + Math.random() * 9000);
+
+            await db.ref('publicWall').push({
+                names: names,
+                story: content,
+                code: uniqueCode,
+                timestamp: Date.now()
+            });
+
+            alert("CONGRATULATIONS! Your memory is now eternal.");
+        }
+
+
+        // --- 5. PUBLIC WALL LOGIC ---
+        
+        // Listen to public wall
+        db.ref('publicWall').on('value', snapshot => {
+            const wallDiv = document.getElementById('public-grid');
+            wallDiv.innerHTML = "";
+            const data = snapshot.val();
+            if(!data) {
+                wallDiv.innerHTML = "<div style='padding:20px'>The Wall is empty. Be the first.</div>";
+                return;
+            }
+
+            // Convert object to array and reverse (newest first)
+            const tiles = Object.values(data).reverse();
+
+            tiles.forEach(t => {
+                const el = document.createElement('div');
+                el.className = 'tile occupied';
+                el.innerHTML = `
+                    <div class="tile-content">
+                        <div class="tile-names">${t.names}</div>
+                        <div style="margin-top:5px; color:#555; font-size:0.7rem;">${t.code}</div>
+                    </div>
+                `;
+                el.onclick = () => openModal(t);
+                wallDiv.appendChild(el);
+            });
+        });
+
+        function filterWall() {
+            const term = document.getElementById('search-bar').value.toUpperCase();
+            const tiles = document.querySelectorAll('.tile');
+            tiles.forEach(t => {
+                const txt = t.innerText.toUpperCase();
+                t.style.display = txt.includes(term) ? 'block' : 'none';
+            });
+        }
+
+        // Modal
+        const modal = document.getElementById('modal');
+        function openModal(data) {
+            document.getElementById('m-names').innerText = data.names;
+            document.getElementById('m-code').innerText = data.code;
+            document.getElementById('m-story').innerText = `"${data.story}"`;
+            document.getElementById('m-date').innerText = new Date(data.timestamp).toDateString().toUpperCase();
+            modal.style.display = 'flex';
+        }
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+        window.onclick = function(event) {
+            if (event.target == modal) closeModal();
+        }
+
+    </script>
+</body>
+</html>
