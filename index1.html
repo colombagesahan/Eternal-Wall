@@ -3,378 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ETERNAL WALL | The Monument of Us</title>
+    <title>ETERNAL WALL | The Legacy</title>
     
-    <!-- FONTS & ICONS -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- FONTS -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <!-- FIREBASE SDK -->
+    <!-- FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <!-- EFFECTS -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
             --bg: #050505;
-            --surface: rgba(20, 20, 20, 0.6);
-            --surface-solid: #141414;
-            --border: rgba(255, 255, 255, 0.1);
-            --primary: #D4AF37; /* Luxury Gold */
-            --primary-glow: rgba(212, 175, 55, 0.3);
-            --accent: #E91E63; /* Love Pink */
-            --text: #E0E0E0;
-            --text-dim: #888;
-            --glass: blur(12px);
-            --success: #2ecc71;
-            --danger: #ff4757;
+            --surface: #0f0f0f;
+            --border: #222;
+            --gold: #C5A059;
+            --text-main: #f0f0f0;
+            --text-muted: #666;
+            --error: #8b2b2b;
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            font-family: 'Lato', sans-serif;
             margin: 0;
-            overflow-x: hidden;
+            padding: 0;
             min-height: 100vh;
+            letter-spacing: 0.5px;
         }
 
-        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
-        button { cursor: pointer; transition: 0.2s; font-family: inherit; }
-        a { text-decoration: none; color: inherit; }
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; font-weight: 400; }
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        a:hover { color: var(--gold); }
+        button { cursor: pointer; transition: 0.3s; font-family: inherit; }
 
-        /* --- ANIMATED MAP BACKGROUND --- */
-        .map-bg {
+        /* --- BACKGROUND FX --- */
+        #starfield {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(circle at center, #111 0%, #000 80%);
-            overflow: hidden;
+            background: var(--bg);
+            opacity: 0.5;
         }
-        .map-dot {
-            position: absolute; width: 6px; height: 6px; background: var(--primary);
-            border-radius: 50%; opacity: 0; animation: pulseMap 4s infinite;
+        .star {
+            position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%;
+            opacity: 0; animation: twinkle 4s infinite ease-in-out;
         }
-        @keyframes pulseMap { 0% { opacity: 0; transform: scale(0.5); } 50% { opacity: 0.8; transform: scale(1.5); box-shadow: 0 0 15px var(--primary); } 100% { opacity: 0; transform: scale(0.5); } }
+        @keyframes twinkle { 0% { opacity: 0; } 50% { opacity: 0.7; } 100% { opacity: 0; } }
 
-        /* --- UI COMPONENTS --- */
-        .glass-panel {
-            background: var(--surface); backdrop-filter: var(--glass);
-            -webkit-backdrop-filter: var(--glass); border: 1px solid var(--border);
-            border-radius: 16px; padding: 20px;
-        }
-
-        .btn {
-            padding: 10px 20px; border-radius: 50px; font-weight: 600; border: none;
-            display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; justify-content: center;
-        }
-        .btn-gold { background: var(--primary); color: #000; box-shadow: 0 4px 15px var(--primary-glow); }
-        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--primary-glow); }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-        .btn-success { background: var(--success); color: #000; }
-        .btn-danger { background: rgba(255, 71, 87, 0.1); color: var(--danger); border: 1px solid var(--danger); }
-
-        .input-box {
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-            color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-family: inherit;
-        }
-        .input-box:focus { border-color: var(--primary); }
-
-        /* --- NAVIGATION --- */
-        .navbar {
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border); padding: 15px 5%;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .brand { font-size: 1.4rem; color: var(--primary); letter-spacing: 1px; font-weight: bold; }
+        /* --- UI KIT --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         
-        .streak-badge {
-            display: flex; align-items: center; gap: 5px; background: rgba(233, 30, 99, 0.1); 
-            border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; 
-            border-radius: 20px; font-size: 0.8rem; font-weight: bold;
+        .btn {
+            padding: 12px 30px; border: 1px solid var(--border); background: transparent;
+            color: var(--text-main); font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
+            transition: all 0.4s ease;
         }
+        .btn:hover { border-color: var(--gold); color: var(--gold); }
+        .btn-solid { background: var(--gold); color: black; border-color: var(--gold); font-weight: bold; }
+        .btn-solid:hover { background: #b08d4b; color: black; }
+
+        .input-minimal {
+            width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border);
+            color: white; padding: 15px 0; font-family: 'Playfair Display'; font-size: 1.1rem;
+            margin-bottom: 20px; transition: 0.3s;
+        }
+        .input-minimal:focus { border-bottom-color: var(--gold); }
+        .input-minimal::placeholder { color: #333; font-family: 'Lato'; font-size: 0.9rem; }
+
+        /* --- NAV --- */
+        nav {
+            padding: 30px 40px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; background: rgba(5,5,5,0.9); z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+        .brand { font-family: 'Playfair Display'; font-size: 1.5rem; letter-spacing: 3px; }
+        .nav-link { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        .nav-link:hover { color: white; }
 
         /* --- VIEWS --- */
-        .view { display: none; padding-top: 20px; padding-bottom: 80px; min-height: 90vh; animation: fadeIn 0.5s; }
-        .active-view { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .view { display: none; padding-top: 40px; padding-bottom: 100px; opacity: 0; transition: opacity 0.8s; }
+        .active-view { display: block; opacity: 1; }
 
-        /* --- VIEW: HOME (WALL) --- */
-        .hero { text-align: center; padding: 40px 20px; margin-bottom: 20px; }
-        .hero h1 { font-size: 3rem; margin-bottom: 10px; background: linear-gradient(to right, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
-        
-        .search-container { max-width: 400px; margin: 0 auto 40px; }
+        /* --- HOME --- */
+        .hero { text-align: center; margin: 60px 0 80px; }
+        .hero h1 { font-size: 4rem; margin: 0; line-height: 1.1; }
+        .hero p { color: var(--text-muted); margin-top: 15px; font-weight: 300; letter-spacing: 1px; }
 
         .wall-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 2px; max-width: 1400px; margin: 0 auto; padding: 0 10px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1px; border: 1px solid var(--border); background: var(--border);
         }
         .tile {
-            aspect-ratio: 1; position: relative; cursor: pointer; overflow: hidden; background: #111;
+            aspect-ratio: 1; background: #0a0a0a; position: relative; overflow: hidden; cursor: pointer;
         }
-        .tile img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; opacity: 0.8; }
-        .tile:hover img { transform: scale(1.1); opacity: 0.4; }
-        .tile-overlay {
-            position: absolute; inset: 0; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; opacity: 0; transition: 0.3s;
-            background: rgba(0,0,0,0.4); text-align: center; padding: 5px;
+        .tile img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: 0.6s; opacity: 0.6; }
+        .tile:hover img { filter: grayscale(0%); opacity: 1; transform: scale(1.05); }
+        .tile-info {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px;
+            background: linear-gradient(to top, black, transparent); opacity: 0; transition: 0.4s;
         }
-        .tile:hover .tile-overlay { opacity: 1; }
+        .tile:hover .tile-info { opacity: 1; }
 
-        /* --- VIEW: PROFILE --- */
-        .prof-header { text-align: center; padding: 40px 20px; }
-        .prof-cover { 
-            width: 140px; height: 140px; border-radius: 50%; object-fit: cover; 
-            border: 3px solid var(--primary); margin-bottom: 20px; box-shadow: 0 0 30px var(--primary-glow);
+        /* --- DASHBOARD --- */
+        .dash-header { 
+            text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 40px; margin-bottom: 40px; 
         }
-        .prof-grid { 
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; 
-            max-width: 800px; margin: 0 auto; padding: 10px; 
-        }
-        .prof-item { aspect-ratio: 1; cursor: pointer; position: relative; }
-        .prof-item img { width: 100%; height: 100%; object-fit: cover; }
+        .clock-display { font-family: 'Playfair Display'; font-size: 3rem; color: var(--gold); margin: 10px 0; }
+        .meta-row { display: flex; justify-content: center; gap: 30px; color: var(--text-muted); font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* --- VIEW: DASHBOARD --- */
-        .dash-layout { 
-            display: grid; grid-template-columns: 350px 1fr; gap: 20px; 
-            max-width: 1200px; margin: 0 auto; padding: 0 20px; 
-        }
+        .dash-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; }
 
-        /* Clock Section */
-        .clock-banner { 
-            text-align: center; background: linear-gradient(90deg, #111, #1a1a1a); 
-            padding: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border);
-        }
-        .clock-digits { font-family: monospace; font-size: 1.5rem; color: var(--primary); letter-spacing: 2px; }
+        .panel { margin-bottom: 40px; }
+        .panel-title { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
 
-        /* Mood Battery */
-        .mood-track { height: 8px; background: #333; border-radius: 10px; margin: 15px 0; position: relative; cursor: pointer;}
-        .mood-fill { height: 100%; background: linear-gradient(90deg, #ff4757, #2ecc71); width: 50%; border-radius: 10px; transition: width 0.3s; }
-        .mood-thumb { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 16px; height: 16px; background: white; border-radius: 50%; box-shadow: 0 0 10px white; }
+        /* WIDGETS */
+        .mood-slider { width: 100%; height: 1px; background: #333; position: relative; cursor: pointer; margin: 30px 0; }
+        .mood-knob { width: 10px; height: 10px; background: var(--gold); border-radius: 50%; position: absolute; top: -5px; transition: left 0.3s; }
+        
+        .pulse-box { border: 1px solid var(--border); padding: 30px; text-align: center; }
+        .pulse-q { font-size: 1.5rem; margin-bottom: 20px; font-family: 'Playfair Display'; }
+        .blur-txt { color: transparent; text-shadow: 0 0 12px rgba(255,255,255,0.5); cursor: pointer; transition: 0.5s; }
+        .blur-txt:hover { text-shadow: 0 0 0 white; color: white; }
 
-        /* Daily Pulse */
-        .pulse-card { border-left: 3px solid var(--accent); }
-        .blur-ans { filter: blur(8px); cursor: pointer; transition: 0.3s; }
-        .blur-ans:hover { filter: blur(4px); }
-        .reveal { filter: none !important; }
+        .prop-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border); }
+        .prop-status { font-size: 0.7rem; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; }
 
-        /* Proposals */
-        .prop-item { 
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; 
-            margin-bottom: 10px; border-left: 2px solid var(--text-dim); 
+        /* CHAT DRAWER */
+        .chat-drawer {
+            position: fixed; bottom: 0; right: 40px; width: 320px; background: #0a0a0a;
+            border: 1px solid var(--border); border-bottom: none; transform: translateY(100%); transition: 0.4s; z-index: 200;
         }
-        .prop-pending { border-color: var(--primary); }
+        .chat-drawer.open { transform: translateY(0); }
+        .chat-bar { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; }
+        .chat-content { height: 400px; display: flex; flex-direction: column; }
+        .msgs { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .msg { font-size: 0.9rem; color: #aaa; max-width: 80%; line-height: 1.5; }
+        .msg-me { align-self: flex-end; text-align: right; color: white; }
+        .chat-input { padding: 15px; border-top: 1px solid var(--border); background: #000; border: none; color: white; width: 100%; font-family: 'Lato'; }
 
-        /* Chat Floating */
-        .chat-fab {
-            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
-            background: var(--primary); border-radius: 50%; display: flex; 
-            justify-content: center; align-items: center; color: black; font-size: 1.5rem;
-            cursor: pointer; box-shadow: 0 5px 20px var(--primary-glow); z-index: 90;
-        }
-        .chat-modal {
-            position: fixed; bottom: 90px; right: 20px; width: 350px; height: 500px;
-            background: #111; border: 1px solid var(--border); border-radius: 16px;
-            display: none; flex-direction: column; z-index: 90; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }
-        .chat-feed { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 8px 12px; border-radius: 12px; max-width: 80%; font-size: 0.9rem; }
-        .msg-me { background: var(--primary); color: black; align-self: flex-end; }
-        .msg-partner { background: #333; align-self: flex-start; }
-        .sys-msg { align-self: center; font-size: 0.75rem; color: #888; margin: 5px 0; font-style: italic; }
+        /* PROFILE */
+        .prof-hero { text-align: center; padding-bottom: 60px; border-bottom: 1px solid var(--border); }
+        .prof-img { width: 120px; height: 120px; object-fit: cover; margin-bottom: 20px; filter: grayscale(100%); }
+        .prof-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; margin-top: 60px; }
+        .memory-block img { width: 100%; margin-bottom: 15px; filter: grayscale(20%); }
+        .memory-date { font-size: 0.7rem; color: var(--gold); letter-spacing: 2px; }
+        .memory-cap { font-family: 'Playfair Display'; font-size: 1.2rem; margin-top: 5px; }
 
-        /* --- AUTH --- */
-        .auth-container { max-width: 400px; margin: 5vh auto; text-align: center; }
-        .blink-alert { 
-            background: linear-gradient(45deg, var(--accent), #ff9f43); color: white; 
-            padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold;
-        }
+        /* AUTH */
+        .auth-box { max-width: 400px; margin: 10vh auto; text-align: center; }
 
-        /* Mobile */
-        @media (max-width: 900px) {
-            .dash-layout { grid-template-columns: 1fr; }
-            .chat-modal { width: 90%; right: 5%; bottom: 90px; }
-        }
+        @media(max-width: 768px) { .dash-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 2.5rem; } }
+
     </style>
 </head>
 <body>
 
-    <div class="map-bg" id="map-canvas">
-        <!-- JS injects dots here -->
-    </div>
+    <div id="starfield"></div>
 
-    <!-- NAVIGATION -->
-    <nav class="navbar">
-        <a href="#" onclick="route('home')" class="brand">ETERNAL WALL</a>
-        <div style="display:flex; gap:10px; align-items:center;">
-            <div id="streak-badge" class="streak-badge" style="display:none;">
-                <i class="fas fa-fire"></i> <span id="streak-num">0</span>
-            </div>
-            <div id="nav-actions">
-                <!-- Injected by JS -->
-            </div>
-        </div>
+    <nav>
+        <div class="brand">ETERNAL</div>
+        <div id="nav-actions"></div>
     </nav>
 
-    <!-- 1. HOME VIEW (PUBLIC WALL) -->
+    <!-- 1. HOME VIEW -->
     <div id="view-home" class="view active-view">
-        <div class="hero">
-            <h1 class="serif">The Monument of Us</h1>
-            <div class="search-container">
-                <input type="text" id="search-input" class="input-box" placeholder="🔍 Find Couple by #CODE..." onkeyup="filterWall()">
+        <div class="container">
+            <div class="hero">
+                <h1>The Monument</h1>
+                <p>A permanent record of human connection.</p>
+                <input type="text" style="background:transparent; border:none; border-bottom:1px solid #333; color:white; text-align:center; margin-top:30px; padding:10px; width:200px;" placeholder="Search ID..." onkeyup="searchFilter()">
             </div>
-        </div>
-        <div class="wall-grid" id="wall-grid">
-            <!-- Public Tiles -->
+            <div class="wall-grid" id="wall-grid"></div>
         </div>
     </div>
 
-    <!-- 2. PROFILE VIEW -->
-    <div id="view-profile" class="view">
-        <div class="prof-header">
-            <img src="" id="p-img" class="prof-cover">
-            <h1 class="serif" id="p-names" style="margin:0;">Loading...</h1>
-            <div style="color:var(--primary); letter-spacing:2px; margin-top:5px;" id="p-code">#CODE</div>
-            <p style="color:var(--text-dim); margin-top:10px;" id="p-bio">United on Eternal Wall.</p>
-        </div>
-        <div class="prof-grid" id="p-grid">
-            <!-- Sealed Memories -->
-        </div>
-    </div>
-
-    <!-- 3. DASHBOARD VIEW (COUPLE OS) -->
+    <!-- 2. DASHBOARD VIEW -->
     <div id="view-dashboard" class="view">
-        
-        <!-- SINGLE STATE -->
-        <div id="dash-single" class="glass-panel" style="max-width:500px; margin: 40px auto; text-align:center; display:none;">
-            <h2 class="serif" style="color:var(--primary)">Missing Piece</h2>
-            <p style="color:var(--text-dim)">Eternal Wall is designed for two. Invite your partner to unlock the Dashboard.</p>
-            <div style="background:rgba(0,0,0,0.5); padding:10px; margin:15px 0; font-family:monospace; word-break:break-all; cursor:pointer;" onclick="copyBlink()" id="my-blink">Loading...</div>
-            <button class="btn btn-gold" onclick="copyBlink()">COPY INVITE LINK</button>
+        <div class="container">
+            
+            <!-- SINGLE USER -->
+            <div id="dash-single" style="text-align:center; padding: 60px 0; display:none;">
+                <h2 class="serif" style="font-size:2rem; margin-bottom:20px;">The Union</h2>
+                <p style="color:var(--text-muted); margin-bottom:40px;">Eternal Wall is built for two. Invite your partner to begin.</p>
+                <div style="border:1px solid var(--border); padding:15px; display:inline-block; font-family:monospace; margin-bottom:20px; color:var(--gold);" id="blink-code">...</div>
+                <br>
+                <button class="btn" onclick="copyBlink()">COPY INVITATION</button>
+            </div>
+
+            <!-- COUPLE USER -->
+            <div id="dash-couple" style="display:none;">
+                <div class="dash-header">
+                    <div class="meta-row">
+                        <span>EST. 2025</span>
+                        <span><span id="streak-val">0</span> DAYS RECORDED</span>
+                    </div>
+                    <div class="clock-display" id="clock">00 : 00 : 00</div>
+                    <div style="font-size:0.7rem; letter-spacing:4px; color:var(--text-muted);">YEARS DAYS HOURS</div>
+                </div>
+
+                <div class="dash-grid">
+                    <!-- LEFT -->
+                    <div>
+                        <div class="panel">
+                            <div class="panel-title">Resonance</div>
+                            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">
+                                <span>SOLITUDE</span>
+                                <span>CONNECTION</span>
+                            </div>
+                            <div class="mood-slider" id="mood-track" onclick="setMood(event)">
+                                <div class="mood-knob" id="mood-knob"></div>
+                            </div>
+                            <div style="text-align:right; font-size:0.8rem; color:var(--gold);" id="mood-label">Partner: ...</div>
+                        </div>
+
+                        <div class="panel pulse-box">
+                            <div style="font-size:0.7rem; color:var(--gold); letter-spacing:2px; margin-bottom:20px;">QUESTION OF THE DAY</div>
+                            <div class="pulse-q" id="pulse-q">...</div>
+                            <div id="pulse-in">
+                                <input class="input-minimal" id="pulse-ans" placeholder="Type your answer...">
+                                <button class="btn" onclick="subPulse()">REVEAL</button>
+                            </div>
+                            <div id="pulse-out" style="display:none; text-align:left;">
+                                <p style="font-size:0.8rem; color:var(--text-muted);">YOU</p>
+                                <p id="ans-me" style="margin-bottom:20px;">...</p>
+                                <p style="font-size:0.8rem; color:var(--text-muted);">PARTNER</p>
+                                <p id="ans-part" class="blur-txt">Waiting for answer...</p>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="panel-title">Time Capsule</div>
+                            <input class="input-minimal" id="cap-msg" placeholder="Message for the future">
+                            <input type="date" id="cap-date" style="background:#111; border:1px solid #333; color:white; padding:5px;">
+                            <button class="btn" onclick="addCap()" style="margin-top:10px;">LOCK</button>
+                            <div id="cap-list" style="margin-top:20px; font-size:0.8rem; color:var(--text-muted);"></div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT -->
+                    <div>
+                        <div class="panel">
+                            <div class="panel-title">Wall Proposals</div>
+                            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:20px;">
+                                Drafts require mutual consent before engraving.
+                            </p>
+                            <input class="input-minimal" id="prop-img" placeholder="Image URL">
+                            <input class="input-minimal" id="prop-txt" placeholder="Caption">
+                            <button class="btn btn-solid" style="width:100%" onclick="addProp()">PROPOSE ENGRAVING</button>
+                            
+                            <div id="prop-list" style="margin-top:40px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHAT -->
+                <div class="chat-drawer" id="chat-win">
+                    <div class="chat-bar" onclick="toggleChat()">
+                        <span style="font-size:0.8rem; letter-spacing:1px;">PRIVATE LINE</span>
+                        <i class="fas fa-chevron-up"></i>
+                    </div>
+                    <div class="chat-content">
+                        <div class="msgs" id="chat-feed"></div>
+                        <input class="chat-input" id="chat-in" placeholder="Write..." onkeypress="if(event.key==='Enter') sendChat()">
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <!-- COUPLE STATE -->
-        <div id="dash-couple" style="display:none;">
-            
-            <div class="clock-banner">
-                <div style="font-size:0.8rem; color:var(--text-dim); margin-bottom:5px;">TOGETHER FOR</div>
-                <div class="clock-digits" id="timer-display">00 : 00 : 00 : 00</div>
-                <div style="font-size:0.7rem; color:var(--primary); margin-top:5px;">Y : D : H : M</div>
+    <!-- 3. PROFILE VIEW -->
+    <div id="view-profile" class="view">
+        <div class="container">
+            <div class="prof-hero">
+                <img src="" id="p-img" class="prof-img">
+                <h1 class="serif" id="p-names">...</h1>
+                <div style="font-size:0.8rem; letter-spacing:3px; color:var(--gold); margin-top:10px;" id="p-code">...</div>
             </div>
-
-            <div class="dash-layout">
-                <!-- LEFT COL: INTERACTION -->
-                <div style="display:flex; flex-direction:column; gap:20px;">
-                    
-                    <!-- Mood Battery -->
-                    <div class="glass-panel">
-                        <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-                            <span><i class="fas fa-battery-half"></i> Social Battery</span>
-                            <span id="mood-val" style="color:var(--text-dim)">Neutral</span>
-                        </div>
-                        <div class="mood-track" id="mood-track" onclick="setMood(event)">
-                            <div class="mood-fill" id="mood-bar"></div>
-                            <div class="mood-thumb" id="mood-thumb"></div>
-                        </div>
-                    </div>
-
-                    <!-- Daily Pulse -->
-                    <div class="glass-panel pulse-card">
-                        <div style="font-size:0.7rem; color:var(--accent); font-weight:bold; margin-bottom:10px;">DAILY PULSE</div>
-                        <h3 class="serif" id="pulse-q" style="margin-top:0;">...</h3>
-                        
-                        <div id="pulse-input-div">
-                            <input id="pulse-in" class="input-box" placeholder="Your Answer...">
-                            <button class="btn btn-outline" style="width:100%" onclick="submitPulse()">Answer</button>
-                        </div>
-                        
-                        <div id="pulse-result" style="display:none; margin-top:15px;">
-                            <div style="margin-bottom:5px;"><small>YOU:</small> <span id="ans-me" style="color:var(--primary)"></span></div>
-                            <div><small>PARTNER:</small> <span id="ans-partner" class="blur-ans" onclick="this.classList.add('reveal')">...</span></div>
-                        </div>
-                    </div>
-
-                    <!-- Time Capsule -->
-                    <div class="glass-panel">
-                        <h3 class="serif"><i class="fas fa-box-archive"></i> Time Capsule</h3>
-                        <div style="display:flex; gap:5px; margin-bottom:10px;">
-                            <input id="cap-msg" class="input-box" placeholder="Message..." style="margin:0;">
-                            <input type="date" id="cap-date" class="input-box" style="width:140px; margin:0;">
-                        </div>
-                        <button class="btn btn-outline" style="width:100%" onclick="addCapsule()">Lock Away</button>
-                        <div id="cap-list" style="margin-top:15px; font-size:0.9rem;"></div>
-                    </div>
-
-                </div>
-
-                <!-- RIGHT COL: PROPOSALS -->
-                <div class="glass-panel">
-                    <h3 class="serif"><i class="fas fa-pen-nib"></i> Wall Proposals</h3>
-                    <p style="font-size:0.8rem; color:var(--text-dim);">Both partners must agree to publish to the Eternal Wall.</p>
-                    
-                    <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:8px; margin-bottom:20px;">
-                        <input id="prop-img" class="input-box" placeholder="Image URL (Required for Tile)">
-                        <textarea id="prop-txt" class="input-box" rows="2" placeholder="Caption..."></textarea>
-                        <button class="btn btn-gold" style="width:100%" onclick="submitProposal()">Create Draft</button>
-                    </div>
-
-                    <div id="prop-list">
-                        <!-- Items injected here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- FLOATING CHAT -->
-            <div class="chat-fab" onclick="toggleChat()"><i class="fas fa-comment"></i></div>
-            
-            <div class="chat-modal" id="chat-win">
-                <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                    <span class="serif">Private Chat</span>
-                    <i class="fas fa-times" style="cursor:pointer;" onclick="toggleChat()"></i>
-                </div>
-                
-                <div class="chat-feed" id="chat-feed"></div>
-                
-                <!-- Toolkit -->
-                <div style="padding:10px; display:flex; gap:5px; overflow-x:auto;">
-                    <button class="btn-outline" style="font-size:0.7rem; padding:5px 10px;" onclick="runTool('coin')">🪙 Flip</button>
-                    <button class="btn-outline" style="font-size:0.7rem; padding:5px 10px;" onclick="runTool('wheel')">🍕 Dinner</button>
-                    <button class="btn-outline" style="font-size:0.7rem; padding:5px 10px;" onclick="runTool('sorry')">❤️ Sorry</button>
-                </div>
-
-                <div style="padding:10px; display:flex; gap:5px; border-top:1px solid var(--border);">
-                    <input id="chat-in" class="input-box" style="margin:0; border-radius:20px;" placeholder="Message...">
-                    <button onclick="sendChat()" style="background:var(--primary); width:40px; height:40px; border-radius:50%; border:none;"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-
+            <div class="prof-grid" id="p-grid"></div>
         </div>
     </div>
 
     <!-- 4. AUTH VIEW -->
     <div id="view-auth" class="view">
-        <div class="auth-container glass-panel">
-            <h1 class="serif" style="margin-bottom:10px;">Sanctuary</h1>
+        <div class="auth-box">
+            <h1 class="serif" style="margin-bottom:40px;">Entrance</h1>
             
-            <div id="blink-alert" class="blink-alert" style="display:none;">
-                <i class="fas fa-link"></i> CONNECTING TO PARTNER...
+            <div id="blink-alert" style="color:var(--gold); font-size:0.8rem; margin-bottom:20px; letter-spacing:1px; display:none;">
+                LINKING PARTNER ACCOUNT
             </div>
 
-            <input id="u-name" class="input-box" placeholder="Your Name" style="display:none;">
-            <input id="u-email" class="input-box" placeholder="Email Address">
-            <input id="u-pass" type="password" class="input-box" placeholder="Password">
+            <input id="u-name" class="input-minimal" placeholder="Name" style="display:none;">
+            <input id="u-email" class="input-minimal" placeholder="Email">
+            <input id="u-pass" type="password" class="input-minimal" placeholder="Password">
             
-            <button class="btn btn-gold" style="width:100%; margin-top:10px;" onclick="handleAuth()" id="btn-auth">ENTER</button>
-            <p style="margin-top:20px; font-size:0.9rem; cursor:pointer; color:var(--text-dim);" onclick="toggleAuth()" id="txt-switch">New? Create Account</p>
+            <button class="btn btn-solid" style="width:100%; margin-top:20px;" onclick="handleAuth()" id="btn-auth">ENTER</button>
+            <div style="margin-top:30px; font-size:0.7rem; cursor:pointer; color:var(--text-muted); letter-spacing:1px;" onclick="toggleAuth()" id="txt-switch">REQUEST ACCESS</div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT ENGINE -->
     <script>
-        // --- 1. FIREBASE CONFIG ---
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4",
             authDomain: "onlineshop-30cd1.firebaseapp.com",
@@ -389,430 +321,279 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // --- 2. GLOBAL STATE ---
-        let user = null;
-        let coupleId = null;
-        let isSignup = false;
+        let user = null, cid = null, signup = false;
 
-        // --- 3. ROUTER ---
-        function route(page) {
-            document.querySelectorAll('.view').forEach(el => el.classList.remove('active-view'));
-            
-            const params = new URLSearchParams(window.location.search);
-            if(!page && params.get('blink')) page = 'auth';
-            if(!page && params.get('page') === 'profile') {
-                page = 'profile';
-                loadProfile(params.get('id'));
-            }
-            if(!page) page = 'home';
-
-            document.getElementById(`view-${page}`).classList.add('active-view');
-            updateNav();
-
-            if(page === 'home') initMapFX();
-            if(page === 'auth' && params.get('blink')) setupBlinkUI();
-        }
-
-        function updateNav() {
-            const container = document.getElementById('nav-actions');
-            if(user) {
-                container.innerHTML = `
-                    <button class="btn btn-outline" onclick="route('dashboard')">Dashboard</button>
-                    <button class="btn btn-danger" style="padding:5px 10px;" onclick="auth.signOut()"><i class="fas fa-power-off"></i></button>
-                `;
-            } else {
-                container.innerHTML = `<button class="btn btn-gold" onclick="route('auth')">Login</button>`;
+        // FX
+        function initStars() {
+            const c = document.getElementById('starfield');
+            for(let i=0; i<50; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                s.style.top = Math.random()*100+'%';
+                s.style.left = Math.random()*100+'%';
+                s.style.animationDelay = Math.random()*4+'s';
+                c.appendChild(s);
             }
         }
+        initStars();
 
-        // --- 4. AUTH & BLINK ---
+        // ROUTER
+        function route(p) {
+            document.querySelectorAll('.view').forEach(e => e.classList.remove('active-view'));
+            const url = new URLSearchParams(location.search);
+            if(!p && url.get('blink')) p = 'auth';
+            if(!p && url.get('page') === 'profile') { p = 'profile'; loadProf(url.get('id')); }
+            if(!p) p = 'home';
+            document.getElementById(`view-${p}`).classList.add('active-view');
+            navUpdate();
+            if(p === 'auth' && url.get('blink')) blinkUI();
+        }
+
+        function navUpdate() {
+            const el = document.getElementById('nav-actions');
+            if(user) el.innerHTML = `<button class="btn" onclick="route('dashboard')">RESIDENCE</button>`;
+            else el.innerHTML = `<button class="btn" onclick="route('auth')">ENTER</button>`;
+        }
+
+        // AUTH
         function toggleAuth() {
-            isSignup = !isSignup;
-            document.getElementById('u-name').style.display = isSignup ? 'block' : 'none';
-            document.getElementById('btn-auth').innerText = isSignup ? "JOIN" : "ENTER";
-            document.getElementById('txt-switch').innerText = isSignup ? "Have an account? Log In" : "New? Create Account";
+            signup = !signup;
+            document.getElementById('u-name').style.display = signup ? 'block' : 'none';
+            document.getElementById('btn-auth').innerText = signup ? "INITIALIZE" : "ENTER";
+            document.getElementById('txt-switch').innerText = signup ? "EXISTING MEMBER" : "REQUEST ACCESS";
         }
-
-        function setupBlinkUI() {
-            isSignup = true;
-            toggleAuth(); isSignup = true; // Force UI reset then set true
+        function blinkUI() {
+            signup = true; toggleAuth(); signup = true;
             document.getElementById('blink-alert').style.display = 'block';
             document.getElementById('txt-switch').style.display = 'none';
         }
-
         async function handleAuth() {
-            const email = document.getElementById('u-email').value;
-            const pass = document.getElementById('u-pass').value;
-            const name = document.getElementById('u-name').value;
-            const blink = new URLSearchParams(window.location.search).get('blink');
-
+            const e = document.getElementById('u-email').value;
+            const p = document.getElementById('u-pass').value;
+            const n = document.getElementById('u-name').value;
+            const b = new URLSearchParams(location.search).get('blink');
             try {
-                if(isSignup) {
-                    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-                    const uid = cred.user.uid;
-                    let cid = null;
-
-                    // IF INVITE EXISTS
-                    if(blink) {
-                        const inviter = (await db.ref(`users/${blink}`).once('value')).val();
-                        if(inviter && !inviter.coupleId) {
-                            cid = `c_${Date.now()}`;
-                            // Create Couple
-                            await db.ref(`couples/${cid}`).set({
-                                u1: blink, u2: uid,
-                                start: Date.now(),
-                                created: Date.now()
-                            });
-                            // Update Inviter
-                            await db.ref(`users/${blink}`).update({ coupleId: cid });
+                if(signup) {
+                    const c = await auth.createUserWithEmailAndPassword(e, p);
+                    const uid = c.user.uid;
+                    let nc = null;
+                    if(b) {
+                        const inv = (await db.ref(`users/${b}`).once('value')).val();
+                        if(inv && !inv.coupleId) {
+                            nc = `c_${Date.now()}`;
+                            await db.ref(`couples/${nc}`).set({ u1:b, u2:uid, start:Date.now() });
+                            await db.ref(`users/${b}`).update({ coupleId: nc });
                         }
                     }
-
-                    await db.ref(`users/${uid}`).set({ name, email, coupleId: cid });
-                    // Clean URL
-                    window.history.replaceState({}, '', location.pathname);
-
+                    await db.ref(`users/${uid}`).set({ name:n, email:e, coupleId: nc });
+                    history.replaceState({},'',location.pathname);
                 } else {
-                    await auth.signInWithEmailAndPassword(email, pass);
+                    await auth.signInWithEmailAndPassword(e, p);
                 }
                 route('dashboard');
-            } catch(e) { alert(e.message); }
+            } catch(err) { alert(err.message); }
         }
 
-        // --- 5. DASHBOARD CORE ---
+        // DASHBOARD
         auth.onAuthStateChanged(u => {
             user = u;
-            updateNav();
             if(u) {
                 db.ref(`users/${u.uid}`).on('value', s => {
                     const d = s.val();
-                    if(d.coupleId) {
-                        coupleId = d.coupleId;
-                        initCoupleOS();
-                    } else {
-                        initSingle();
-                    }
+                    if(d.coupleId) { cid = d.coupleId; initCouple(); }
+                    else initSingle();
                 });
             }
+            navUpdate();
         });
 
         function initSingle() {
             document.getElementById('dash-single').style.display = 'block';
             document.getElementById('dash-couple').style.display = 'none';
-            document.getElementById('streak-badge').style.display = 'none';
-            document.getElementById('my-blink').innerText = `${location.origin}${location.pathname}?blink=${user.uid}`;
+            document.getElementById('blink-code').innerText = `${location.origin}${location.pathname}?blink=${user.uid}`;
         }
         function copyBlink() {
-            navigator.clipboard.writeText(document.getElementById('my-blink').innerText);
-            alert("Invite copied!");
+            navigator.clipboard.writeText(document.getElementById('blink-code').innerText);
+            alert("Invitation Copied");
         }
 
-        function initCoupleOS() {
+        function initCouple() {
             document.getElementById('dash-single').style.display = 'none';
             document.getElementById('dash-couple').style.display = 'block';
             
-            initClock();
-            initStreak();
-            initMood();
-            initPulse();
-            initCapsule();
-            initProposals();
-            initChat();
-        }
-
-        // --- FEATURES ---
-
-        // CLOCK
-        function initClock() {
-            db.ref(`couples/${coupleId}/start`).on('value', s => {
+            // Clock
+            db.ref(`couples/${cid}/start`).on('value', s => {
                 const start = s.val() || Date.now();
                 setInterval(() => {
                     const diff = Date.now() - start;
-                    const d = Math.floor(diff / 86400000);
-                    const h = Math.floor((diff / 3600000) % 24);
-                    const m = Math.floor((diff / 60000) % 60);
-                    document.getElementById('timer-display').innerText = `${d} : ${h} : ${m}`;
+                    const d = Math.floor(diff/86400000);
+                    document.getElementById('clock').innerText = 
+                        `${Math.floor(d/365)} : ${d%365} : ${Math.floor((diff/3600000)%24)}`;
+                    document.getElementById('streak-val').innerText = d;
                 }, 1000);
             });
-        }
 
-        // STREAK
-        function initStreak() {
-            document.getElementById('streak-badge').style.display = 'flex';
-            // Update Activity
-            db.ref(`couples/${coupleId}/streak/last`).set(Date.now());
-            // Listen
-            db.ref(`couples/${coupleId}/streak`).on('value', s => {
-                // Simulating streak for demo
-                document.getElementById('streak-num').innerText = "🔥"; 
-            });
-        }
-
-        // MOOD
-        function initMood() {
-            db.ref(`couples/${coupleId}/mood`).on('value', s => {
-                const data = s.val();
-                if(!data) return;
-                // Find Partner's mood
-                const pId = Object.keys(data).find(k => k !== user.uid);
-                if(pId) {
-                    const val = data[pId];
-                    document.getElementById('mood-bar').style.width = val + '%';
-                    document.getElementById('mood-thumb').style.left = val + '%';
-                    document.getElementById('mood-val').innerText = `Partner: ${val}%`;
+            // Mood
+            db.ref(`couples/${cid}/mood`).on('value', s => {
+                const d = s.val();
+                if(d) {
+                    const pid = Object.keys(d).find(k => k !== user.uid);
+                    if(pid) {
+                        document.getElementById('mood-label').innerText = `PARTNER RESONANCE: ${d[pid]}%`;
+                        document.getElementById('mood-knob').style.left = d[pid] + '%'; // Visualizes partner's mood
+                    }
                 }
             });
-        }
-        function setMood(e) {
-            const rect = document.getElementById('mood-track').getBoundingClientRect();
-            const pct = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
-            db.ref(`couples/${coupleId}/mood/${user.uid}`).set(Math.floor(pct));
-        }
 
-        // DAILY PULSE
-        function initPulse() {
-            const qs = ["Best memory?", "Dream trip?", "Fav food?", "Pet peeve?"];
-            const idx = Math.floor(Date.now() / 86400000) % qs.length;
-            document.getElementById('pulse-q').innerText = qs[idx];
-            
+            // Pulse
+            const qs = ["Best memory?", "Dream home?", "Favorite sound?", "Legacy goal?"];
             const today = new Date().toISOString().split('T')[0];
-            db.ref(`couples/${coupleId}/pulse/${today}`).on('value', s => {
+            document.getElementById('pulse-q').innerText = qs[Math.floor(Date.now()/86400000)%qs.length];
+            
+            db.ref(`couples/${cid}/pulse/${today}`).on('value', s => {
                 const d = s.val();
                 if(d && d[user.uid]) {
-                    document.getElementById('pulse-input-div').style.display = 'none';
-                    document.getElementById('pulse-result').style.display = 'block';
+                    document.getElementById('pulse-in').style.display = 'none';
+                    document.getElementById('pulse-out').style.display = 'block';
                     document.getElementById('ans-me').innerText = d[user.uid];
-                    
-                    const pId = Object.keys(d).find(k => k !== user.uid);
-                    const pAns = document.getElementById('ans-partner');
-                    if(pId) {
-                        pAns.innerText = d[pId];
-                        // If partner has answered, show effect
-                        if(!pAns.classList.contains('reveal')) confetti();
-                    } else {
-                        pAns.innerText = "Waiting...";
-                        pAns.classList.remove('blur-ans');
+                    const pid = Object.keys(d).find(k => k !== user.uid);
+                    const pAns = document.getElementById('ans-part');
+                    if(pid) {
+                        pAns.innerText = d[pid];
+                        pAns.onclick = () => pAns.classList.remove('blur-txt');
                     }
                 }
             });
-        }
-        function submitPulse() {
-            const v = document.getElementById('pulse-in').value;
-            if(!v) return;
-            const today = new Date().toISOString().split('T')[0];
-            db.ref(`couples/${coupleId}/pulse/${today}/${user.uid}`).set(v);
-        }
 
-        // TIME CAPSULE
-        function initCapsule() {
-            db.ref(`couples/${coupleId}/capsules`).on('value', s => {
-                const l = document.getElementById('cap-list');
+            // Proposals
+            db.ref(`couples/${cid}/props`).on('value', s => {
+                const l = document.getElementById('prop-list');
                 l.innerHTML = "";
                 const d = s.val();
-                if(!d) return;
-                Object.values(d).forEach(c => {
-                    const locked = Date.now() < c.unlock;
-                    l.innerHTML += `<div style="padding:5px; background:rgba(255,255,255,0.05); margin-bottom:5px; border-radius:4px; display:flex; align-items:center; gap:10px;">
-                        <i class="fas ${locked ? 'fa-lock' : 'fa-envelope-open'}"></i>
-                        ${locked ? `Opens ${new Date(c.unlock).toLocaleDateString()}` : c.msg}
-                    </div>`;
-                });
-            });
-        }
-        function addCapsule() {
-            const m = document.getElementById('cap-msg').value;
-            const d = document.getElementById('cap-date').value;
-            if(!m || !d) return;
-            db.ref(`couples/${coupleId}/capsules`).push({ msg:m, unlock: new Date(d).getTime() });
-            document.getElementById('cap-msg').value = "";
-        }
-
-        // PROPOSALS (AGREE POSTING)
-        function initProposals() {
-            db.ref(`couples/${coupleId}/proposals`).on('value', s => {
-                const list = document.getElementById('prop-list');
-                list.innerHTML = "";
-                const data = s.val();
-                if(!data) return;
-
-                Object.keys(data).forEach(key => {
-                    const p = data[key];
-                    const div = document.createElement('div');
-                    div.className = `prop-item ${p.status === 'pending' ? 'prop-pending' : ''}`;
-                    
-                    let btns = "";
-                    if(p.status === 'pending') {
-                        if(p.author === user.uid) {
-                            // I wrote it -> I can delete
-                            btns = `<button class="btn-danger" style="font-size:0.7rem; padding:4px 8px;" onclick="delProp('${key}')">Delete Draft</button>`;
+                if(d) {
+                    Object.keys(d).forEach(k => {
+                        const p = d[k];
+                        const div = document.createElement('div');
+                        div.className = 'prop-item';
+                        let act = "";
+                        if(p.status === 'pending') {
+                            if(p.by === user.uid) act = `<button class="btn" style="padding:5px 10px; font-size:0.6rem;" onclick="delProp('${k}')">WITHDRAW</button>`;
+                            else act = `<button class="btn btn-solid" style="padding:5px 10px; font-size:0.6rem;" onclick="sealProp('${k}')">ENGRAVE</button>`;
                         } else {
-                            // Partner wrote it -> I can Agree or Veto
-                            btns = `
-                                <div style="display:flex; gap:5px; margin-top:5px;">
-                                    <button class="btn-success" style="font-size:0.7rem; padding:4px 8px;" onclick="sealProp('${key}')">SEAL IT</button>
-                                    <button class="btn-danger" style="font-size:0.7rem; padding:4px 8px;" onclick="delProp('${key}')">VETO</button>
-                                </div>
-                            `;
+                            act = `<span class="prop-status">ENGRAVED</span>`;
                         }
-                    } else {
-                        btns = `<small style="color:var(--primary)">SEALED ON WALL</small>`;
-                    }
-
-                    div.innerHTML = `
-                        <div style="font-size:0.9rem;">"${p.caption}"</div>
-                        ${btns}
-                    `;
-                    list.prepend(div);
-                });
+                        div.innerHTML = `<div>${p.txt}</div>${act}`;
+                        l.prepend(div);
+                    });
+                }
             });
-        }
-        function submitProposal() {
-            const img = document.getElementById('prop-img').value;
-            const txt = document.getElementById('prop-txt').value;
-            if(!img || !txt) return alert("Image URL and Caption required");
-            db.ref(`couples/${coupleId}/proposals`).push({
-                author: user.uid, image: img, caption: txt, status: 'pending'
-            });
-            document.getElementById('prop-txt').value = "";
-        }
-        function delProp(key) {
-            if(confirm("Remove this proposal?")) db.ref(`couples/${coupleId}/proposals/${key}`).remove();
-        }
-        async function sealProp(key) {
-            // Update Status
-            await db.ref(`couples/${coupleId}/proposals/${key}`).update({ status: 'sealed' });
-            
-            // Get Data
-            const prop = (await db.ref(`couples/${coupleId}/proposals/${key}`).once('value')).val();
-            const cData = (await db.ref(`couples/${coupleId}`).once('value')).val();
-            const u1 = (await db.ref(`users/${cData.u1}`).once('value')).val().name;
-            const u2 = (await db.ref(`users/${cData.u2}`).once('value')).val().name;
 
-            // Post to Public Wall
-            await db.ref('publicWall').push({
-                cid: coupleId,
-                names: `${u1} & ${u2}`,
-                image: prop.image,
-                caption: prop.caption,
-                timestamp: Date.now()
-            });
-            confetti();
-        }
-
-        // CHAT & TOOLKIT
-        function toggleChat() {
-            const win = document.getElementById('chat-win');
-            win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
-        }
-        function initChat() {
-            db.ref(`couples/${coupleId}/chat`).limitToLast(50).on('child_added', s => {
+            // Chat
+            db.ref(`couples/${cid}/chat`).limitToLast(20).on('child_added', s => {
                 const m = s.val();
                 const d = document.createElement('div');
-                if(m.sys) {
-                    d.className = 'sys-msg';
-                    d.innerText = m.text;
-                } else {
-                    d.className = `msg ${m.uid === user.uid ? 'msg-me' : 'msg-partner'}`;
-                    d.innerText = m.text;
-                }
+                d.className = `msg ${m.u === user.uid ? 'msg-me' : ''}`;
+                d.innerText = m.t;
                 const f = document.getElementById('chat-feed');
                 f.appendChild(d);
                 f.scrollTop = f.scrollHeight;
             });
-        }
-        function sendChat() {
-            const i = document.getElementById('chat-in');
-            if(!i.value) return;
-            db.ref(`couples/${coupleId}/chat`).push({ uid: user.uid, text: i.value });
-            i.value = "";
-        }
-        function runTool(type) {
-            let r = "";
-            if(type==='coin') r = Math.random()>0.5 ? "Heads" : "Tails";
-            if(type==='wheel') r = ["Pizza","Sushi","Tacos"][Math.floor(Math.random()*3)];
-            if(type==='sorry') r = "Sent an Apology ❤️";
-            db.ref(`couples/${coupleId}/chat`).push({ text:`[TOOL] ${type.toUpperCase()}: ${r}`, sys:true });
+
+            // Capsule
+             db.ref(`couples/${cid}/caps`).on('value', s => {
+                const l = document.getElementById('cap-list');
+                l.innerHTML = "";
+                const d = s.val();
+                if(d) Object.values(d).forEach(c => {
+                    const lock = Date.now() < c.time;
+                    l.innerHTML += `<div style="margin-bottom:5px; padding:5px; border-bottom:1px solid #222;">
+                        <i class="fas ${lock ? 'fa-lock' : 'fa-envelope-open'}"></i> 
+                        ${lock ? new Date(c.time).toLocaleDateString() : c.msg}
+                    </div>`;
+                });
+            });
         }
 
-        // --- 6. PUBLIC WALL & PROFILES ---
-        function initMapFX() {
-            const map = document.getElementById('map-canvas');
-            map.innerHTML = "";
-            for(let i=0; i<15; i++) {
-                setTimeout(() => {
-                    const d = document.createElement('div');
-                    d.className = 'map-dot';
-                    d.style.top = Math.random()*80+10+'%';
-                    d.style.left = Math.random()*90+5+'%';
-                    map.appendChild(d);
-                }, i*800);
+        // ACTIONS
+        function setMood(e) {
+            const r = document.getElementById('mood-track').getBoundingClientRect();
+            const v = Math.min(100, Math.max(0, ((e.clientX - r.left)/r.width)*100));
+            db.ref(`couples/${cid}/mood/${user.uid}`).set(Math.floor(v));
+        }
+        function subPulse() {
+            const v = document.getElementById('pulse-ans').value;
+            if(v) db.ref(`couples/${cid}/pulse/${new Date().toISOString().split('T')[0]}/${user.uid}`).set(v);
+        }
+        function addProp() {
+            const i = document.getElementById('prop-img').value;
+            const t = document.getElementById('prop-txt').value;
+            if(i && t) {
+                db.ref(`couples/${cid}/props`).push({ by:user.uid, img:i, txt:t, status:'pending' });
+                document.getElementById('prop-txt').value = "";
             }
         }
+        function delProp(k) { db.ref(`couples/${cid}/props/${k}`).remove(); }
+        async function sealProp(k) {
+            await db.ref(`couples/${cid}/props/${k}`).update({ status:'sealed' });
+            const p = (await db.ref(`couples/${cid}/props/${k}`).once('value')).val();
+            const cd = (await db.ref(`couples/${cid}`).once('value')).val();
+            const n1 = (await db.ref(`users/${cd.u1}`).once('value')).val().name;
+            const n2 = (await db.ref(`users/${cd.u2}`).once('value')).val().name;
+            await db.ref('wall').push({ cid:cid, names:`${n1} & ${n2}`, img:p.img, txt:p.txt });
+        }
+        function toggleChat() { document.getElementById('chat-win').classList.toggle('open'); }
+        function sendChat() {
+            const i = document.getElementById('chat-in');
+            if(i.value) { db.ref(`couples/${cid}/chat`).push({ u:user.uid, t:i.value }); i.value = ""; }
+        }
+        function addCap() {
+            const m = document.getElementById('cap-msg').value;
+            const t = document.getElementById('cap-date').value;
+            if(m && t) db.ref(`couples/${cid}/caps`).push({ msg:m, time: new Date(t).getTime() });
+        }
 
-        db.ref('publicWall').limitToLast(100).on('value', s => {
+        // WALL
+        db.ref('wall').limitToLast(50).on('value', s => {
             const g = document.getElementById('wall-grid');
             g.innerHTML = "";
             const d = s.val();
-            if(!d) return;
-
-            const seen = new Set();
-            Object.values(d).reverse().forEach(p => {
-                if(seen.has(p.cid)) return;
-                seen.add(p.cid);
-
+            if(d) Object.values(d).reverse().forEach(p => {
                 const t = document.createElement('div');
                 t.className = 'tile';
-                t.onclick = () => window.location.href = `?page=profile&id=${p.cid}`;
+                t.onclick = () => location.href = `?page=profile&id=${p.cid}`;
                 t.innerHTML = `
-                    <img src="${p.image}">
-                    <div class="tile-overlay">
-                        <div class="serif" style="color:var(--primary); font-size:1.1rem;">${p.names}</div>
-                        <div style="font-size:0.8rem; margin-top:5px;">CLICK TO VISIT</div>
+                    <img src="${p.img}">
+                    <div class="tile-info">
+                        <div class="serif" style="color:var(--gold); font-size:1.1rem;">${p.names}</div>
                     </div>
                 `;
                 g.appendChild(t);
             });
         });
 
-        function filterWall() {
-            const q = document.getElementById('search-input').value.toUpperCase();
-            // In a real app, query DB. Here we filter loaded DOM for demo simplicity
-            // or just rely on visual scan for now.
-            // Implementing basic ID search logic:
-            if(q.length > 3) {
-                 // Simulate finding
-                 alert("Search feature connects to Backend Indexing in production.");
-            }
-        }
-
-        async function loadProfile(cid) {
-            const snap = await db.ref('publicWall').orderByChild('cid').equalTo(cid).once('value');
-            const data = snap.val();
+        // PROFILE
+        async function loadProf(id) {
+            const s = await db.ref('wall').orderByChild('cid').equalTo(id).once('value');
+            const d = s.val();
+            if(!d) return;
+            const arr = Object.values(d).reverse();
+            document.getElementById('p-names').innerText = arr[0].names;
+            document.getElementById('p-code').innerText = `#${id.substring(5,10).toUpperCase()}`;
+            document.getElementById('p-img').src = arr[0].img;
             
-            if(!data) {
-                document.getElementById('p-names').innerText = "Couple Not Found";
-                return;
-            }
-
-            const posts = Object.values(data).reverse();
-            const latest = posts[0];
-
-            document.getElementById('p-names').innerText = latest.names;
-            document.getElementById('p-code').innerText = `#${cid.substring(5,10).toUpperCase()}`;
-            document.getElementById('p-img').src = latest.image;
-
             const g = document.getElementById('p-grid');
             g.innerHTML = "";
-            posts.forEach(p => {
-                const d = document.createElement('div');
-                d.className = 'prof-item';
-                d.innerHTML = `<img src="${p.image}">`;
-                d.onclick = () => alert(p.caption); // Simple caption view
-                g.appendChild(d);
+            arr.forEach(p => {
+                g.innerHTML += `
+                    <div class="memory-block">
+                        <img src="${p.img}">
+                        <div class="memory-date">ENGRAVED FOREVER</div>
+                        <div class="memory-cap">"${p.txt}"</div>
+                    </div>
+                `;
             });
         }
 
-        // START
         route();
     </script>
 </body>
