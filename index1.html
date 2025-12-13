@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternal Wall | The Monument of Us</title>
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --bg: #000000;
+            --panel: #121212;
+            --border: #2a2a2a;
+            --primary: #ededed;
+            --secondary: #a8a8a8;
+            --accent: #ff304f; /* Love Red */
+            --gold: #d4af37;
+            --font-main: 'Inter', sans-serif;
+            --font-header: 'Playfair Display', serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--primary);
+            font-family: var(--font-main);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; transition: 0.2s; font-family: inherit; }
+
+        /* --- NAVIGATION --- */
+        nav {
+            background: rgba(0,0,0,0.9);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .brand { font-family: var(--font-header); font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; }
+        .nav-btn {
+            background: #fff; color: #000; border: none; padding: 8px 16px; 
+            border-radius: 4px; font-weight: 600; font-size: 0.9rem;
+        }
+        .nav-btn.outline { background: transparent; color: #fff; border: 1px solid #fff; margin-right: 10px; }
+
+        /* --- VIEWS --- */
+        .view { display: none; min-height: 100vh; padding-top: 20px; }
+        .active-view { display: block; }
+
+        /* --- VIEW: HOME (WALL) --- */
+        .hero { text-align: center; padding: 40px 20px; }
+        .hero h1 { font-family: var(--font-header); font-size: 2.5rem; margin-bottom: 10px; }
+        .hero p { color: var(--secondary); max-width: 600px; margin: 0 auto 30px; }
+
+        .wall-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 4px;
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            padding: 0 10px;
+        }
+
+        .tile {
+            aspect-ratio: 1;
+            background-color: #1a1a1a;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .tile-bg {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.3s; opacity: 0.8;
+        }
+        .tile:hover .tile-bg { transform: scale(1.1); opacity: 0.4; }
+        
+        .tile-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s; text-align: center; padding: 10px;
+        }
+        .tile:hover .tile-overlay { opacity: 1; }
+        
+        .tile-names { font-family: var(--font-header); font-weight: bold; font-size: 1.1rem; }
+        .tile-btn { margin-top: 10px; padding: 5px 10px; background: var(--accent); border:none; border-radius: 20px; color: white; font-size: 0.8rem; }
+
+        /* --- VIEW: PROFILE (INSTAGRAM STYLE) --- */
+        .profile-header {
+            max-width: 900px; margin: 0 auto; padding: 20px;
+            display: flex; gap: 40px; align-items: center; border-bottom: 1px solid var(--border);
+        }
+        .profile-pic {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: #222; border: 2px solid var(--gold);
+            object-fit: cover;
+        }
+        .profile-info h2 { font-family: var(--font-header); font-size: 2rem; margin: 0 0 10px 0; }
+        .profile-meta { color: var(--secondary); font-size: 0.9rem; margin-bottom: 15px; }
+        .profile-bio { font-size: 1rem; line-height: 1.5; }
+        
+        .memories-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px; /* Instagram gap is usually small */
+            max-width: 900px; margin: 20px auto; padding: 0 20px;
+        }
+        .memory-item {
+            aspect-ratio: 1; background: #1a1a1a; position: relative; cursor: pointer;
+        }
+        .memory-img { width: 100%; height: 100%; object-fit: cover; }
+        .memory-caption {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: rgba(0,0,0,0.7); padding: 10px; font-size: 0.9rem;
+            opacity: 0; transition: 0.2s;
+        }
+        .memory-item:hover .memory-caption { opacity: 1; }
+
+        /* --- VIEW: AUTH --- */
+        .auth-box {
+            max-width: 350px; margin: 80px auto; background: var(--panel);
+            padding: 40px; border: 1px solid var(--border); border-radius: 8px; text-align: center;
+        }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-field {
+            width: 100%; padding: 12px; background: #000; border: 1px solid #333;
+            color: white; border-radius: 4px; outline: none;
+        }
+        .input-field:focus { border-color: var(--secondary); }
+        .auth-btn { width: 100%; padding: 12px; background: #fff; color: #000; border: none; font-weight: bold; border-radius: 4px; margin-top: 10px;}
+        .switch-link { margin-top: 20px; font-size: 0.8rem; color: var(--secondary); cursor: pointer; }
+
+        /* --- VIEW: DASHBOARD --- */
+        .dash-container { display: flex; height: calc(100vh - 70px); }
+        .dash-sidebar { width: 300px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .dash-main { flex: 1; display: flex; flex-direction: column; }
+        
+        .chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 70%; padding: 10px 15px; border-radius: 20px; font-size: 0.9rem; }
+        .msg-me { background: #3797f0; color: white; align-self: flex-end; }
+        .msg-partner { background: #262626; align-self: flex-start; }
+        
+        .chat-input-area { padding: 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        
+        .proposal-area { padding: 20px; background: #000; border-bottom: 1px solid var(--border); }
+        .prop-card { background: var(--panel); padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 3px solid var(--gold); }
+        
+        /* Utility */
+        .hidden { display: none !important; }
+        .blink-alert { background: linear-gradient(45deg, #ff304f, #ff8c00); padding: 15px; color: white; border-radius: 5px; margin-bottom: 20px; font-weight: bold; }
+
+        @media (max-width: 768px) {
+            .profile-header { flex-direction: column; text-align: center; }
+            .dash-container { flex-direction: column; }
+            .dash-sidebar { height: 40vh; border-right: none; border-bottom: 1px solid var(--border); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="#" onclick="route('home')" class="brand">ETERNAL WALL</a>
+        <div id="nav-actions">
+            <!-- Injected by JS -->
+        </div>
+    </nav>
+
+    <!-- 1. HOME VIEW (THE PUBLIC WALL) -->
+    <div id="view-home" class="view active-view">
+        <div class="hero">
+            <h1>The Monument of Us</h1>
+            <p>A digital universe where love stories are sealed forever.</p>
+        </div>
+        <div class="wall-container" id="public-wall-grid">
+            <!-- Tiles -->
+        </div>
+    </div>
+
+    <!-- 2. PROFILE VIEW (INSTAGRAM STYLE) -->
+    <div id="view-profile" class="view">
+        <div class="profile-header">
+            <img src="https://via.placeholder.com/150" id="prof-img" class="profile-pic">
+            <div class="profile-info">
+                <h2 id="prof-names">Couple Names</h2>
+                <div class="profile-meta">
+                    <span id="prof-date">EST. 2024</span> • 
+                    <span id="prof-code">#CODE</span>
+                </div>
+                <div class="profile-bio" id="prof-bio">
+                    Loading bio...
+                </div>
+            </div>
+        </div>
+        
+        <!-- The Grid -->
+        <div class="memories-grid" id="prof-grid">
+            <!-- Memories -->
+        </div>
+    </div>
+
+    <!-- 3. AUTH VIEW -->
+    <div id="view-auth" class="view">
+        <div class="auth-box">
+            <h2 id="auth-header" style="font-family: var(--font-header); margin-bottom: 20px;">Login</h2>
+            
+            <div id="invite-alert" class="hidden blink-alert">
+                <i class="fas fa-heart"></i> You are connecting with your partner!
+            </div>
+
+            <div class="input-group">
+                <input type="email" id="email" class="input-field" placeholder="Email Address">
+            </div>
+            
+            <div class="input-group" id="group-name" class="hidden">
+                <input type="text" id="username" class="input-field" placeholder="Your Name">
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" class="input-field" placeholder="Password">
+            </div>
+
+            <button class="auth-btn" onclick="handleAuth()" id="btn-submit">Log In</button>
+            
+            <div class="switch-link" id="auth-switch" onclick="toggleAuth()">
+                New to Eternal Wall? Create Account
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. DASHBOARD VIEW (PRIVATE COUPLE OS) -->
+    <div id="view-dashboard" class="view" style="padding-top:0;">
+        
+        <!-- SINGLE USER STATE -->
+        <div id="dash-single" class="hero hidden">
+            <h2>You are Single on Eternal Wall</h2>
+            <div style="background: var(--panel); padding: 30px; border-radius: 10px; max-width: 600px; margin: 20px auto; border: 1px solid var(--accent);">
+                <h3>🔗 Your Blink Link™</h3>
+                <p>Send this link to your partner. Once they sign up using this link, your accounts will be fused forever.</p>
+                <div style="background: #000; padding: 15px; font-family: monospace; word-break: break-all; cursor: pointer;" onclick="copyBlink()" id="my-blink">
+                    Loading...
+                </div>
+            </div>
+        </div>
+
+        <!-- COUPLE STATE -->
+        <div id="dash-couple" class="dash-container hidden">
+            
+            <!-- Sidebar: Proposals -->
+            <div class="dash-sidebar">
+                <div style="padding: 15px; border-bottom: 1px solid var(--border); font-weight: bold;">
+                    <i class="fas fa-pen-nib"></i> Wall Proposals
+                </div>
+                <div style="padding: 15px; background: #000;">
+                    <input type="text" id="prop-img" class="input-field" placeholder="Image URL (Required for Tile)" style="margin-bottom:5px;">
+                    <textarea id="prop-text" class="input-field" placeholder="Caption / Story..." rows="2"></textarea>
+                    <button class="auth-btn" style="background: var(--accent); color: white; margin-top:5px;" onclick="submitProposal()">Propose Post</button>
+                </div>
+                <div style="flex:1; overflow-y: auto; padding: 10px;" id="proposal-list">
+                    <!-- Proposals List -->
+                </div>
+            </div>
+
+            <!-- Main: Chat -->
+            <div class="dash-main">
+                <div style="padding: 15px; border-bottom: 1px solid var(--border); font-weight: bold;">
+                    <i class="fas fa-comments"></i> Private Encrypted Chat
+                </div>
+                <div class="chat-container" id="chat-feed">
+                    <!-- Messages -->
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-msg" class="input-field" placeholder="Message your partner..." style="border-radius: 20px;">
+                    <button onclick="sendChat()" style="background:transparent; border:none; color: var(--accent); font-size: 1.2rem;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4",
+            authDomain: "onlineshop-30cd1.firebaseapp.com",
+            databaseURL: "https://onlineshop-30cd1-default-rtdb.firebaseio.com",
+            projectId: "onlineshop-30cd1",
+            storageBucket: "onlineshop-30cd1.firebasestorage.app",
+            messagingSenderId: "818252574868",
+            appId: "1:818252574868:web:8dd36825db589a886cc481",
+            measurementId: "G-6YLGGH2NDD"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // --- STATE ---
+        let currentUser = null;
+        let coupleId = null;
+        let isSignup = false;
+
+        // --- ROUTING ---
+        function route(page, paramId = null) {
+            document.querySelectorAll('.view').forEach(e => e.classList.remove('active-view'));
+            
+            // Check URL Params logic
+            if(!page) {
+                const params = new URLSearchParams(window.location.search);
+                if(params.get('blink')) page = 'auth';
+                else if(params.get('page') === 'profile') {
+                    page = 'profile';
+                    loadProfile(params.get('id'));
+                }
+                else page = 'home';
+            }
+
+            document.getElementById(`view-${page}`).classList.add('active-view');
+            updateNav();
+
+            if(page === 'auth') checkBlinkLogic();
+        }
+
+        function updateNav() {
+            const nav = document.getElementById('nav-actions');
+            if(currentUser) {
+                nav.innerHTML = `
+                    <button class="nav-btn outline" onclick="route('dashboard')">My Dashboard</button>
+                    <button class="nav-btn" onclick="auth.signOut()">Logout</button>
+                `;
+            } else {
+                nav.innerHTML = `<button class="nav-btn" onclick="route('auth')">Login / Join</button>`;
+            }
+        }
+
+        // --- AUTH LOGIC ---
+        function checkBlinkLogic() {
+            const params = new URLSearchParams(window.location.search);
+            if(params.get('blink')) {
+                // FORCE SIGNUP
+                isSignup = true;
+                document.getElementById('auth-header').innerText = "Create Account";
+                document.getElementById('btn-submit').innerText = "Connect & Join";
+                document.getElementById('group-name').classList.remove('hidden');
+                document.getElementById('auth-switch').classList.add('hidden'); // Hide toggle
+                document.getElementById('invite-alert').classList.remove('hidden');
+            }
+        }
+
+        function toggleAuth() {
+            isSignup = !isSignup;
+            document.getElementById('auth-header').innerText = isSignup ? "Create Account" : "Login";
+            document.getElementById('btn-submit').innerText = isSignup ? "Sign Up" : "Log In";
+            document.getElementById('auth-switch').innerText = isSignup ? "Have an account? Log In" : "New? Create Account";
+            
+            if(isSignup) document.getElementById('group-name').classList.remove('hidden');
+            else document.getElementById('group-name').classList.add('hidden');
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const name = document.getElementById('username').value;
+            const params = new URLSearchParams(window.location.search);
+            const inviteCode = params.get('blink');
+
+            try {
+                if(isSignup) {
+                    if(!name) return alert("Name required");
+                    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                    const uid = cred.user.uid;
+                    
+                    let newCoupleId = null;
+
+                    // LINKING LOGIC
+                    if(inviteCode) {
+                        const inviterSnap = await db.ref('users/' + inviteCode).once('value');
+                        if(inviterSnap.exists() && !inviterSnap.val().coupleId) {
+                            newCoupleId = `couple_${Date.now()}`;
+                            // Create Couple Node
+                            await db.ref('couples/' + newCoupleId).set({
+                                user1: inviteCode,
+                                user2: uid,
+                                established: Date.now()
+                            });
+                            // Update Inviter
+                            await db.ref('users/' + inviteCode).update({ coupleId: newCoupleId });
+                        }
+                    }
+
+                    // Save User
+                    await db.ref('users/' + uid).set({
+                        name: name,
+                        email: email,
+                        coupleId: newCoupleId
+                    });
+
+                    // Clear URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+
+                } else {
+                    await auth.signInWithEmailAndPassword(email, pass);
+                }
+                route('dashboard');
+            } catch(e) {
+                alert(e.message);
+            }
+        }
+
+        // --- DASHBOARD LOGIC ---
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            updateNav();
+            if(user) {
+                // Listen for Profile Changes
+                db.ref('users/' + user.uid).on('value', snap => {
+                    const profile = snap.val();
+                    if(profile && profile.coupleId) {
+                        coupleId = profile.coupleId;
+                        initCoupleDash();
+                    } else {
+                        initSingleDash();
+                    }
+                });
+            }
+        });
+
+        function initSingleDash() {
+            document.getElementById('dash-single').classList.remove('hidden');
+            document.getElementById('dash-couple').classList.add('hidden');
+            const link = `${window.location.origin}${window.location.pathname}?blink=${currentUser.uid}`;
+            document.getElementById('my-blink').innerText = link;
+        }
+
+        function copyBlink() {
+            navigator.clipboard.writeText(document.getElementById('my-blink').innerText);
+            alert("Link Copied!");
+        }
+
+        function initCoupleDash() {
+            document.getElementById('dash-single').classList.add('hidden');
+            document.getElementById('dash-couple').classList.remove('hidden');
+
+            // Chat Listener
+            db.ref(`couples/${coupleId}/chat`).limitToLast(20).on('child_added', snap => {
+                const msg = snap.val();
+                const div = document.createElement('div');
+                div.className = `msg ${msg.sender === currentUser.uid ? 'msg-me' : 'msg-partner'}`;
+                div.innerText = msg.text;
+                const feed = document.getElementById('chat-feed');
+                feed.appendChild(div);
+                feed.scrollTop = feed.scrollHeight;
+            });
+
+            // Proposals Listener
+            db.ref(`couples/${coupleId}/proposals`).on('value', snap => {
+                const list = document.getElementById('proposal-list');
+                list.innerHTML = "";
+                const data = snap.val();
+                if(!data) return;
+
+                Object.keys(data).forEach(key => {
+                    const p = data[key];
+                    const div = document.createElement('div');
+                    div.className = 'prop-card';
+                    
+                    let btnHTML = "";
+                    if(p.status === 'pending') {
+                         if(p.author !== currentUser.uid) {
+                             btnHTML = `<button onclick="sealProposal('${key}')" style="background:#00e701; border:none; padding:5px; border-radius:3px;">✅ SEAL IT</button>`;
+                         } else {
+                             btnHTML = `<span style="color:#888; font-size:0.8rem;">Waiting for partner...</span>`;
+                         }
+                    } else {
+                        btnHTML = `<span style="color:var(--accent);">❤️ POSTED</span>`;
+                    }
+
+                    div.innerHTML = `
+                        ${p.image ? `<img src="${p.image}" style="width:100%; height:100px; object-fit:cover; border-radius:4px;">` : ''}
+                        <div style="margin:5px 0;">"${p.text}"</div>
+                        ${btnHTML}
+                    `;
+                    list.prepend(div);
+                });
+            });
+        }
+
+        function sendChat() {
+            const txt = document.getElementById('chat-msg').value;
+            if(!txt) return;
+            db.ref(`couples/${coupleId}/chat`).push({
+                sender: currentUser.uid,
+                text: txt,
+                timestamp: Date.now()
+            });
+            document.getElementById('chat-msg').value = "";
+        }
+
+        function submitProposal() {
+            const txt = document.getElementById('prop-text').value;
+            const img = document.getElementById('prop-img').value;
+            if(!txt) return alert("Write something!");
+            
+            db.ref(`couples/${coupleId}/proposals`).push({
+                author: currentUser.uid,
+                text: txt,
+                image: img,
+                status: 'pending'
+            });
+            document.getElementById('prop-text').value = "";
+            document.getElementById('prop-img').value = "";
+        }
+
+        async function sealProposal(key) {
+            // Get proposal data
+            const snap = await db.ref(`couples/${coupleId}/proposals/${key}`).once('value');
+            const prop = snap.val();
+            
+            // Mark approved
+            await db.ref(`couples/${coupleId}/proposals/${key}`).update({ status: 'approved' });
+
+            // Fetch User Names
+            const cSnap = await db.ref(`couples/${coupleId}`).once('value');
+            const cData = cSnap.val();
+            const u1 = (await db.ref(`users/${cData.user1}`).once('value')).val().name;
+            const u2 = (await db.ref(`users/${cData.user2}`).once('value')).val().name;
+
+            // Push to PUBLIC WALL
+            await db.ref('publicWall').push({
+                coupleId: coupleId,
+                names: `${u1} & ${u2}`,
+                image: prop.image || "https://via.placeholder.com/150",
+                caption: prop.text,
+                timestamp: Date.now()
+            });
+            
+            alert("Memory Sealed on the Wall!");
+        }
+
+        // --- PUBLIC FACING LOGIC ---
+
+        // Load Main Wall
+        db.ref('publicWall').limitToLast(100).on('value', snap => {
+            const grid = document.getElementById('public-wall-grid');
+            grid.innerHTML = "";
+            const data = snap.val();
+            if(!data) return;
+            
+            // We only want 1 tile per couple on the home page (the latest one or a random one)
+            // But for simplicity, let's show all posts. 
+            // Better UX: Show unique couples.
+            
+            const uniqueCouples = new Set();
+            
+            Object.values(data).reverse().forEach(post => {
+                if(uniqueCouples.has(post.coupleId)) return; // Only show 1 tile per couple
+                uniqueCouples.add(post.coupleId);
+
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.onclick = () => {
+                    // Navigate to Profile
+                    window.location.href = `?page=profile&id=${post.coupleId}`;
+                };
+                
+                tile.innerHTML = `
+                    <img src="${post.image}" class="tile-bg">
+                    <div class="tile-overlay">
+                        <div class="tile-names">${post.names}</div>
+                        <button class="tile-btn">VISIT PAGE</button>
+                    </div>
+                `;
+                grid.appendChild(tile);
+            });
+        });
+
+        // Load Specific Profile
+        async function loadProfile(cid) {
+            // 1. Get Couple Data (Names)
+            // We have to reverse engineer names from a post or store them in couple node. 
+            // For speed, let's look at publicWall posts for this ID.
+            
+            const wallSnap = await db.ref('publicWall').orderByChild('coupleId').equalTo(cid).once('value');
+            const posts = wallSnap.val();
+            
+            if(!posts) {
+                document.getElementById('prof-names').innerText = "Couple Not Found";
+                return;
+            }
+
+            const postsArray = Object.values(posts);
+            const firstPost = postsArray[0];
+
+            // Fill Header
+            document.getElementById('prof-names').innerText = firstPost.names;
+            document.getElementById('prof-code').innerText = `#${cid.substring(7,12).toUpperCase()}`;
+            document.getElementById('prof-img').src = firstPost.image; // Use latest post as profile pic
+            document.getElementById('prof-bio').innerText = "United on Eternal Wall.";
+
+            // Fill Grid
+            const grid = document.getElementById('prof-grid');
+            grid.innerHTML = "";
+            
+            postsArray.reverse().forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'memory-item';
+                item.innerHTML = `
+                    <img src="${p.image}" class="memory-img">
+                    <div class="memory-caption">${p.caption}</div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        // Init Route
+        route();
+
+    </script>
+</body>
+</html>
