@@ -291,21 +291,26 @@
         // --- 3. AUTHENTICATION ---
         
         // Listen to Auth State
-        auth.onAuthStateChanged(async (user) => {
+        auth.onAuthStateChanged((user) => {
             currentUser = user;
             updateNav();
             
             if (user) {
-                // Fetch User Profile
-                const snapshot = await db.ref('users/' + user.uid).once('value');
-                userProfile = snapshot.val();
-                
-                if (userProfile && userProfile.coupleId) {
-                    currentCoupleId = userProfile.coupleId;
-                    initDashboardCouple();
-                } else {
-                    initDashboardSingle();
-                }
+                // CHANGE: Use .on() instead of .once() to listen for changes instantly
+                db.ref('users/' + user.uid).on('value', snapshot => {
+                    userProfile = snapshot.val();
+                    
+                    // If the database says we have a coupleId, switch views immediately
+                    if (userProfile && userProfile.coupleId) {
+                        // Only init if we haven't already (prevents duplicate listeners)
+                        if (currentCoupleId !== userProfile.coupleId) {
+                            currentCoupleId = userProfile.coupleId;
+                            initDashboardCouple();
+                        }
+                    } else {
+                        initDashboardSingle();
+                    }
+                });
             }
         });
 
