@@ -3,276 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ETERNAL WALL | The Digital Monument</title>
+    <title>ETERNAL WALL | The Super-App for Couples</title>
     
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Libraries -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <!-- Confetti for Celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --bg: #050505;
-            --surface: #121212;
-            --surface-light: #1e1e1e;
+            --bg: #050505; --surface: #141414; --surface-light: #1f1f1f;
+            --primary: #d4af37; /* Gold */
+            --accent: #e91e63; /* Pink */
+            --text: #e0e0e0; --text-dim: #888;
             --border: #333;
-            --text-main: #e0e0e0;
-            --text-muted: #888;
-            --primary: #d4af37; /* Luxury Gold */
-            --primary-dim: #8a701f;
-            --accent: #e91e63; /* Love Pink */
-            --danger: #ff4757;
-            --success: #2ed573;
-            --glass: rgba(18, 18, 18, 0.85);
+            --glass: rgba(20, 20, 20, 0.9);
         }
 
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            padding-bottom: 80px; /* Space for mobile nav */
-        }
-
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
         h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
-        a { text-decoration: none; color: inherit; }
-        button { cursor: pointer; transition: 0.2s; font-family: inherit; }
-
-        /* --- UI COMPONENTS --- */
-        .btn {
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            border: none;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-        }
-        .btn-primary { background: var(--primary); color: #000; }
-        .btn-primary:hover { background: #f0c94e; transform: translateY(-2px); }
-        .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); }
-        .btn-danger { background: rgba(255, 71, 87, 0.1); color: var(--danger); border: 1px solid var(--danger); }
-        .btn-success { background: var(--success); color: #000; }
+        button { cursor: pointer; font-family: inherit; transition: 0.2s; }
         
-        .input-box {
-            background: var(--surface-light);
-            border: 1px solid var(--border);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            width: 100%;
-            margin-bottom: 15px;
-            font-size: 1rem;
-        }
-        .input-box:focus { border-color: var(--primary); }
+        /* --- UTILS --- */
+        .btn { padding: 10px 20px; border-radius: 50px; border: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .btn-gold { background: var(--primary); color: #000; }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
+        .btn-outline { border: 1px solid var(--border); background: transparent; color: var(--text); }
+        .input-box { width: 100%; background: var(--surface-light); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        
+        /* --- NAV --- */
+        .navbar { position: sticky; top: 0; z-index: 100; background: var(--glass); backdrop-filter: blur(10px); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 1.2rem; color: var(--primary); letter-spacing: 1px; font-weight: bold; text-decoration: none; }
 
-        /* --- NAVIGATION --- */
-        .navbar {
-            position: sticky; top: 0; z-index: 100;
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            padding: 15px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .brand { font-size: 1.4rem; font-weight: 700; color: var(--primary); letter-spacing: 1px; }
-        .nav-items { display: flex; gap: 15px; }
-
-        /* --- VIEWS UTILS --- */
-        .view { display: none; animation: fadeIn 0.4s ease; min-height: 80vh; }
+        /* --- VIEWS --- */
+        .view { display: none; animation: fadeIn 0.5s; min-height: 90vh; }
         .active-view { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- VIEW: HOME --- */
-        .hero {
-            text-align: center; padding: 60px 20px;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000 70%);
-        }
-        .hero h1 { font-size: 3rem; margin-bottom: 10px; background: linear-gradient(to right, #fff, #999); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
+        /* --- HOME: LOVE MAP --- */
+        .map-container { position: relative; height: 60vh; background: #0b0b0b; overflow: hidden; border-bottom: 1px solid var(--border); }
+        .world-map { width: 100%; height: 100%; object-fit: cover; opacity: 0.3; }
+        .map-dot { position: absolute; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; box-shadow: 0 0 10px var(--accent); }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+        .home-content { padding: 40px 20px; text-align: center; }
         
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 2px;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 10px;
-        }
-        .tile {
-            aspect-ratio: 1; position: relative; cursor: pointer; overflow: hidden; background: var(--surface);
-        }
-        .tile img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; opacity: 0.8; }
-        .tile:hover img { transform: scale(1.1); opacity: 0.4; }
-        .tile-overlay {
-            position: absolute; inset: 0;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; transition: 0.3s;
-        }
-        .tile:hover .tile-overlay { opacity: 1; }
-
-        /* --- VIEW: PROFILE --- */
-        .cover-photo {
-            height: 300px; width: 100%; object-fit: cover;
-            mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-        }
-        .profile-content { max-width: 900px; margin: -80px auto 0; padding: 20px; position: relative; }
-        .names-large { font-size: 3.5rem; margin: 0; line-height: 1; text-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .profile-meta { display: flex; gap: 20px; margin: 20px 0; font-size: 0.9rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+        /* --- DASHBOARD GRID --- */
+        .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; overflow: hidden; margin-bottom: 20px; }
         
-        .memories-feed { display: flex; flex-direction: column; gap: 40px; margin-top: 40px; }
-        .memory-card { background: var(--surface); border-radius: 1px; overflow: hidden; border: 1px solid var(--border); }
-        .memory-img { width: 100%; display: block; }
-        .memory-text { padding: 30px; font-family: 'Playfair Display'; font-size: 1.2rem; line-height: 1.6; text-align: center; color: #ccc; }
+        /* 1. CLOCK */
+        .clock-display { text-align: center; padding: 20px; background: linear-gradient(45deg, #111, #1a1a1a); border-bottom: 1px solid var(--border); }
+        .time-digits { font-size: 2rem; font-family: monospace; color: var(--primary); letter-spacing: 2px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+        .time-label { color: var(--text-dim); font-size: 0.8rem; margin-top: 5px; text-transform: uppercase; }
 
-        /* --- VIEW: DASHBOARD --- */
-        .dash-layout { display: flex; gap: 20px; max-width: 1200px; margin: 20px auto; padding: 0 20px; height: 85vh; }
-        .dash-col-left { width: 350px; display: flex; flex-direction: column; gap: 20px; }
-        .dash-col-right { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; }
+        /* 2. DAILY PULSE */
+        .pulse-card { background: linear-gradient(135deg, #2a0a12, #000); border: 1px solid var(--accent); }
+        .blur-text { filter: blur(8px); user-select: none; transition: 0.5s; cursor: pointer; }
+        .blur-text:hover { filter: blur(4px); }
+        .revealed { filter: blur(0); }
+        .q-badge { background: var(--accent); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
 
-        /* Proposals */
-        .proposal-box { background: var(--surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; height: 100%; }
-        .prop-list { flex: 1; overflow-y: auto; margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
+        /* 3. TIME CAPSULE */
+        .capsule-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--surface-light); margin-bottom: 8px; border-radius: 8px; }
+        .lock-icon { font-size: 1.2rem; color: var(--text-dim); }
+        .unlocked-icon { color: var(--primary); }
         
-        .prop-item { background: var(--surface-light); padding: 12px; border-radius: 8px; border-left: 3px solid var(--text-muted); }
-        .prop-item.pending { border-color: var(--primary); }
-        .prop-actions { display: flex; gap: 5px; margin-top: 10px; }
-        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: #333; }
+        /* 4. TOOLKIT */
+        .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .tool-btn { background: var(--surface-light); border: 1px solid var(--border); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .tool-btn:hover { border-color: var(--primary); background: #222; }
+        .tool-btn i { font-size: 1.5rem; margin-bottom: 5px; color: var(--text); }
 
-        /* Chat */
-        .chat-feed { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; }
-        .msg { max-width: 75%; padding: 10px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.4; }
-        .msg-me { background: var(--primary); color: #000; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg-partner { background: #2a2a2a; color: #fff; align-self: flex-start; border-bottom-left-radius: 4px; }
-        .chat-input-bar { padding: 15px; background: var(--surface-light); border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        /* CHAT */
+        .chat-window { height: 400px; display: flex; flex-direction: column; }
+        .chat-feed { flex: 1; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 8px; }
+        .msg { padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; max-width: 80%; }
+        .msg-me { background: var(--primary); color: #000; align-self: flex-end; }
+        .msg-partner { background: #333; align-self: flex-start; }
+        .sys-msg { align-self: center; font-size: 0.8rem; color: var(--text-dim); background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px; margin: 10px 0; }
 
-        /* --- VIEW: AUTH --- */
-        .auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
-        .auth-card { background: var(--surface); padding: 40px; border-radius: 20px; border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; }
-        .blink-banner { background: linear-gradient(to right, var(--accent), #ff8e53); color: white; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; font-weight: bold; }
-
-        /* Mobile */
-        @media (max-width: 900px) {
-            .dash-layout { flex-direction: column; height: auto; }
-            .dash-col-left { width: 100%; height: 500px; }
-            .dash-col-right { height: 500px; }
-            .names-large { font-size: 2.5rem; }
-        }
+        /* MOBILE */
+        @media (max-width: 768px) { .dash-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <!-- NAVBAR -->
     <nav class="navbar">
         <a href="#" onclick="route('home')" class="brand"><i class="fas fa-infinity"></i> ETERNAL</a>
-        <div class="nav-items" id="nav-actions">
-            <!-- Dynamic Buttons -->
-        </div>
+        <div id="nav-actions"></div>
     </nav>
 
-    <!-- 1. HOME VIEW -->
+    <!-- VIEW: HOME (LOVE MAP) -->
     <div id="view-home" class="view active-view">
-        <div class="hero">
-            <h1 class="serif">The Monument of Us</h1>
-            <p style="color:var(--text-muted)">Secure your legacy in the digital universe.</p>
+        <div class="map-container" id="map-bg">
+            <!-- Simulated World Map Background -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" class="world-map">
+            <!-- Dots injected by JS -->
         </div>
-        <div class="grid-container" id="public-grid">
-            <!-- Tiles -->
-        </div>
-    </div>
-
-    <!-- 2. PROFILE VIEW -->
-    <div id="view-profile" class="view">
-        <img src="" id="prof-cover" class="cover-photo">
-        <div class="profile-content">
-            <h1 id="prof-names" class="names-large serif">Loading...</h1>
-            <div class="profile-meta">
-                <span><i class="fas fa-hashtag"></i> <span id="prof-code">000</span></span>
-                <span><i class="fas fa-heart"></i> EST. 2025</span>
-            </div>
-            <div class="memories-feed" id="prof-feed">
-                <!-- Posts -->
-            </div>
+        <div class="home-content">
+            <h1 class="serif" style="font-size: 2.5rem; margin-bottom: 10px;">The World of Us</h1>
+            <p style="color: var(--text-dim); max-width: 500px; margin: 0 auto 30px;">Join 2.4 Million couples building their digital legacy.</p>
+            <div id="home-tiles" style="display:flex; gap:5px; justify-content:center; flex-wrap:wrap;"></div>
         </div>
     </div>
 
-    <!-- 3. DASHBOARD VIEW -->
+    <!-- VIEW: DASHBOARD (THE SUPER APP) -->
     <div id="view-dashboard" class="view">
         
-        <!-- SINGLE MODE -->
-        <div id="dash-single" class="auth-wrapper" style="display:none;">
-            <div class="auth-card" style="text-align: left;">
-                <h2 class="serif" style="color:var(--primary)">One Step Left</h2>
-                <p style="color:var(--text-muted); margin-bottom: 20px;">Eternal Wall is for couples. Send this link to your partner to fuse your accounts.</p>
-                <div style="background:#000; padding:15px; border-radius:8px; word-break:break-all; font-family:monospace; cursor:pointer;" onclick="copyBlink()" id="my-blink">Loading Link...</div>
-                <div style="margin-top:10px; font-size:0.8rem; color:var(--success); text-align:center;">Click link to copy</div>
-            </div>
+        <!-- RELATIONSHIP CLOCK -->
+        <div class="clock-display" id="clock-section" style="display:none;">
+            <div class="time-label">WE HAVE BEEN TOGETHER FOR</div>
+            <div class="time-digits" id="timer-val">00 : 00 : 00 : 00</div>
+            <div class="time-label">YEARS : DAYS : HOURS : MINS</div>
+            <button class="btn btn-outline" style="margin-top:15px; font-size:0.7rem;" onclick="shareClock()"><i class="fas fa-share-alt"></i> Share to Story</button>
         </div>
 
-        <!-- COUPLE MODE -->
-        <div id="dash-couple" class="dash-layout" style="display:none;">
-            <!-- Left: Proposals -->
-            <div class="dash-col-left">
-                <div class="proposal-box">
-                    <h3 class="serif"><i class="fas fa-pen-nib"></i> Draft Memory</h3>
-                    <input type="text" id="prop-img" class="input-box" placeholder="Image URL (Required)">
-                    <textarea id="prop-text" class="input-box" rows="2" placeholder="Write a caption..."></textarea>
-                    <button class="btn btn-primary" style="width:100%" onclick="submitProposal()">Propose to Wall</button>
+        <div class="dash-grid">
+            <!-- LEFT COL -->
+            <div class="dash-col">
+                
+                <!-- DAILY PULSE -->
+                <div class="card pulse-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <span class="q-badge">DAILY PULSE</span>
+                        <small style="color:#aaa" id="pulse-date">Today</small>
+                    </div>
+                    <h3 class="serif" id="pulse-q" style="margin:0 0 15px 0;">Loading Question...</h3>
                     
-                    <div style="border-top:1px solid var(--border); margin-top:20px; padding-top:10px;">
-                        <small style="color:var(--text-muted)">PENDING APPROVALS</small>
+                    <div id="pulse-answers">
+                        <input type="text" id="my-answer" class="input-box" placeholder="Your Answer..." style="background:rgba(0,0,0,0.5);">
+                        <button class="btn btn-gold" style="width:100%" onclick="submitPulse()">Answer to Reveal</button>
                     </div>
-                    <div class="prop-list" id="prop-list">
-                        <!-- Proposals -->
+                    
+                    <div id="pulse-reveal" style="display:none; margin-top:15px;">
+                        <div style="margin-bottom:10px;">
+                            <small style="color:var(--text-dim)">YOU</small>
+                            <div id="ans-me" style="font-weight:bold;">-</div>
+                        </div>
+                        <div>
+                            <small style="color:var(--text-dim)">PARTNER</small>
+                            <div id="ans-partner" class="blur-text" onclick="this.classList.add('revealed')">-</div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- TIME CAPSULE -->
+                <div class="card">
+                    <h3 class="serif"><i class="fas fa-box"></i> Time Capsule</h3>
+                    <div style="display:flex; gap:5px; margin-bottom:15px;">
+                        <input type="text" id="capsule-msg" class="input-box" placeholder="Message for future..." style="margin:0;">
+                        <input type="date" id="capsule-date" class="input-box" style="width:130px; margin:0;">
+                    </div>
+                    <button class="btn btn-outline" style="width:100%; margin-bottom:15px;" onclick="addCapsule()">Lock Away</button>
+                    
+                    <div id="capsule-list">
+                        <!-- Items -->
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Right: Chat -->
-            <div class="dash-col-right">
-                <div style="padding:15px; border-bottom:1px solid var(--border); background:var(--surface-light); font-weight:bold;">
-                    <i class="fas fa-comment-alt"></i> Private Channel
+            <!-- RIGHT COL -->
+            <div class="dash-col">
+                
+                <!-- TOOLKIT -->
+                <div class="card">
+                    <h4 style="margin:0 0 15px 0; color:var(--text-dim);">ARGUMENT SOLVER</h4>
+                    <div class="tool-grid">
+                        <div class="tool-btn" onclick="runTool('coin')">
+                            <i class="fas fa-coins" style="color:#ffd700;"></i>
+                            <div>Flip Coin</div>
+                        </div>
+                        <div class="tool-btn" onclick="runTool('dice')">
+                            <i class="fas fa-dice" style="color:#ff304f;"></i>
+                            <div>Roll Dice</div>
+                        </div>
+                        <div class="tool-btn" onclick="runTool('wheel')">
+                            <i class="fas fa-pizza-slice" style="color:#4caf50;"></i>
+                            <div>Dinner Wheel</div>
+                        </div>
+                        <div class="tool-btn" onclick="runTool('sorry')">
+                            <i class="fas fa-heart-broken" style="color:#2196f3;"></i>
+                            <div>Send "Sorry"</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="chat-feed" id="chat-feed"></div>
-                <div class="chat-input-bar">
-                    <input type="text" id="chat-input" class="input-box" style="margin:0; border-radius:50px;" placeholder="Message partner...">
-                    <button onclick="sendChat()" style="background:var(--primary); width:50px; height:50px; border-radius:50%; border:none;"><i class="fas fa-paper-plane"></i></button>
+
+                <!-- CHAT -->
+                <div class="card chat-window">
+                    <div class="chat-feed" id="chat-feed"></div>
+                    <div style="margin-top:10px; display:flex; gap:5px;">
+                        <input id="chat-in" class="input-box" style="margin:0; border-radius:20px;" placeholder="Message...">
+                        <button onclick="sendChat()" style="background:var(--primary); width:40px; height:40px; border-radius:50%; border:none;"><i class="fas fa-paper-plane"></i></button>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
 
-    <!-- 4. AUTH VIEW -->
-    <div id="view-auth" class="view">
-        <div class="auth-wrapper">
-            <div class="auth-card">
-                <div id="blink-alert" class="blink-banner" style="display:none;">
-                    <i class="fas fa-link"></i> PARTNER INVITE DETECTED
-                </div>
-                <h2 id="auth-title" class="serif">Welcome</h2>
-                <input type="text" id="username" class="input-box" placeholder="Your Name" style="display:none;">
-                <input type="email" id="email" class="input-box" placeholder="Email">
-                <input type="password" id="password" class="input-box" placeholder="Password">
-                <button class="btn btn-primary" style="width:100%" onclick="handleAuth()" id="auth-submit">Log In</button>
-                <div style="margin-top:20px; font-size:0.9rem; cursor:pointer; color:var(--text-muted);" onclick="toggleAuth()" id="auth-toggle">
-                    Create Account
-                </div>
+    <!-- VIEW: AUTH -->
+    <div id="view-auth" class="view" style="display:flex; justify-content:center; align-items:center;">
+        <div class="card" style="width:100%; max-width:400px; text-align:center;">
+            <h2 class="serif">Welcome</h2>
+            <div id="blink-msg" style="background:var(--accent); color:white; padding:10px; border-radius:5px; display:none; margin-bottom:15px;">
+                <i class="fas fa-link"></i> Connecting you to partner...
             </div>
+            <input id="u-name" class="input-box" placeholder="Name" style="display:none;">
+            <input id="u-email" class="input-box" placeholder="Email">
+            <input id="u-pass" type="password" class="input-box" placeholder="Password">
+            <button class="btn btn-gold" style="width:100%; margin-top:10px;" onclick="handleAuth()">Enter</button>
+            <p style="font-size:0.8rem; cursor:pointer; color:var(--text-dim);" onclick="toggleAuth()" id="auth-switch">New? Create Account</p>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- CONFIG ---
+        // --- 1. CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4",
             authDomain: "onlineshop-30cd1.firebaseapp.com",
@@ -288,84 +239,87 @@
         const db = firebase.database();
 
         let currentUser = null;
-        let currentCoupleId = null;
+        let coupleId = null;
         let isSignup = false;
 
-        // --- ROUTER ---
+        // --- 2. ROUTING & MAP FX ---
         function route(page) {
             document.querySelectorAll('.view').forEach(e => e.classList.remove('active-view'));
             
-            // Auto-handle Blink Link
             const params = new URLSearchParams(window.location.search);
-            if(!page && params.get('blink')) page = 'auth';
-            if(!page && params.get('page') === 'profile') {
-                page = 'profile';
-                loadProfile(params.get('id'));
-            }
+            if(params.get('blink')) page = 'auth';
             if(!page) page = 'home';
-
+            
             document.getElementById(`view-${page}`).classList.add('active-view');
             updateNav();
 
-            if(page === 'auth' && params.get('blink')) setupBlinkAuth();
+            if(page === 'home') startMapFX();
+            if(page === 'auth' && params.get('blink')) setupBlink();
         }
 
         function updateNav() {
             const el = document.getElementById('nav-actions');
             if(currentUser) {
-                el.innerHTML = `
-                    <button class="btn btn-outline" onclick="route('dashboard')">DASHBOARD</button>
-                    <button class="btn btn-primary" onclick="auth.signOut()">EXIT</button>
-                `;
+                el.innerHTML = `<button class="btn btn-outline" onclick="route('dashboard')">Dashboard</button>`;
             } else {
-                el.innerHTML = `<button class="btn btn-primary" onclick="route('auth')">LOGIN</button>`;
+                el.innerHTML = `<button class="btn btn-gold" onclick="route('auth')">Login</button>`;
             }
         }
 
-        // --- AUTH ---
-        function toggleAuth() {
-            isSignup = !isSignup;
-            document.getElementById('auth-title').innerText = isSignup ? "Create Account" : "Log In";
-            document.getElementById('auth-submit').innerText = isSignup ? "Join Eternal" : "Enter";
-            document.getElementById('username').style.display = isSignup ? 'block' : 'none';
-            document.getElementById('auth-toggle').innerText = isSignup ? "Have an account? Log In" : "New? Create Account";
+        function startMapFX() {
+            const map = document.getElementById('map-bg');
+            // Remove old dots
+            document.querySelectorAll('.map-dot').forEach(e => e.remove());
+            // Create random pulsing dots
+            for(let i=0; i<15; i++) {
+                setTimeout(() => {
+                    const dot = document.createElement('div');
+                    dot.className = 'map-dot';
+                    dot.style.top = Math.random() * 80 + 10 + '%';
+                    dot.style.left = Math.random() * 90 + 5 + '%';
+                    map.appendChild(dot);
+                }, i * 500);
+            }
         }
 
-        function setupBlinkAuth() {
+        // --- 3. AUTH & SETUP ---
+        function toggleAuth() {
+            isSignup = !isSignup;
+            document.getElementById('u-name').style.display = isSignup ? 'block' : 'none';
+            document.getElementById('auth-switch').innerText = isSignup ? "Log In" : "Create Account";
+        }
+        function setupBlink() {
             isSignup = true;
-            toggleAuth(); // Reset UI first
-            isSignup = true; // Force true again
-            document.getElementById('auth-title').innerText = "Connect Partner";
-            document.getElementById('blink-alert').style.display = 'block';
-            document.getElementById('auth-toggle').style.display = 'none'; // Hide switch
-            document.getElementById('username').style.display = 'block';
+            toggleAuth(); isSignup = true; // reset visual
+            document.getElementById('blink-msg').style.display = 'block';
+            document.getElementById('auth-switch').style.display = 'none';
         }
 
         async function handleAuth() {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
-            const name = document.getElementById('username').value;
-            const params = new URLSearchParams(window.location.search);
-            const invite = params.get('blink');
+            const email = document.getElementById('u-email').value;
+            const pass = document.getElementById('u-pass').value;
+            const name = document.getElementById('u-name').value;
+            const blink = new URLSearchParams(window.location.search).get('blink');
 
             try {
                 if(isSignup) {
-                    if(!name) return alert("Name required");
                     const cred = await auth.createUserWithEmailAndPassword(email, pass);
                     const uid = cred.user.uid;
-                    let cId = null;
-
-                    if(invite) {
-                        const inviter = (await db.ref(`users/${invite}`).once('value')).val();
+                    let cid = null;
+                    if(blink) {
+                        const inviter = (await db.ref(`users/${blink}`).once('value')).val();
                         if(inviter && !inviter.coupleId) {
-                            cId = `c_${Date.now()}`;
-                            await db.ref(`couples/${cId}`).set({ u1: invite, u2: uid, created: Date.now() });
-                            await db.ref(`users/${invite}`).update({ coupleId: cId });
+                            cid = `c_${Date.now()}`;
+                            // Establish Relationship Start Date as NOW
+                            await db.ref(`couples/${cid}`).set({ 
+                                u1: blink, u2: uid, start: Date.now(),
+                                created: Date.now() 
+                            });
+                            await db.ref(`users/${blink}`).update({ coupleId: cid });
                         }
                     }
-
-                    await db.ref(`users/${uid}`).set({ name, email, coupleId: cId });
-                    window.history.replaceState({}, document.title, window.location.pathname);
+                    await db.ref(`users/${uid}`).set({ name, email, coupleId: cid });
+                    window.history.replaceState({},'',location.pathname);
                 } else {
                     await auth.signInWithEmailAndPassword(email, pass);
                 }
@@ -373,196 +327,186 @@
             } catch(e) { alert(e.message); }
         }
 
-        // --- DASHBOARD ---
+        // --- 4. DASHBOARD CORE ---
         auth.onAuthStateChanged(user => {
             currentUser = user;
             updateNav();
             if(user) {
-                db.ref(`users/${user.uid}`).on('value', snap => {
-                    const data = snap.val();
-                    if(data.coupleId) {
-                        currentCoupleId = data.coupleId;
-                        initCoupleView();
+                db.ref(`users/${user.uid}`).on('value', s => {
+                    const d = s.val();
+                    if(d.coupleId) {
+                        coupleId = d.coupleId;
+                        initSuperApp();
                     } else {
-                        initSingleView();
+                        // Create a temporary couple ID for singles to view dashboard features (demo mode)
+                        // In real app, show "Invite Partner" screen
+                        alert("Please invite a partner to unlock full features! (Link in URL)");
+                        window.history.replaceState({},'',`?blink=${user.uid}`);
                     }
                 });
             }
         });
 
-        function initSingleView() {
-            document.getElementById('dash-single').style.display = 'flex';
-            document.getElementById('dash-couple').style.display = 'none';
-            const link = `${window.location.origin}${window.location.pathname}?blink=${currentUser.uid}`;
-            document.getElementById('my-blink').innerText = link;
+        function initSuperApp() {
+            initClock();
+            initPulse();
+            initCapsules();
+            initChat();
         }
 
-        function copyBlink() {
-            navigator.clipboard.writeText(document.getElementById('my-blink').innerText);
-            alert("Link Copied!");
-        }
-
-        function initCoupleView() {
-            document.getElementById('dash-single').style.display = 'none';
-            document.getElementById('dash-couple').style.display = 'flex';
-
-            // CHAT LISTENER
-            db.ref(`couples/${currentCoupleId}/chat`).limitToLast(50).on('child_added', s => {
-                const msg = s.val();
-                const div = document.createElement('div');
-                div.className = `msg ${msg.uid === currentUser.uid ? 'msg-me' : 'msg-partner'}`;
-                div.innerText = msg.text;
-                const feed = document.getElementById('chat-feed');
-                feed.appendChild(div);
-                feed.scrollTop = feed.scrollHeight;
+        // --- FEATURE 1: CLOCK ---
+        function initClock() {
+            document.getElementById('clock-section').style.display = 'block';
+            db.ref(`couples/${coupleId}/start`).on('value', s => {
+                const start = s.val() || Date.now();
+                setInterval(() => {
+                    const diff = Date.now() - start;
+                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                    const m = Math.floor((diff / 1000 / 60) % 60);
+                    const y = Math.floor(d / 365);
+                    const remD = d % 365;
+                    document.getElementById('timer-val').innerText = 
+                        `${y} : ${remD} : ${h} : ${m}`;
+                }, 1000);
             });
+        }
+        function shareClock() {
+            alert("Generating Instagram Story image... (Simulated)");
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
 
-            // PROPOSAL LISTENER (WITH DELETE/REJECT LOGIC)
-            db.ref(`couples/${currentCoupleId}/proposals`).on('value', s => {
-                const list = document.getElementById('prop-list');
+        // --- FEATURE 2: DAILY PULSE ---
+        const QUESTIONS = [
+            "What is your favorite memory of us?",
+            "Where do you want to be in 5 years?",
+            "What meal represents our love?",
+            "Who is the better driver?"
+        ];
+        
+        function initPulse() {
+            // Pick question based on Day of Year
+            const qIdx = Math.floor(Date.now() / 86400000) % QUESTIONS.length;
+            document.getElementById('pulse-q').innerText = QUESTIONS[qIdx];
+            
+            // Listen for answers
+            const dateKey = new Date().toISOString().split('T')[0];
+            db.ref(`couples/${coupleId}/pulse/${dateKey}`).on('value', s => {
+                const data = s.val() || {};
+                const myAns = data[currentUser.uid];
+                const partnerAns = Object.values(data).find(v => v !== myAns); // simplistic logic
+                
+                if(myAns) {
+                    document.getElementById('pulse-answers').style.display = 'none';
+                    document.getElementById('pulse-reveal').style.display = 'block';
+                    document.getElementById('ans-me').innerText = myAns;
+                    
+                    if(Object.keys(data).length >= 2) {
+                        // Both answered
+                        document.getElementById('ans-partner').innerText = partnerAns || "Error";
+                    } else {
+                        document.getElementById('ans-partner').innerText = "Waiting for partner...";
+                        document.getElementById('ans-partner').classList.remove('blur-text');
+                    }
+                }
+            });
+        }
+
+        function submitPulse() {
+            const ans = document.getElementById('my-answer').value;
+            if(!ans) return;
+            const dateKey = new Date().toISOString().split('T')[0];
+            db.ref(`couples/${coupleId}/pulse/${dateKey}`).update({
+                [currentUser.uid]: ans
+            });
+        }
+
+        // --- FEATURE 3: TIME CAPSULE ---
+        function initCapsules() {
+            db.ref(`couples/${coupleId}/capsules`).on('value', s => {
+                const list = document.getElementById('capsule-list');
                 list.innerHTML = "";
                 const data = s.val();
                 if(!data) return;
 
-                Object.keys(data).forEach(key => {
-                    const p = data[key];
+                Object.values(data).forEach(c => {
+                    const isLocked = Date.now() < c.unlock;
                     const div = document.createElement('div');
-                    div.className = `prop-item ${p.status}`;
+                    div.className = 'capsule-item';
                     
-                    // Logic for Buttons
-                    let buttons = '';
-                    if(p.status === 'pending') {
-                        if(p.author === currentUser.uid) {
-                            // I made this -> I can DELETE it
-                            buttons = `<button class="btn-outline" style="font-size:0.7rem; padding:5px 10px;" onclick="removeProposal('${key}')"><i class="fas fa-trash"></i> Delete</button>`;
-                        } else {
-                            // Partner made this -> I can APPROVE or REJECT
-                            buttons = `
-                                <button class="btn-success" style="font-size:0.7rem; padding:5px 10px; border:none; border-radius:4px;" onclick="sealProposal('${key}')"><i class="fas fa-check"></i> SEAL IT</button>
-                                <button class="btn-danger" style="font-size:0.7rem; padding:5px 10px; border-radius:4px;" onclick="removeProposal('${key}')"><i class="fas fa-times"></i> VETO</button>
-                            `;
-                        }
+                    if(isLocked) {
+                        const dateStr = new Date(c.unlock).toDateString();
+                        div.innerHTML = `<i class="fas fa-lock lock-icon"></i> <div>Locked until ${dateStr}</div>`;
                     } else {
-                        buttons = `<span class="badge" style="background:var(--primary); color:black">SEALED ON WALL</span>`;
+                        div.innerHTML = `<i class="fas fa-box-open unlocked-icon"></i> <div>"${c.msg}"</div>`;
                     }
-
-                    div.innerHTML = `
-                        <div style="font-size:0.9rem;">"${p.caption}"</div>
-                        <div class="prop-actions">${buttons}</div>
-                    `;
-                    list.prepend(div);
+                    list.appendChild(div);
                 });
             });
         }
 
+        function addCapsule() {
+            const msg = document.getElementById('capsule-msg').value;
+            const dateVal = document.getElementById('capsule-date').value;
+            if(!msg || !dateVal) return alert("Message and Date required");
+            
+            const unlockTS = new Date(dateVal).getTime();
+            if(unlockTS <= Date.now()) return alert("Date must be in future");
+
+            db.ref(`couples/${coupleId}/capsules`).push({
+                msg: msg, unlock: unlockTS
+            });
+            document.getElementById('capsule-msg').value = "";
+        }
+
+        // --- FEATURE 4: TOOLKIT ---
+        function runTool(type) {
+            let res = "";
+            if(type === 'coin') res = Math.random() > 0.5 ? "Heads" : "Tails";
+            if(type === 'dice') res = Math.floor(Math.random() * 6) + 1;
+            if(type === 'wheel') {
+                const foods = ["Pizza", "Sushi", "Burgers", "Tacos"];
+                res = foods[Math.floor(Math.random()*foods.length)];
+            }
+            if(type === 'sorry') res = "Sent a Virtual Hug & Apology ❤️";
+
+            // Send system message to chat
+            db.ref(`couples/${coupleId}/chat`).push({
+                text: `[TOOL] Used ${type.toUpperCase()}: Result = ${res}`,
+                sys: true,
+                timestamp: Date.now()
+            });
+        }
+
+        // --- CHAT ---
+        function initChat() {
+            db.ref(`couples/${coupleId}/chat`).limitToLast(50).on('child_added', s => {
+                const m = s.val();
+                const d = document.createElement('div');
+                if(m.sys) {
+                    d.className = 'sys-msg';
+                    d.innerText = m.text;
+                } else {
+                    d.className = `msg ${m.sender === currentUser.uid ? 'msg-me' : 'msg-partner'}`;
+                    d.innerText = m.text;
+                }
+                const f = document.getElementById('chat-feed');
+                f.appendChild(d);
+                f.scrollTop = f.scrollHeight;
+            });
+        }
+
         function sendChat() {
-            const inp = document.getElementById('chat-input');
-            if(!inp.value) return;
-            db.ref(`couples/${currentCoupleId}/chat`).push({
-                uid: currentUser.uid, text: inp.value, time: Date.now()
+            const t = document.getElementById('chat-in').value;
+            if(!t) return;
+            db.ref(`couples/${coupleId}/chat`).push({
+                sender: currentUser.uid, text: t, timestamp: Date.now()
             });
-            inp.value = "";
-        }
-
-        function submitProposal() {
-            const img = document.getElementById('prop-img').value;
-            const txt = document.getElementById('prop-text').value;
-            if(!img || !txt) return alert("Image and Caption required.");
-            db.ref(`couples/${currentCoupleId}/proposals`).push({
-                author: currentUser.uid,
-                image: img, caption: txt, status: 'pending'
-            });
-            document.getElementById('prop-text').value = "";
-        }
-
-        function removeProposal(key) {
-            if(confirm("Are you sure?")) {
-                db.ref(`couples/${currentCoupleId}/proposals/${key}`).remove();
-            }
-        }
-
-        async function sealProposal(key) {
-            // Get data
-            const snap = await db.ref(`couples/${currentCoupleId}/proposals/${key}`).once('value');
-            const prop = snap.val();
-            
-            // Mark Sealed
-            await db.ref(`couples/${currentCoupleId}/proposals/${key}`).update({ status: 'sealed' });
-
-            // Get Names
-            const cData = (await db.ref(`couples/${currentCoupleId}`).once('value')).val();
-            const u1 = (await db.ref(`users/${cData.u1}`).once('value')).val().name;
-            const u2 = (await db.ref(`users/${cData.u2}`).once('value')).val().name;
-
-            // Push to Public Wall
-            await db.ref('publicWall').push({
-                cid: currentCoupleId,
-                names: `${u1} & ${u2}`,
-                image: prop.image,
-                caption: prop.caption,
-                time: Date.now()
-            });
-        }
-
-        // --- PUBLIC WALL ---
-        db.ref('publicWall').limitToLast(100).on('value', snap => {
-            const grid = document.getElementById('public-grid');
-            grid.innerHTML = "";
-            const data = snap.val();
-            if(!data) return;
-
-            // Simple Set to show unique couples only on home page
-            const seen = new Set();
-            Object.values(data).reverse().forEach(post => {
-                if(seen.has(post.cid)) return;
-                seen.add(post.cid);
-
-                const tile = document.createElement('div');
-                tile.className = 'tile';
-                tile.innerHTML = `
-                    <img src="${post.image}">
-                    <div class="tile-overlay">
-                        <div class="serif" style="font-size:1.2rem; color:var(--primary);">${post.names}</div>
-                        <button class="btn btn-outline" style="margin-top:10px; font-size:0.7rem;" onclick="window.location.href='?page=profile&id=${post.cid}'">VISIT</button>
-                    </div>
-                `;
-                grid.appendChild(tile);
-            });
-        });
-
-        async function loadProfile(id) {
-            // Get Posts for this couple
-            const snap = await db.ref('publicWall').orderByChild('cid').equalTo(id).once('value');
-            const posts = snap.val();
-            
-            if(!posts) {
-                document.getElementById('prof-names').innerText = "Not Found";
-                return;
-            }
-
-            const arr = Object.values(posts).reverse();
-            const latest = arr[0];
-
-            document.getElementById('prof-cover').src = latest.image;
-            document.getElementById('prof-names').innerText = latest.names;
-            document.getElementById('prof-code').innerText = id.substring(5,10).toUpperCase();
-
-            const feed = document.getElementById('prof-feed');
-            feed.innerHTML = "";
-            arr.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'memory-card';
-                card.innerHTML = `
-                    <img src="${p.image}" class="memory-img">
-                    <div class="memory-text">"${p.caption}"</div>
-                `;
-                feed.appendChild(card);
-            });
+            document.getElementById('chat-in').value = "";
         }
 
         // Init
         route();
-
     </script>
 </body>
 </html>
