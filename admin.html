@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin | EternalWall</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-10">
+    <h1 class="text-3xl font-bold mb-8 text-rose-500">EternalWall Administration</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-gray-800 p-6 rounded border border-gray-700">
+            <h3 class="text-gray-400">Total Users</h3>
+            <p id="countUsers" class="text-4xl font-bold">Loading...</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded border border-gray-700">
+            <h3 class="text-gray-400">Active Couples</h3>
+            <p id="countCouples" class="text-4xl font-bold text-rose-500">Loading...</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded border border-gray-700">
+            <h3 class="text-gray-400">Market Items</h3>
+            <p id="countMarket" class="text-4xl font-bold text-green-500">Loading...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4",
+            authDomain: "onlineshop-30cd1.firebaseapp.com",
+            databaseURL: "https://onlineshop-30cd1-default-rtdb.firebaseio.com",
+            projectId: "onlineshop-30cd1",
+            storageBucket: "onlineshop-30cd1.firebasestorage.app",
+            messagingSenderId: "818252574868",
+            appId: "1:818252574868:web:8dd36825db589a886cc481",
+            measurementId: "G-6YLGGH2NDD"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        onValue(ref(db, 'users'), snap => {
+            document.getElementById('countUsers').innerText = snap.size;
+        });
+        onValue(ref(db, 'couples'), snap => {
+            document.getElementById('countCouples').innerText = snap.size;
+        });
+        onValue(ref(db, 'market_feed'), snap => {
+            document.getElementById('countMarket').innerText = snap.size;
+        });
+    </script>
+</body>
+</html>
