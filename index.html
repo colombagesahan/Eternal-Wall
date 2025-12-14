@@ -3,259 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eternal Wall | The Monument of Us</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDKs (Compat version for ease of use) -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
+    <title>EternalWall | The Network for Lovers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root {
-            --bg: #0b0c10;
-            --panel: #1f2833;
-            --primary: #66fcf1;
-            --secondary: #45a29e;
-            --text: #c5c6c7;
-            --gold: #ffd700;
-            --love: #ff0055;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Lato', sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3 { font-family: 'Cinzel', serif; margin: 0; }
-        button { cursor: pointer; font-family: inherit; transition: 0.2s; }
-
-        /* --- NAVIGATION --- */
-        nav {
-            background: rgba(11, 12, 16, 0.95);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #333;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-        }
-
-        .brand { font-size: 1.5rem; color: var(--primary); letter-spacing: 2px; text-decoration: none; font-weight: bold;}
-        .nav-links button {
-            background: transparent; border: 1px solid var(--primary); color: var(--primary);
-            padding: 8px 16px; margin-left: 10px; border-radius: 4px;
-        }
-        .nav-links button:hover { background: var(--primary); color: #000; }
-
-        /* --- VIEWS --- */
-        .view { display: none; padding: 20px; min-height: 80vh; }
-        .active-view { display: block; }
-
-        /* --- VIEW 1: PUBLIC WALL --- */
-        #search-bar {
-            width: 100%; max-width: 500px; padding: 12px;
-            background: #000; border: 1px solid #333; color: white;
-            border-radius: 30px; margin: 20px auto; display: block; text-align: center;
-        }
-
-        .wall-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 5px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .tile {
-            aspect-ratio: 1;
-            background: #151515;
-            border: 1px solid #333;
-            position: relative;
-            cursor: pointer;
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
-        .tile:hover { transform: scale(1.1); z-index: 10; border-color: var(--primary); }
-        .tile.occupied { background: linear-gradient(135deg, #222, #333); border-color: #555; }
-        .tile-content { 
-            position: absolute; top:0; left:0; width:100%; height:100%; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; font-size: 0.8rem; padding: 5px; box-sizing: border-box;
-        }
-        .tile-names { color: var(--primary); font-weight: bold; font-family: 'Cinzel'; }
-
-        /* --- VIEW 2: AUTH --- */
-        .auth-container {
-            max-width: 400px; margin: 50px auto;
-            background: var(--panel); padding: 30px; border-radius: 10px;
-            text-align: center; box-shadow: 0 0 20px rgba(102, 252, 241, 0.1);
-        }
-        .auth-input {
-            width: 100%; padding: 12px; margin: 10px 0;
-            background: #000; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;
-        }
-        .primary-btn {
-            width: 100%; padding: 12px; background: var(--primary); color: #000;
-            border: none; font-weight: bold; border-radius: 5px; margin-top: 10px;
-        }
-
-        /* --- VIEW 3: COUPLE DASHBOARD --- */
-        .dashboard-layout {
-            display: flex; gap: 20px; max-width: 1200px; margin: 0 auto; height: 80vh;
-        }
-        .dash-panel { flex: 1; background: var(--panel); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
-        
-        /* Chat */
-        .chat-area { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 8px 12px; border-radius: 15px; max-width: 80%; font-size: 0.9rem; }
-        .msg-me { background: var(--secondary); align-self: flex-end; color: black; }
-        .msg-partner { background: #333; align-self: flex-start; }
-        
-        /* Proposal Area */
-        .proposal-item {
-            background: #111; padding: 15px; margin: 10px; border-radius: 8px; border-left: 3px solid var(--gold);
-        }
-        .proposal-actions { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-approve { flex:1; background: var(--primary); border:none; padding: 5px; border-radius:3px; }
-        .btn-reject { flex:1; background: var(--love); color:white; border:none; padding: 5px; border-radius:3px; }
-
-        /* Blink Link Box */
-        .blink-box {
-            background: linear-gradient(45deg, var(--love), #ff8800);
-            padding: 15px; margin-bottom: 20px; border-radius: 8px; text-align: center; color: white;
-        }
-        .code-display { font-family: monospace; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 4px; user-select: all; cursor: pointer;}
-
-        /* MODAL */
-        #modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 1000;
-        }
-        .modal-content {
-            background: var(--panel); padding: 30px; border-radius: 10px; max-width: 500px; width: 90%; text-align: center; position: relative; border: 1px solid var(--primary);
-        }
-        .modal-close { position: absolute; top: 10px; right: 15px; color: #fff; cursor: pointer; font-size: 24px; }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .dashboard-layout { flex-direction: column; height: auto; }
-            .dash-panel { height: 50vh; }
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .heart-mask { clip-path: path("M12 4.248c-3.148-5.402-12-3.825-12 2.944 0 4.661 5.571 9.427 12 15.808 6.43-6.381 12-11.147 12-15.808 0-6.792-8.875-8.306-12-2.944z"); }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        #map { height: 600px; z-index: 1; }
+        .gold-badge { background: linear-gradient(45deg, #FFD700, #FDB931); color: #5c4002; }
     </style>
 </head>
-<body>
+<body class="bg-rose-50 text-gray-800">
 
-    <!-- NAV -->
-    <nav>
-        <a href="#" class="brand" onclick="showView('public-view')">ETERNAL WALL</a>
-        <div class="nav-links" id="nav-actions">
-            <!-- JS will populate Login / Dashboard buttons -->
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 glass shadow-sm transition-all duration-300">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-3xl font-bold text-rose-600 tracking-tighter">EternalWall <i class="fas fa-heart"></i></a>
+            <div class="hidden md:flex space-x-6">
+                <input type="text" id="searchInput" placeholder="Search Code (e.g. EW-123)" class="border rounded-full px-4 py-1 text-sm focus:outline-rose-500">
+                <button onclick="searchCouple()" class="text-rose-600 hover:text-rose-800"><i class="fas fa-search"></i></button>
+            </div>
+            <div>
+                <a href="dashboard.html" class="bg-rose-600 text-white px-6 py-2 rounded-full hover:bg-rose-700 transition shadow-lg hover:shadow-rose-500/50">Login / Join</a>
+            </div>
         </div>
     </nav>
 
-    <!-- VIEW: PUBLIC WALL -->
-    <div id="public-view" class="view active-view">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h1>The Monument of Us</h1>
-            <p style="color: #888;">Secure your love in the digital universe.</p>
-        </div>
+    <!-- Content Wrapper -->
+    <div id="mainContent" class="pt-24">
         
-        <input type="text" id="search-bar" placeholder="🔍 Search by Unique Code (e.g. #EW-102)" onkeyup="filterWall()">
-        
-        <div class="wall-grid" id="public-grid">
-            <!-- Tiles generated by JS -->
-        </div>
-    </div>
-
-    <!-- VIEW: AUTH -->
-    <div id="auth-view" class="view">
-        <div class="auth-container">
-            <h2 id="auth-title">Login</h2>
-            <div id="blink-invite-msg" style="display:none; color: var(--gold); margin-bottom:10px; font-size:0.9rem;">
-                ❤️ You are accepting a Blink Invite!
+        <!-- Hero -->
+        <header class="text-center py-20 px-4 bg-gradient-to-b from-rose-50 to-white">
+            <h1 class="text-5xl md:text-7xl font-bold text-gray-900 mb-6">Leave a Mark on Eternity</h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">The exclusive social network for couples. Create your shared space, plan your future, and visualize your love on the world map.</p>
+            <div class="flex justify-center gap-4">
+                <a href="dashboard.html" class="bg-rose-600 text-white px-8 py-3 rounded-full text-lg shadow-lg hover:bg-rose-700">Create Couple Account</a>
             </div>
-            
-            <input type="email" id="email" class="auth-input" placeholder="Email">
-            <input type="password" id="password" class="auth-input" placeholder="Password">
-            
-            <!-- Extra field for Name on Signup -->
-            <input type="text" id="username" class="auth-input" placeholder="Your Name" style="display:none;">
+        </header>
 
-            <button class="primary-btn" onclick="handleAuth()" id="auth-btn">LOGIN</button>
-            <p style="font-size: 0.8rem; margin-top: 15px; cursor: pointer; color: var(--primary);" onclick="toggleAuthMode()" id="toggle-auth-text">
-                Don't have an account? Create one.
-            </p>
-        </div>
-    </div>
+        <!-- World Map -->
+        <section class="container mx-auto px-4 mb-20">
+            <h2 class="text-3xl font-bold text-center mb-10">Love Around The World</h2>
+            <div id="map" class="rounded-2xl shadow-2xl border-4 border-white"></div>
+        </section>
 
-    <!-- VIEW: DASHBOARD (PRIVATE) -->
-    <div id="dashboard-view" class="view">
-        <div id="blink-generation-area" class="blink-box" style="display: none;">
-            <h3>🔗 Connect Your Partner</h3>
-            <p>You are currently single on Eternal Wall. Send this Blink Link to your partner to connect.</p>
-            <div class="code-display" onclick="copyBlink()" id="my-blink-link">Loading...</div>
-        </div>
+        <!-- Profile Viewer Modal (Dynamic) -->
+        <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-80 z-[60] hidden overflow-y-auto">
+            <div class="min-h-screen px-4 text-center">
+                <span class="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
+                <div class="inline-block w-full max-w-4xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl relative">
+                    <button onclick="closeProfile()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl"><i class="fas fa-times"></i></button>
+                    
+                    <!-- Profile Content -->
+                    <div id="profileData" class="text-center">
+                        <div class="relative w-40 h-40 mx-auto mb-6">
+                            <img id="p_image" src="https://via.placeholder.com/150" class="w-full h-full object-cover heart-mask border-4 border-rose-500 shadow-lg">
+                        </div>
+                        <h2 id="p_names" class="text-4xl font-bold text-gray-800 mb-2">Names Loading...</h2>
+                        <p id="p_date" class="text-sm text-gray-500 mb-4">Established 2023</p>
+                        <div id="p_badge" class="inline-block px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wide mb-6 gold-badge">Status</div>
+                        <p id="p_slogan" class="text-xl italic font-serif text-rose-600 mb-8">"Slogan goes here"</p>
+                        
+                        <!-- Tabs for Profile -->
+                        <div class="border-t border-gray-200 pt-8">
+                            <h3 class="text-2xl font-bold mb-4">Our Memories</h3>
+                            <div id="p_posts" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                                <!-- Posts injected here -->
+                            </div>
+                        </div>
 
-        <div class="dashboard-layout" id="couple-interface" style="display: none;">
-            <!-- Chat Panel -->
-            <div class="dash-panel">
-                <div style="padding: 15px; border-bottom: 1px solid #333; font-weight: bold; background: rgba(0,0,0,0.2);">
-                    💬 Private Chat
-                </div>
-                <div class="chat-area" id="chat-messages">
-                    <!-- Chat messages -->
-                </div>
-                <div style="padding: 10px; display: flex; gap: 5px; border-top: 1px solid #333;">
-                    <input type="text" id="chat-input" class="auth-input" style="margin:0;" placeholder="Say something...">
-                    <button class="primary-btn" style="width: auto; margin:0;" onclick="sendChat()">➤</button>
-                </div>
-            </div>
-
-            <!-- Wall Proposal Panel -->
-            <div class="dash-panel">
-                <div style="padding: 15px; border-bottom: 1px solid #333; font-weight: bold; background: rgba(0,0,0,0.2);">
-                    📝 Wall Proposals (Dual Consent)
-                </div>
-                
-                <!-- New Proposal Form -->
-                <div style="padding: 15px; background: #111;">
-                    <textarea id="prop-text" class="auth-input" rows="2" placeholder="Write a memory for the public wall..."></textarea>
-                    <button class="primary-btn" onclick="submitProposal()">PROPOSE TO WALL</button>
-                </div>
-
-                <!-- List of Pending/Approved -->
-                <div style="flex: 1; overflow-y: auto; padding: 10px;" id="proposal-list">
-                    <!-- Proposals loaded here -->
+                         <!-- Ad Modal Trigger (Scroll logic handled in JS) -->
+                         <div id="adSpace" class="mt-10 p-4 bg-gray-100 hidden">
+                             <h4 class="text-xs font-bold text-gray-400 uppercase">Sponsored</h4>
+                             <div id="adContent"></div>
+                         </div>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 
-    <!-- TILE MODAL -->
-    <div id="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">&times;</span>
-            <h2 id="m-names" style="color: var(--primary); margin-bottom: 10px;">Names</h2>
-            <div style="font-size: 0.8rem; color: #888; margin-bottom: 20px;" id="m-code">#CODE</div>
-            <p id="m-story" style="font-style: italic; font-size: 1.1rem; line-height: 1.6;">Story</p>
-            <div style="margin-top: 20px; font-size: 0.8rem; color: #555;">ESTABLISHED <span id="m-date">DATE</span></div>
-        </div>
-    </div>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-    <!-- FIREBASE LOGIC -->
-    <script>
-        // --- 1. CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4",
             authDomain: "onlineshop-30cd1.firebaseapp.com",
@@ -267,322 +105,127 @@
             measurementId: "G-6YLGGH2NDD"
         };
 
-        // Initialize
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        // --- 2. STATE & UTILS ---
-        let currentUser = null;
-        let userProfile = null;
-        let currentCoupleId = null;
-        let isLoginMode = true;
+        // Map Init
+        var map = L.map('map').setView([20, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
 
-        function showView(id) {
-            document.querySelectorAll('.view').forEach(el => el.classList.remove('active-view'));
-            document.getElementById(id).classList.add('active-view');
-        }
-
-        function getUrlParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
-
-        // --- 3. AUTHENTICATION ---
-        
-        // Listen to Auth State
-        auth.onAuthStateChanged((user) => {
-            currentUser = user;
-            updateNav();
-            
-            if (user) {
-                // CHANGE: Use .on() instead of .once() to listen for changes instantly
-                db.ref('users/' + user.uid).on('value', snapshot => {
-                    userProfile = snapshot.val();
-                    
-                    // If the database says we have a coupleId, switch views immediately
-                    if (userProfile && userProfile.coupleId) {
-                        // Only init if we haven't already (prevents duplicate listeners)
-                        if (currentCoupleId !== userProfile.coupleId) {
-                            currentCoupleId = userProfile.coupleId;
-                            initDashboardCouple();
+        // Load Couples to Map
+        async function loadMap() {
+            const dbRef = ref(db);
+            get(child(dbRef, `public_profiles`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const data = childSnapshot.val();
+                        if(data.lat && data.lng) {
+                            var icon = L.divIcon({
+                                className: 'custom-div-icon',
+                                html: `<div style="background-color:#e11d48;width:10px;height:10px;border-radius:50%;box-shadow:0 0 10px #e11d48;"></div>`,
+                                iconSize: [10, 10],
+                                iconAnchor: [5, 5]
+                            });
+                            
+                            const marker = L.marker([data.lat, data.lng], {icon: icon}).addTo(map);
+                            marker.bindPopup(`
+                                <div class="text-center p-2">
+                                    <h3 class="font-bold text-rose-600">${data.names}</h3>
+                                    <p class="text-xs">${data.city || 'Love City'}</p>
+                                    <button onclick="window.location.href='index.html?code=${data.code}'" class="mt-2 text-xs bg-gray-800 text-white px-2 py-1 rounded">View Profile</button>
+                                </div>
+                            `);
                         }
-                    } else {
-                        initDashboardSingle();
+                    });
+                }
+            });
+        }
+        loadMap();
+
+        // Search & Profile View Logic
+        window.searchCouple = function() {
+            const code = document.getElementById('searchInput').value;
+            if(code) window.location.href = `index.html?code=${code}`;
+        }
+
+        // Check URL for code
+        const urlParams = new URLSearchParams(window.location.search);
+        const profileCode = urlParams.get('code');
+
+        if(profileCode) {
+            loadProfile(profileCode);
+        }
+
+        async function loadProfile(code) {
+            const dbRef = ref(db);
+            // In a real app we would query by child, for now assuming key is code or search works
+            // This is a simplified search for prototype
+            get(child(dbRef, `public_profiles`)).then((snapshot) => {
+                let found = false;
+                snapshot.forEach(child => {
+                    const data = child.val();
+                    if(data.code === code) {
+                        found = true;
+                        openProfileModal(data, child.key); // child.key is coupleId
                     }
                 });
-            }
-        });
-
-        function updateNav() {
-            const nav = document.getElementById('nav-actions');
-            if (currentUser) {
-                nav.innerHTML = `
-                    <button onclick="showView('dashboard-view')">MY WALL</button>
-                    <button onclick="auth.signOut(); window.location.reload();">LOGOUT</button>
-                `;
-            } else {
-                nav.innerHTML = `<button onclick="showView('auth-view')">LOGIN</button>`;
-            }
+                if(!found) alert('Couple not found!');
+            });
         }
 
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').innerText = isLoginMode ? 'Login' : 'Create Account';
-            document.getElementById('auth-btn').innerText = isLoginMode ? 'LOGIN' : 'SIGN UP';
-            document.getElementById('toggle-auth-text').innerText = isLoginMode ? "Don't have an account? Create one." : "Already have an account? Login.";
-            document.getElementById('username').style.display = isLoginMode ? 'none' : 'block';
-        }
+        function openProfileModal(data, coupleId) {
+            document.getElementById('profileModal').classList.remove('hidden');
+            document.getElementById('p_names').innerText = data.names;
+            document.getElementById('p_slogan').innerText = `"${data.slogan || 'Love is eternal'}"`;
+            document.getElementById('p_badge').innerText = data.badge || 'Couple';
+            document.getElementById('p_date').innerText = 'Established ' + (data.since || 'Recently');
+            if(data.photo) document.getElementById('p_image').src = data.photo;
 
-        async function handleAuth() {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
-            const name = document.getElementById('username').value;
-            const inviteCode = getUrlParam('blink');
-
-            try {
-                if (isLoginMode) {
-                    await auth.signInWithEmailAndPassword(email, pass);
-                } else {
-                    if(!name) return alert("Name is required");
-                    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-                    const uid = cred.user.uid;
-
-                    // Create User Record
-                    let coupleId = null;
-                    
-                    // IF ACCEPTING INVITE
-                    if (inviteCode) {
-                        // Lookup inviter
-                        const inviterSnap = await db.ref('users/' + inviteCode).once('value');
-                        if (inviterSnap.exists()) {
-                            const inviter = inviterSnap.val();
-                            if (!inviter.coupleId) {
-                                // Create new Couple
-                                coupleId = `couple_${Date.now()}`;
-                                await db.ref('couples/' + coupleId).set({
-                                    user1: inviteCode,
-                                    user2: uid,
-                                    created: Date.now()
-                                });
-                                // Update inviter
-                                await db.ref('users/' + inviteCode).update({ coupleId: coupleId });
-                            }
+            // Load Posts
+            const postsDiv = document.getElementById('p_posts');
+            postsDiv.innerHTML = '<p class="text-gray-400 text-sm col-span-2 text-center">Loading memories...</p>';
+            
+            get(child(ref(db), `couples/${coupleId}/wall`)).then((snap) => {
+                postsDiv.innerHTML = '';
+                if(snap.exists()) {
+                    snap.forEach(postSnap => {
+                        const post = postSnap.val();
+                        if(post.status === 'published') {
+                            postsDiv.innerHTML += `
+                                <div class="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-100">
+                                    <img src="${post.image || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover rounded mb-3">
+                                    <p class="text-gray-700 text-sm">${post.text}</p>
+                                    <div class="mt-2 flex justify-between text-xs text-gray-400">
+                                        <span><i class="fas fa-heart text-rose-500"></i> ${post.likes || 0}</span>
+                                        <span>${new Date(post.date).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            `;
                         }
-                    }
-
-                    // Save User
-                    await db.ref('users/' + uid).set({
-                        name: name,
-                        email: email,
-                        coupleId: coupleId // will be null if no invite
                     });
-                    
-                    // Clear URL params
-                    window.history.replaceState({}, document.title, "/");
+                } else {
+                    postsDiv.innerHTML = '<p class="text-gray-400 col-span-2 text-center">No public memories yet.</p>';
                 }
-                showView('dashboard-view');
-            } catch (e) {
-                alert(e.message);
-            }
-        }
-
-        // Handle Blink Invite UI on load
-        if (getUrlParam('blink')) {
-            showView('auth-view');
-            isLoginMode = false;
-            toggleAuthMode(); // Switch to signup
-            document.getElementById('blink-invite-msg').style.display = 'block';
-        }
-
-
-        // --- 4. DASHBOARD LOGIC ---
-
-        function initDashboardSingle() {
-            document.getElementById('blink-generation-area').style.display = 'block';
-            document.getElementById('couple-interface').style.display = 'none';
-            
-            // Blink Link is just the User ID
-            const link = window.location.origin + window.location.pathname + "?blink=" + currentUser.uid;
-            document.getElementById('my-blink-link').innerText = link;
-        }
-
-        function copyBlink() {
-            const text = document.getElementById('my-blink-link').innerText;
-            navigator.clipboard.writeText(text);
-            alert("Blink Link Copied! Send this to your partner.");
-        }
-
-        function initDashboardCouple() {
-            document.getElementById('blink-generation-area').style.display = 'none';
-            document.getElementById('couple-interface').style.display = 'flex';
-
-            // Listen to Chat
-            db.ref('couples/' + currentCoupleId + '/chat').limitToLast(20).on('child_added', snapshot => {
-                const msg = snapshot.val();
-                renderMessage(msg);
             });
 
-            // Listen to Proposals
-            db.ref('couples/' + currentCoupleId + '/proposals').on('value', snapshot => {
-                renderProposals(snapshot.val());
-            });
-        }
-
-        // CHAT
-        function sendChat() {
-            const txt = document.getElementById('chat-input').value;
-            if(!txt) return;
-            db.ref('couples/' + currentCoupleId + '/chat').push({
-                sender: currentUser.uid,
-                text: txt,
-                timestamp: Date.now()
-            });
-            document.getElementById('chat-input').value = "";
-        }
-
-        function renderMessage(msg) {
-            const div = document.createElement('div');
-            div.className = `msg ${msg.sender === currentUser.uid ? 'msg-me' : 'msg-partner'}`;
-            div.innerText = msg.text;
-            const container = document.getElementById('chat-messages');
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // PROPOSALS (DUAL CONSENT)
-        function submitProposal() {
-            const txt = document.getElementById('prop-text').value;
-            if(!txt) return;
-            
-            db.ref('couples/' + currentCoupleId + '/proposals').push({
-                author: currentUser.uid,
-                content: txt,
-                status: 'pending', // pending, approved
-                timestamp: Date.now()
-            });
-            document.getElementById('prop-text').value = "";
-        }
-
-        function renderProposals(props) {
-            const list = document.getElementById('proposal-list');
-            list.innerHTML = "";
-            if(!props) return;
-
-            Object.keys(props).forEach(key => {
-                const p = props[key];
-                const el = document.createElement('div');
-                el.className = 'proposal-item';
-                
-                let html = `<div style="font-size:0.9rem; margin-bottom:5px;">"${p.content}"</div>`;
-                
-                if (p.status === 'approved') {
-                    html += `<div style="color:var(--primary); font-size:0.8rem;">✅ SEALED & PUBLIC</div>`;
-                } else if (p.status === 'pending') {
-                    // If I am NOT the author, I see approve buttons
-                    if (p.author !== currentUser.uid) {
-                        html += `
-                            <div style="font-size:0.8rem; color:#888;">Partner wants to post this.</div>
-                            <div class="proposal-actions">
-                                <button class="btn-approve" onclick="sealProposal('${key}', '${p.content}')">SEAL IT ❤️</button>
-                                <button class="btn-reject" onclick="deleteProposal('${key}')">VETO</button>
-                            </div>
-                        `;
-                    } else {
-                        html += `<div style="font-size:0.8rem; color:#888;">⏳ Waiting for partner approval...</div>`;
-                    }
+            // Ads Logic (Scroll)
+            const modalContainer = document.querySelector('#profileModal > div');
+            modalContainer.addEventListener('scroll', () => {
+                if(modalContainer.scrollTop > 200) {
+                     // Check if ads exist for this couple
+                     if(data.adContent && document.getElementById('adSpace').classList.contains('hidden')) {
+                         document.getElementById('adSpace').classList.remove('hidden');
+                         document.getElementById('adContent').innerHTML = data.adContent;
+                     }
                 }
-                
-                el.innerHTML = html;
-                list.prepend(el);
             });
         }
 
-        function deleteProposal(key) {
-            db.ref('couples/' + currentCoupleId + '/proposals/' + key).remove();
+        window.closeProfile = function() {
+            document.getElementById('profileModal').classList.add('hidden');
+            // Remove code from URL without refresh
+            window.history.pushState({}, document.title, window.location.pathname);
         }
-
-        async function sealProposal(key, content) {
-            // 1. Update status to approved
-            await db.ref('couples/' + currentCoupleId + '/proposals/' + key).update({ status: 'approved' });
-            
-            // 2. Push to PUBLIC WALL
-            // Need couple names
-            const coupleSnap = await db.ref('couples/' + currentCoupleId).once('value');
-            const cData = coupleSnap.val();
-            
-            const u1Snap = await db.ref('users/' + cData.user1).once('value');
-            const u2Snap = await db.ref('users/' + cData.user2).once('value');
-            const names = `${u1Snap.val().name} & ${u2Snap.val().name}`;
-
-            // Unique Code (Simple hash of key)
-            const uniqueCode = "#EW-" + Math.floor(1000 + Math.random() * 9000);
-
-            await db.ref('publicWall').push({
-                names: names,
-                story: content,
-                code: uniqueCode,
-                timestamp: Date.now()
-            });
-
-            alert("CONGRATULATIONS! Your memory is now eternal.");
-        }
-
-
-        // --- 5. PUBLIC WALL LOGIC ---
-        
-        // Listen to public wall
-        db.ref('publicWall').on('value', snapshot => {
-            const wallDiv = document.getElementById('public-grid');
-            wallDiv.innerHTML = "";
-            const data = snapshot.val();
-            if(!data) {
-                wallDiv.innerHTML = "<div style='padding:20px'>The Wall is empty. Be the first.</div>";
-                return;
-            }
-
-            // Convert object to array and reverse (newest first)
-            const tiles = Object.values(data).reverse();
-
-            tiles.forEach(t => {
-                const el = document.createElement('div');
-                el.className = 'tile occupied';
-                el.innerHTML = `
-                    <div class="tile-content">
-                        <div class="tile-names">${t.names}</div>
-                        <div style="margin-top:5px; color:#555; font-size:0.7rem;">${t.code}</div>
-                    </div>
-                `;
-                el.onclick = () => openModal(t);
-                wallDiv.appendChild(el);
-            });
-        });
-
-        function filterWall() {
-            const term = document.getElementById('search-bar').value.toUpperCase();
-            const tiles = document.querySelectorAll('.tile');
-            tiles.forEach(t => {
-                const txt = t.innerText.toUpperCase();
-                t.style.display = txt.includes(term) ? 'block' : 'none';
-            });
-        }
-
-        // Modal
-        const modal = document.getElementById('modal');
-        function openModal(data) {
-            document.getElementById('m-names').innerText = data.names;
-            document.getElementById('m-code').innerText = data.code;
-            document.getElementById('m-story').innerText = `"${data.story}"`;
-            document.getElementById('m-date').innerText = new Date(data.timestamp).toDateString().toUpperCase();
-            modal.style.display = 'flex';
-        }
-        function closeModal() {
-            modal.style.display = 'none';
-        }
-        window.onclick = function(event) {
-            if (event.target == modal) closeModal();
-        }
-
     </script>
 </body>
 </html>
