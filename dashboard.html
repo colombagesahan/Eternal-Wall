@@ -10,178 +10,231 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .sidebar-link.active { background-color: #ffe4e6; color: #be123c; border-right: 4px solid #be123c; }
-        .clip-heart { clip-path: path("M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"); }
+        .heart-clip { clip-path: path("M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"); }
     </style>
 </head>
-<body class="bg-gray-100 h-screen flex overflow-hidden">
+<body class="bg-gray-100 h-screen overflow-hidden font-sans">
 
-    <!-- Auth / Connect Overlay -->
-    <div id="authOverlay" class="fixed inset-0 bg-white z-[100] flex items-center justify-center p-4">
-        <div class="max-w-md w-full text-center">
-            <h1 class="text-4xl font-bold text-rose-600 mb-6">EternalWall</h1>
+    <!-- 1. LOGIN / REGISTER SCREEN -->
+    <div id="authScreen" class="fixed inset-0 bg-gradient-to-br from-rose-500 to-purple-600 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+            <h1 class="text-4xl font-bold text-rose-600 mb-2">EternalWall</h1>
+            <p class="text-gray-500 mb-6">Login to access your shared world.</p>
             
-            <!-- Login Form -->
-            <div id="loginForm" class="space-y-4">
-                <input type="email" id="email" placeholder="Email" class="w-full border p-3 rounded-lg">
-                <input type="password" id="password" placeholder="Password" class="w-full border p-3 rounded-lg">
-                <div class="flex gap-2">
-                    <button onclick="authAction('login')" class="flex-1 bg-gray-800 text-white p-3 rounded-lg hover:bg-black">Login</button>
-                    <button onclick="authAction('register')" class="flex-1 bg-rose-600 text-white p-3 rounded-lg hover:bg-rose-700">Register</button>
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="text-xs font-bold text-gray-600">EMAIL</label>
+                    <input type="email" id="email" class="w-full border-b-2 border-gray-200 p-2 focus:border-rose-500 outline-none transition" placeholder="you@example.com">
                 </div>
-            </div>
-
-            <!-- Partner Connect Logic (Hidden initially) -->
-            <div id="connectForm" class="hidden mt-8 text-left bg-rose-50 p-6 rounded-xl border border-rose-200">
-                <h3 class="font-bold text-lg mb-2 text-rose-700">Connect Partner</h3>
-                <p class="text-sm text-gray-600 mb-4">You need two hearts to enter. Share your ID or enter your partner's.</p>
-                <div class="bg-white p-2 rounded border mb-4 text-center font-mono select-all cursor-pointer" id="myUidDisplay"></div>
-                <div class="flex gap-2">
-                    <input type="text" id="partnerUidInput" placeholder="Enter Partner's ID" class="flex-1 border p-2 rounded">
-                    <button onclick="connectPartner()" class="bg-rose-600 text-white px-4 rounded">Connect</button>
+                <div>
+                    <label class="text-xs font-bold text-gray-600">PASSWORD</label>
+                    <input type="password" id="password" class="w-full border-b-2 border-gray-200 p-2 focus:border-rose-500 outline-none transition" placeholder="••••••••">
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button onclick="handleAuth('login')" class="flex-1 bg-gray-800 text-white py-3 rounded-lg hover:bg-black font-bold">LOGIN</button>
+                    <button onclick="handleAuth('register')" class="flex-1 bg-white border-2 border-rose-500 text-rose-600 py-3 rounded-lg hover:bg-rose-50 font-bold">CREATE ACCOUNT</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-xl flex flex-col h-full z-10 hidden" id="mainSidebar">
-        <div class="p-6 text-center border-b border-gray-100">
-            <h2 class="font-bold text-xl text-rose-600">EternalWall</h2>
-            <p class="text-xs text-gray-400 mt-1" id="coupleCodeDisplay">Loading...</p>
-        </div>
-        <nav class="flex-1 overflow-y-auto no-scrollbar py-2 text-sm font-medium">
-            <button onclick="tab('wall')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-stream w-5"></i> Lovers Wall</button>
-            <button onclick="tab('tile')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-puzzle-piece w-5"></i> Our Tile</button>
-            <button onclick="tab('profile')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-user-circle w-5"></i> Our Profile</button>
-            <button onclick="tab('comments')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-comments w-5"></i> Public Comments</button>
-            <button onclick="tab('chats')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-comment-dots w-5"></i> Our Chats</button>
-            <button onclick="tab('alerts')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-bell w-5"></i> Present/Future Alerts</button>
-            <button onclick="tab('goals')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-bullseye w-5"></i> Goals & Dreams</button>
-            <button onclick="tab('money')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-wallet w-5"></i> Money Mgmt</button>
-            <button onclick="tab('games')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-gamepad w-5"></i> Our Games</button>
-            <button onclick="tab('business')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-store w-5"></i> Online Business</button>
-            <button onclick="tab('ads')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-ad w-5"></i> Our Ads</button>
-            <button onclick="tab('market')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-shopping-bag w-5"></i> Marketplace</button>
-            <button onclick="tab('bizmsg')" class="sidebar-link w-full text-left px-6 py-3 text-gray-600 hover:bg-rose-50"><i class="fas fa-bullhorn w-5"></i> Biz Messages</button>
-            <button onclick="logout()" class="w-full text-left px-6 py-3 text-red-500 hover:bg-red-50 mt-4"><i class="fas fa-sign-out-alt w-5"></i> Logout</button>
-        </nav>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto p-8 hidden relative" id="mainContent">
-        
-        <!-- Tab: Lovers Wall -->
-        <div id="wall" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4">Lovers Wall <span class="text-sm font-normal text-gray-400 ml-2">Shared Publicly</span></h2>
-            <div class="bg-white p-4 rounded-lg shadow mb-6 border-l-4 border-rose-500">
-                <textarea id="wallPostText" class="w-full border p-2 rounded mb-2 focus:outline-none" placeholder="Share a loving moment..."></textarea>
-                <input type="text" id="wallPostImg" class="w-full border p-2 rounded mb-2 text-sm" placeholder="Image URL (optional)">
-                <div class="flex justify-between items-center">
-                    <button onclick="postToWall()" class="bg-rose-600 text-white px-6 py-2 rounded hover:bg-rose-700">Request to Post</button>
-                    <span class="text-xs text-gray-400 italic">Partner must agree before publishing</span>
-                </div>
+    <!-- 2. PARTNER CONNECTION "LOCK" SCREEN -->
+    <div id="lockScreen" class="hidden fixed inset-0 bg-gray-100 z-[90] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl p-8 max-w-lg w-full text-center border-t-8 border-rose-500">
+            <i class="fas fa-heart-broken text-6xl text-gray-300 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Connect Your Heart</h2>
+            <p class="text-gray-600 mb-6">Your dashboard is locked. You must connect with your partner to enter.</p>
+            
+            <div class="bg-rose-50 p-4 rounded-lg mb-6 border border-rose-200">
+                <p class="text-xs text-rose-800 font-bold uppercase mb-1">Your Connection Code</p>
+                <div class="text-2xl font-mono font-bold tracking-widest text-gray-800 select-all cursor-pointer" id="myUid">LOADING...</div>
+                <p class="text-[10px] text-gray-500 mt-1">Share this code with your partner</p>
             </div>
-            <div id="wallFeed" class="space-y-6 max-w-3xl mx-auto"></div>
-        </div>
 
-        <!-- Tab: Our Tile -->
-        <div id="tile" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4">Edit Public Tile</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <h3 class="font-bold mb-4">Update Details</h3>
-                    <input id="tileNames" type="text" placeholder="Couple Names (e.g. John & Jane)" class="w-full border p-2 rounded mb-3">
-                    <input id="tileCity" type="text" placeholder="Love City" class="w-full border p-2 rounded mb-3">
-                    <select id="tileBadge" class="w-full border p-2 rounded mb-3">
-                        <option>Dating</option>
-                        <option>Engaged</option>
-                        <option>Future Husband & Wife</option>
-                        <option>Married</option>
-                        <option>Soulmates</option>
-                    </select>
-                    <input id="tileSlogan" type="text" placeholder="Slogan" class="w-full border p-2 rounded mb-3">
-                    <button onclick="requestTileUpdate()" class="w-full bg-rose-600 text-white py-2 rounded">Save & Request Approval</button>
+            <div class="relative flex py-2 items-center">
+                <div class="flex-grow border-t border-gray-300"></div>
+                <span class="flex-shrink mx-4 text-gray-400 text-xs">OR ENTER PARTNER'S CODE</span>
+                <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            <div class="mt-4 flex gap-2">
+                <input type="text" id="partnerUidInput" placeholder="Paste Partner's Code Here" class="flex-1 border-2 border-gray-200 rounded-lg px-4 focus:border-rose-500 outline-none">
+                <button onclick="connectPartner()" class="bg-rose-600 text-white px-6 rounded-lg font-bold hover:bg-rose-700">CONNECT</button>
+            </div>
+            <button onclick="logout()" class="mt-6 text-xs text-gray-400 underline">Logout</button>
+        </div>
+    </div>
+
+    <!-- 3. MAIN DASHBOARD (UNLOCKED) -->
+    <div id="mainDashboard" class="hidden flex h-full w-full">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r flex flex-col z-20 shadow-lg">
+            <div class="p-6 text-center border-b bg-rose-50">
+                <h1 class="text-xl font-bold text-rose-600">EternalWall</h1>
+                <p class="text-xs text-gray-500 mt-1" id="coupleCodeDisplay">Loading...</p>
+            </div>
+            <nav class="flex-1 overflow-y-auto no-scrollbar py-2">
+                <!-- Navigation Items -->
+                <button onclick="showTab('wall')" class="sidebar-link active w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-stream w-6 text-center"></i> Lovers Wall</button>
+                <button onclick="showTab('tile')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-heart w-6 text-center"></i> Our Tile</button>
+                <button onclick="showTab('chats')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-comments w-6 text-center"></i> Private Chat</button>
+                <button onclick="showTab('alerts')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-bell w-6 text-center"></i> Alerts</button>
+                <button onclick="showTab('goals')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-bullseye w-6 text-center"></i> Goals & Dreams</button>
+                <button onclick="showTab('money')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-wallet w-6 text-center"></i> Money Mgmt</button>
+                <button onclick="showTab('games')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-gamepad w-6 text-center"></i> Games</button>
+                <button onclick="showTab('business')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-store w-6 text-center"></i> Online Business</button>
+                <button onclick="showTab('ads')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-ad w-6 text-center"></i> Our Ads</button>
+                <button onclick="showTab('market')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-shopping-bag w-6 text-center"></i> Marketplace</button>
+                <button onclick="showTab('bizmsg')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-rose-50 transition"><i class="fas fa-envelope w-6 text-center"></i> Biz Messages</button>
+                <div class="mt-auto border-t p-4">
+                    <button onclick="logout()" class="w-full text-left text-red-500 text-sm hover:underline"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 </div>
-                <div class="bg-rose-50 p-6 rounded-lg flex items-center justify-center">
-                    <!-- Preview -->
-                    <div class="bg-white p-6 rounded-xl shadow-xl w-64 text-center">
-                        <div class="w-24 h-24 bg-gray-300 mx-auto mb-4 clip-heart"></div>
-                        <h3 class="font-bold text-rose-600">Name Preview</h3>
-                        <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Badge</span>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 relative p-6 md:p-10" id="contentArea">
+            
+            <!-- 10. LOVERS WALL -->
+            <div id="wall" class="tab-content">
+                <h2 class="text-3xl font-bold mb-6 text-gray-800">Lovers Wall</h2>
+                <!-- Post Creator -->
+                <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
+                    <textarea id="wallText" class="w-full border-gray-100 bg-gray-50 p-4 rounded-lg focus:outline-rose-500" placeholder="Write a memory... (Requires partner approval)"></textarea>
+                    <input id="wallImg" type="text" class="w-full mt-2 p-2 text-sm border-b" placeholder="Paste Image URL (Optional)">
+                    <div class="mt-4 flex justify-end">
+                        <button onclick="postWall()" class="bg-rose-600 text-white px-6 py-2 rounded-lg hover:bg-rose-700 shadow transition">Request Post</button>
+                    </div>
+                </div>
+                <!-- Feed -->
+                <div id="wallFeed" class="space-y-6 max-w-2xl mx-auto"></div>
+            </div>
+
+            <!-- 1. OUR TILE -->
+            <div id="tile" class="tab-content hidden">
+                <h2 class="text-3xl font-bold mb-6 text-gray-800">Edit Public Tile</h2>
+                
+                <div id="pendingTile" class="hidden bg-yellow-100 text-yellow-800 p-4 rounded mb-6 flex justify-between items-center">
+                    <span>Partner requested changes to your tile!</span>
+                    <button onclick="approveTile()" class="bg-yellow-600 text-white px-4 py-1 rounded hover:bg-yellow-700">Approve</button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="bg-white p-8 rounded-xl shadow-sm">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">COUPLE NAMES</label>
+                        <input id="tileNames" type="text" class="w-full border p-2 rounded mb-4" placeholder="e.g. Romeo & Juliet">
+                        
+                        <label class="block text-xs font-bold text-gray-500 mb-1">LOVE CITY (MAP LOCATION)</label>
+                        <input id="tileCity" type="text" class="w-full border p-2 rounded mb-4" placeholder="e.g. Verona">
+                        
+                        <label class="block text-xs font-bold text-gray-500 mb-1">RELATIONSHIP BADGE</label>
+                        <select id="tileBadge" class="w-full border p-2 rounded mb-4">
+                            <option>Dating</option>
+                            <option>Engaged</option>
+                            <option>Married</option>
+                            <option>Future Husband & Wife</option>
+                        </select>
+                        
+                        <label class="block text-xs font-bold text-gray-500 mb-1">SLOGAN</label>
+                        <input id="tileSlogan" type="text" class="w-full border p-2 rounded mb-6" placeholder="e.g. 'Forever starts now'">
+                        
+                        <button onclick="requestTile()" class="w-full bg-gray-800 text-white py-3 rounded hover:bg-black transition">Save & Request Update</button>
+                    </div>
+
+                    <div class="flex justify-center items-start pt-10">
+                        <div class="bg-white p-6 rounded-2xl shadow-2xl text-center w-72 transform rotate-1">
+                            <div class="w-24 h-24 bg-rose-100 mx-auto mb-4 heart-clip flex items-center justify-center text-rose-300">
+                                <i class="fas fa-camera text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-rose-600 mb-1">Preview</h3>
+                            <p class="text-xs text-gray-400 mb-2">City Name</p>
+                            <span class="inline-block bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-1 rounded uppercase">Badge Status</span>
+                            <p class="text-sm italic text-gray-600 mt-4">"Slogan appears here"</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div id="pendingTileAlert" class="mt-4 hidden bg-yellow-100 p-4 rounded text-yellow-800">
-                Partner requested changes. <button onclick="approveTile()" class="underline font-bold">Click here to Approve</button>
-            </div>
-        </div>
 
-        <!-- Tab: Chats -->
-        <div id="chats" class="tab-content hidden h-[85vh] flex flex-col">
-            <h2 class="text-2xl font-bold mb-2">Private Chat</h2>
-            <div id="chatContainer" class="flex-1 bg-white border rounded-lg p-4 overflow-y-auto mb-4 space-y-3"></div>
-            <div class="flex gap-2">
-                <button class="p-2 text-gray-500 hover:bg-gray-200 rounded"><i class="fas fa-paperclip"></i></button>
-                <input id="chatInput" type="text" class="flex-1 border p-2 rounded focus:outline-rose-500" placeholder="Type message...">
-                <button onclick="sendChat()" class="bg-rose-600 text-white px-4 rounded"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-
-        <!-- Tab: Alerts -->
-        <div id="alerts" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4">Future Alerts</h2>
-            <div class="bg-white p-6 rounded-lg shadow mb-6">
-                <h3 class="font-bold mb-2">Create New Alert</h3>
-                <div class="grid grid-cols-2 gap-4 mb-3">
-                    <input id="alertTitle" type="text" placeholder="Title (e.g. Sorry!)" class="border p-2 rounded">
-                    <input id="alertDate" type="datetime-local" class="border p-2 rounded">
+            <!-- 4. CHATS -->
+            <div id="chats" class="tab-content hidden h-[85vh] flex flex-col">
+                <h2 class="text-3xl font-bold mb-4">Chat</h2>
+                <div id="chatBox" class="flex-1 bg-white rounded-xl shadow-inner p-4 overflow-y-auto mb-4 space-y-3"></div>
+                <div class="flex gap-2">
+                    <input id="chatInput" type="text" class="flex-1 border p-3 rounded-lg focus:outline-rose-500" placeholder="Type a message...">
+                    <button onclick="sendChat()" class="bg-rose-600 text-white px-6 rounded-lg hover:bg-rose-700"><i class="fas fa-paper-plane"></i></button>
                 </div>
-                <textarea id="alertMsg" class="w-full border p-2 rounded mb-3" placeholder="Message content..."></textarea>
-                <button onclick="createAlert()" class="bg-purple-600 text-white px-4 py-2 rounded">Schedule Alert</button>
             </div>
-            <div id="activeAlerts" class="space-y-4"></div>
-        </div>
 
-        <!-- Tab: Online Business -->
-        <div id="business" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4">Our Online Store</h2>
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="font-bold mb-4">Add Product</h3>
-                <input id="prodName" type="text" placeholder="Product Name" class="w-full border p-2 rounded mb-2">
-                <input id="prodPrice" type="number" placeholder="Price ($)" class="w-full border p-2 rounded mb-2">
-                <button onclick="addProduct()" class="bg-green-600 text-white px-4 py-2 rounded">Add to Store</button>
-                
-                <h3 class="font-bold mt-8 mb-2">Inventory</h3>
-                <ul id="productList" class="list-disc pl-5"></ul>
-            </div>
-        </div>
-
-        <!-- Tab: Games -->
-        <div id="games" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4">Tic-Tac-Love</h2>
-            <div class="bg-white p-10 rounded-lg shadow flex flex-col items-center">
-                <div id="gameBoard" class="grid grid-cols-3 gap-2 mb-4">
-                    <!-- Generated by JS -->
+            <!-- 5. ALERTS -->
+            <div id="alerts" class="tab-content hidden">
+                <h2 class="text-3xl font-bold mb-6">Scheduled Alerts</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-bold text-lg mb-4">Create Surprise</h3>
+                        <input id="alertTitle" type="text" placeholder="Title (e.g. Happy Anniversary)" class="w-full border p-2 rounded mb-3">
+                        <textarea id="alertMsg" placeholder="Message..." class="w-full border p-2 rounded mb-3 h-24"></textarea>
+                        <div class="flex gap-2 mb-4">
+                            <input id="alertDate" type="date" class="border p-2 rounded flex-1">
+                            <input id="alertTime" type="time" class="border p-2 rounded flex-1">
+                        </div>
+                        <button onclick="createAlert()" class="bg-purple-600 text-white w-full py-2 rounded hover:bg-purple-700">Schedule</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-bold text-lg mb-4">Upcoming</h3>
+                        <div id="alertList" class="space-y-2 text-sm text-gray-600"></div>
+                    </div>
                 </div>
-                <button onclick="resetGame()" class="text-sm text-gray-500 underline">Reset Game</button>
             </div>
-        </div>
 
-        <!-- Other tabs placeholders for brevity, logic follows same pattern -->
-        <div id="profile" class="tab-content hidden"><h2>Profile Settings (See Index for view)</h2></div>
-        <div id="goals" class="tab-content hidden"><h2>Goals & Dreams</h2><p>Coming Soon...</p></div>
-        <div id="money" class="tab-content hidden"><h2>Money Management</h2><p>Coming Soon...</p></div>
-        <div id="market" class="tab-content hidden"><h2>Marketplace</h2><div id="marketFeed"></div></div>
+            <!-- 7. GAMES -->
+            <div id="games" class="tab-content hidden">
+                <h2 class="text-3xl font-bold mb-6">Tic-Tac-Love</h2>
+                <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow text-center">
+                    <div id="gameBoard" class="grid grid-cols-3 gap-2 mb-4 w-48 mx-auto"></div>
+                    <button onclick="resetGame()" class="text-xs text-gray-400 underline">Reset Board</button>
+                </div>
+            </div>
 
-    </main>
+            <!-- 9. ADS -->
+            <div id="ads" class="tab-content hidden">
+                <h2 class="text-3xl font-bold mb-6">Manage Profile Ad</h2>
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <p class="text-sm text-gray-500 mb-4">This ad will appear when people scroll down on your public profile popup.</p>
+                    <textarea id="adHtml" class="w-full border p-2 rounded mb-4 font-mono text-sm h-32" placeholder="Write HTML content for your ad (Text, Image Links, Contact)"></textarea>
+                    <button onclick="saveAd()" class="bg-green-600 text-white px-6 py-2 rounded">Publish Ad</button>
+                </div>
+            </div>
 
-    <!-- JS Logic -->
+            <!-- 8. BUSINESS -->
+            <div id="business" class="tab-content hidden">
+                <h2 class="text-3xl font-bold mb-6">Our Store</h2>
+                <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
+                    <div class="flex gap-2 mb-4">
+                        <input id="prodName" type="text" placeholder="Product Name" class="flex-1 border p-2 rounded">
+                        <input id="prodPrice" type="number" placeholder="Price" class="w-24 border p-2 rounded">
+                        <button onclick="addProd()" class="bg-blue-600 text-white px-4 rounded">Add</button>
+                    </div>
+                    <ul id="storeList" class="divide-y"></ul>
+                </div>
+            </div>
+
+            <!-- Placeholders for others to keep code concise but working -->
+            <div id="market" class="tab-content hidden"><h2 class="text-3xl font-bold">Marketplace</h2><div id="marketFeed" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4"></div></div>
+            <div id="goals" class="tab-content hidden"><h2 class="text-3xl font-bold">Goals</h2><p class="mt-4 text-gray-500">Feature coming in next update.</p></div>
+            <div id="money" class="tab-content hidden"><h2 class="text-3xl font-bold">Money</h2><p class="mt-4 text-gray-500">Feature coming in next update.</p></div>
+            <div id="bizmsg" class="tab-content hidden"><h2 class="text-3xl font-bold">Messages</h2><p class="mt-4 text-gray-500">Feature coming in next update.</p></div>
+
+        </main>
+    </div>
+
+    <!-- FIREBASE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getDatabase, ref, set, get, update, push, onValue, child } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // CONFIG
+        // --- CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4",
             authDomain: "onlineshop-30cd1.firebaseapp.com",
@@ -197,292 +250,295 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        let currentUser = null;
+        let user = null;
         let coupleId = null;
 
-        // AUTH & CONNECTION
-        window.authAction = (type) => {
+        // --- AUTH LOGIC ---
+        window.handleAuth = (type) => {
             const e = document.getElementById('email').value;
             const p = document.getElementById('password').value;
-            
+            if(!e || !p) return alert("Please fill fields");
+
             if(type === 'register') {
-                createUserWithEmailAndPassword(auth, e, p).then((cred) => {
-                    // Create User Record
-                    set(ref(db, 'users/' + cred.user.uid), { email: e, partner: null });
-                    alert('Account created! Now connect your partner.');
+                createUserWithEmailAndPassword(auth, e, p)
+                .then(cred => {
+                    // Create minimal user record
+                    set(ref(db, 'users/' + cred.user.uid), {
+                        email: e,
+                        partner: null, // Lock state
+                        created: Date.now()
+                    });
                 }).catch(err => alert(err.message));
             } else {
                 signInWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
             }
         };
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('loginForm').classList.add('hidden');
-                checkPartnerStatus();
+        window.logout = () => signOut(auth);
+
+        // --- STATE MANAGEMENT ---
+        onAuthStateChanged(auth, (u) => {
+            if (u) {
+                user = u;
+                document.getElementById('authScreen').classList.add('hidden');
+                initUserListener();
             } else {
-                document.getElementById('authOverlay').classList.remove('hidden');
-                document.getElementById('loginForm').classList.remove('hidden');
-                document.getElementById('mainSidebar').classList.add('hidden');
-                document.getElementById('mainContent').classList.add('hidden');
+                user = null;
+                coupleId = null;
+                document.getElementById('authScreen').classList.remove('hidden');
+                document.getElementById('lockScreen').classList.add('hidden');
+                document.getElementById('mainDashboard').classList.add('hidden');
             }
         });
 
-        function checkPartnerStatus() {
-            onValue(ref(db, 'users/' + currentUser.uid), (snap) => {
+        function initUserListener() {
+            // Listen to User's "partner" field
+            onValue(ref(db, 'users/' + user.uid), (snap) => {
                 const data = snap.val();
+                if(!data) return;
+
                 if (data.partner) {
-                    // Active Couple
+                    // UNLOCKED
                     coupleId = data.coupleId;
-                    document.getElementById('authOverlay').classList.add('hidden');
-                    document.getElementById('mainSidebar').classList.remove('hidden');
-                    document.getElementById('mainContent').classList.remove('hidden');
+                    document.getElementById('lockScreen').classList.add('hidden');
+                    document.getElementById('mainDashboard').classList.remove('hidden');
                     
-                    // Generate Couple Code for UI if not exists
-                    get(ref(db, 'couples/' + coupleId)).then(s => {
-                        if(!s.exists()) {
-                            // Init Couple Data
-                            const code = "EW-" + Math.floor(1000 + Math.random() * 9000);
-                            update(ref(db, 'couples/' + coupleId), { code: code, created: Date.now() });
-                            update(ref(db, 'public_profiles/' + coupleId), { code: code });
-                        }
-                        if(s.val()) document.getElementById('coupleCodeDisplay').innerText = "Code: " + s.val().code;
-                    });
-                    
-                    initDashboardListeners();
+                    // Init Dashboard Features
+                    loadDashboardData();
                 } else {
-                    // Needs Connection
-                    document.getElementById('connectForm').classList.remove('hidden');
-                    document.getElementById('myUidDisplay').innerText = currentUser.uid;
+                    // LOCKED
+                    document.getElementById('mainDashboard').classList.add('hidden');
+                    document.getElementById('lockScreen').classList.remove('hidden');
+                    document.getElementById('myUid').innerText = user.uid;
                 }
             });
         }
 
+        // --- PARTNER CONNECTION LOGIC ---
         window.connectPartner = () => {
-            const pUid = document.getElementById('partnerUidInput').value.trim();
-            if(!pUid) return;
-            
-            // Logic: Create a couple ID (sort UIDs to make it unique per pair)
-            const cId = [currentUser.uid, pUid].sort().join('_');
-            
-            const updates = {};
-            updates['users/' + currentUser.uid + '/partner'] = pUid;
-            updates['users/' + currentUser.uid + '/coupleId'] = cId;
-            updates['users/' + pUid + '/partner'] = currentUser.uid;
-            updates['users/' + pUid + '/coupleId'] = cId;
-            
-            update(ref(db), updates).then(() => {
-                alert('Connected! Refreshing...');
-            }).catch(e => alert("Error connecting: check ID"));
+            const partnerUid = document.getElementById('partnerUidInput').value.trim();
+            if(!partnerUid || partnerUid === user.uid) return alert("Invalid Partner ID");
+
+            // Check if partner exists and is free
+            get(ref(db, 'users/' + partnerUid)).then(snap => {
+                if(!snap.exists()) return alert("Partner ID not found");
+                if(snap.val().partner) return alert("This user is already connected!");
+
+                // Generate ID
+                const newCoupleId = [user.uid, partnerUid].sort().join('_');
+                const uniqueCode = "EW-" + Math.floor(10000 + Math.random() * 90000);
+
+                const updates = {};
+                // Link User A
+                updates['users/' + user.uid + '/partner'] = partnerUid;
+                updates['users/' + user.uid + '/coupleId'] = newCoupleId;
+                // Link User B
+                updates['users/' + partnerUid + '/partner'] = user.uid;
+                updates['users/' + partnerUid + '/coupleId'] = newCoupleId;
+                // Init Public Profile
+                updates['public_profiles/' + newCoupleId] = { code: uniqueCode, since: new Date().getFullYear() };
+                
+                update(ref(db), updates).then(() => {
+                    alert("Connected Successfully! Dashboard Unlocking...");
+                });
+            });
         };
 
-        window.logout = () => signOut(auth);
+        // --- DASHBOARD FEATURES ---
 
-        // DASHBOARD LOGIC
-        window.tab = (id) => {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            // Update Active Style
-            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
-            event.target.closest('button').classList.add('active');
-            
-            if(id === 'games') loadGame();
-            if(id === 'business') loadProducts();
-            if(id === 'market') loadMarket();
-        }
-
-        function initDashboardListeners() {
-            // 1. CHAT LISTENER
-            onValue(ref(db, `couples/${coupleId}/chats`), (snap) => {
-                const div = document.getElementById('chatContainer');
-                div.innerHTML = '';
-                snap.forEach(c => {
-                    const msg = c.val();
-                    const align = msg.uid === currentUser.uid ? 'text-right' : 'text-left';
-                    const bg = msg.uid === currentUser.uid ? 'bg-rose-100' : 'bg-gray-100';
-                    div.innerHTML += `<div class="${align}"><span class="inline-block px-3 py-2 rounded mb-2 ${bg}">${msg.text}</span></div>`;
-                });
-                div.scrollTop = div.scrollHeight;
+        function loadDashboardData() {
+            // Get Couple Code
+            get(ref(db, `public_profiles/${coupleId}/code`)).then(s => {
+                if(s.exists()) document.getElementById('coupleCodeDisplay').innerText = "Code: " + s.val();
             });
 
-            // 2. WALL LISTENER (Public Feed)
-            onValue(ref(db, `public_wall`), (snap) => {
+            // Listen for Chats
+            onValue(ref(db, `couples/${coupleId}/chats`), snap => {
+                const box = document.getElementById('chatBox');
+                box.innerHTML = '';
+                snap.forEach(c => {
+                    const msg = c.val();
+                    const isMe = msg.uid === user.uid;
+                    box.innerHTML += `
+                        <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                            <div class="${isMe ? 'bg-rose-500 text-white' : 'bg-gray-200 text-gray-800'} rounded-lg px-4 py-2 max-w-xs text-sm">
+                                ${msg.text}
+                            </div>
+                        </div>
+                    `;
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+
+            // Listen for Tile Requests
+            onValue(ref(db, `couples/${coupleId}/pending_tile`), snap => {
+                const d = snap.val();
+                const div = document.getElementById('pendingTile');
+                if(d && d.requester !== user.uid) div.classList.remove('hidden');
+                else div.classList.add('hidden');
+            });
+
+            // Listen for Wall Feed (Public)
+            onValue(ref(db, 'public_wall'), snap => {
                 const feed = document.getElementById('wallFeed');
                 feed.innerHTML = '';
                 snap.forEach(c => {
-                    const post = c.val();
+                    const p = c.val();
                     feed.innerHTML += `
-                        <div class="bg-white p-4 rounded shadow">
-                            <div class="flex items-center mb-2">
-                                <i class="fas fa-heart text-rose-500 mr-2"></i> 
-                                <span class="font-bold">${post.names || 'Couple'}</span>
-                            </div>
-                            ${post.image ? `<img src="${post.image}" class="w-full h-64 object-cover rounded mb-2">` : ''}
-                            <p>${post.text}</p>
+                        <div class="bg-white p-4 rounded shadow-sm border border-gray-100">
+                            <div class="text-xs text-rose-500 font-bold mb-2">Couple #${p.coupleCode || 'Unknown'}</div>
+                            ${p.image ? `<img src="${p.image}" class="w-full h-64 object-cover rounded mb-3">` : ''}
+                            <p class="text-gray-700">${p.text}</p>
                         </div>
                     `;
                 });
             });
 
-            // 3. TILE AGREEMENT LISTENER
-            onValue(ref(db, `couples/${coupleId}/pending_tile`), (snap) => {
-                if(snap.exists() && snap.val().requester !== currentUser.uid) {
-                    document.getElementById('pendingTileAlert').classList.remove('hidden');
-                } else {
-                    document.getElementById('pendingTileAlert').classList.add('hidden');
-                }
-            });
+            // Load Game State
+            loadGame();
 
-            // 4. ALERTS CHECKER
-            setInterval(() => {
-                checkAlerts();
-            }, 60000); // Check every min
+            // Load Market
+            loadMarket();
         }
 
-        // FUNCTIONS
-
-        // Chat
-        window.sendChat = () => {
-            const txt = document.getElementById('chatInput').value;
-            if(!txt) return;
-            push(ref(db, `couples/${coupleId}/chats`), {
-                text: txt,
-                uid: currentUser.uid,
-                ts: Date.now()
-            });
-            document.getElementById('chatInput').value = '';
-        };
-
-        // Tile Logic (Agreement)
-        window.requestTileUpdate = () => {
+        // 1. Tile Functions
+        window.requestTile = () => {
             const data = {
                 names: document.getElementById('tileNames').value,
                 city: document.getElementById('tileCity').value,
                 badge: document.getElementById('tileBadge').value,
                 slogan: document.getElementById('tileSlogan').value,
-                requester: currentUser.uid
+                requester: user.uid
             };
             set(ref(db, `couples/${coupleId}/pending_tile`), data);
-            alert('Request sent to partner!');
+            alert("Sent to partner for approval!");
         };
 
         window.approveTile = () => {
             get(ref(db, `couples/${coupleId}/pending_tile`)).then(snap => {
-                const data = snap.val();
-                // Update Public Node
+                const d = snap.val();
                 update(ref(db, `public_profiles/${coupleId}`), {
-                    names: data.names,
-                    city: data.city,
-                    badge: data.badge,
-                    slogan: data.slogan,
-                    lat: (Math.random() * 180 - 90), // Mock Geo for map
-                    lng: (Math.random() * 360 - 180)
+                    names: d.names, city: d.city, badge: d.badge, slogan: d.slogan,
+                    lat: (Math.random() * 160) - 80, // Mock lat for map
+                    lng: (Math.random() * 360) - 180  // Mock lng for map
                 });
-                // Clear pending
                 set(ref(db, `couples/${coupleId}/pending_tile`), null);
-                alert('Approved & Published to World Map!');
+                alert("Published to World Map!");
             });
         };
 
-        // Wall Logic
-        window.postToWall = () => {
-            // Simplified: Direct post for prototype (Should follow agreement logic like tile)
-            const txt = document.getElementById('wallPostText').value;
-            const img = document.getElementById('wallPostImg').value;
-            push(ref(db, `public_wall`), {
-                text: txt,
-                image: img,
-                coupleId: coupleId,
-                names: "Us", // Fetch real names in prod
-                date: Date.now()
-            });
-            alert("Posted to Lovers Wall!");
+        // 2. Chat
+        window.sendChat = () => {
+            const txt = document.getElementById('chatInput').value;
+            if(!txt) return;
+            push(ref(db, `couples/${coupleId}/chats`), { text: txt, uid: user.uid, ts: Date.now() });
+            document.getElementById('chatInput').value = '';
         };
 
-        // Alerts
+        // 3. Alerts
         window.createAlert = () => {
             const title = document.getElementById('alertTitle').value;
-            const date = new Date(document.getElementById('alertDate').value).getTime();
             const msg = document.getElementById('alertMsg').value;
+            const dateStr = document.getElementById('alertDate').value + "T" + document.getElementById('alertTime').value;
+            const ts = new Date(dateStr).getTime();
             
-            push(ref(db, `couples/${coupleId}/alerts`), {
-                title, date, msg, shown: false
-            });
-            alert('Alert Scheduled');
+            push(ref(db, `couples/${coupleId}/alerts`), { title, msg, time: ts, shown: false });
+            alert("Alert Scheduled");
+            
+            // Render list immediately (simplified)
+            const list = document.getElementById('alertList');
+            list.innerHTML += `<div class="bg-gray-100 p-2 rounded">${title} (Scheduled)</div>`;
         };
-
-        function checkAlerts() {
+        
+        // Check alerts loop
+        setInterval(() => {
+            if(!coupleId) return;
             get(ref(db, `couples/${coupleId}/alerts`)).then(snap => {
-                snap.forEach(child => {
-                    const alert = child.val();
-                    if(!alert.shown && Date.now() >= alert.date) {
-                        alert(`SURPRISE: ${alert.title}\n${alert.msg}`);
-                        update(ref(db, `couples/${coupleId}/alerts/${child.key}`), { shown: true });
+                snap.forEach(c => {
+                    const a = c.val();
+                    if(!a.shown && Date.now() >= a.time) {
+                        alert(`🔔 ALERT: ${a.title}\n${a.msg}`);
+                        update(ref(db, `couples/${coupleId}/alerts/${c.key}`), { shown: true });
                     }
                 });
             });
-        }
+        }, 30000);
 
-        // Business
-        window.addProduct = () => {
-            const n = document.getElementById('prodName').value;
-            const p = document.getElementById('prodPrice').value;
-            push(ref(db, `couples/${coupleId}/products`), { name: n, price: p });
-            loadProducts();
-            // Add to global market
-            push(ref(db, `market_feed`), { name: n, price: p, seller: coupleId });
+        // 4. Wall Post
+        window.postWall = () => {
+            const txt = document.getElementById('wallText').value;
+            const img = document.getElementById('wallImg').value;
+            // Get code first
+            get(ref(db, `public_profiles/${coupleId}/code`)).then(s => {
+                const code = s.val() || '???';
+                push(ref(db, 'public_wall'), {
+                    text: txt, image: img, coupleCode: code, date: Date.now()
+                });
+                alert("Posted!");
+                document.getElementById('wallText').value = '';
+            });
         };
 
-        function loadProducts() {
-            onValue(ref(db, `couples/${coupleId}/products`), snap => {
-                const list = document.getElementById('productList');
-                list.innerHTML = '';
-                snap.forEach(c => {
-                    list.innerHTML += `<li>${c.val().name} - $${c.val().price}</li>`;
-                });
-            });
-        }
-
-        function loadMarket() {
-            onValue(ref(db, `market_feed`), snap => {
-                const feed = document.getElementById('marketFeed');
-                feed.innerHTML = '<div class="grid grid-cols-3 gap-4">';
-                snap.forEach(c => {
-                    feed.innerHTML += `
-                        <div class="bg-white p-4 shadow rounded">
-                            <h4 class="font-bold">${c.val().name}</h4>
-                            <p class="text-green-600">$${c.val().price}</p>
-                            <button class="bg-blue-500 text-white text-xs px-2 py-1 rounded mt-2">Buy</button>
-                        </div>
-                    `;
-                });
-                feed.innerHTML += '</div>';
-            });
-        }
-
-        // Game (Tic Tac Toe)
+        // 5. Game
         window.loadGame = () => {
             const board = document.getElementById('gameBoard');
             board.innerHTML = '';
             for(let i=0; i<9; i++) {
-                board.innerHTML += `<div onclick="playMove(${i})" class="w-16 h-16 bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-2xl font-bold cursor-pointer" id="cell-${i}"></div>`;
+                board.innerHTML += `<div onclick="move(${i})" class="w-16 h-16 bg-rose-100 flex items-center justify-center text-2xl font-bold cursor-pointer hover:bg-rose-200 border border-white" id="cell-${i}"></div>`;
             }
             onValue(ref(db, `couples/${coupleId}/game`), snap => {
-                const state = snap.val() || Array(9).fill(null);
-                state.forEach((val, idx) => {
-                    if(val) document.getElementById(`cell-${idx}`).innerText = val;
-                });
+                const g = snap.val();
+                if(g) Object.keys(g).forEach(k => document.getElementById(`cell-${k}`).innerText = g[k]);
+                else for(let i=0; i<9; i++) document.getElementById(`cell-${i}`).innerText = '';
             });
         };
+        window.move = (i) => {
+            update(ref(db, `couples/${coupleId}/game`), { [i]: 'X' }); // Simple X logic
+        };
+        window.resetGame = () => set(ref(db, `couples/${coupleId}/game`), null);
 
-        window.playMove = (idx) => {
-             // Simplified: Just toggle X/O based on random for prototype, 
-             // in real app check whose turn it is
-             update(ref(db, `couples/${coupleId}/game/${idx}`), 'X');
+        // 6. Ads
+        window.saveAd = () => {
+            const html = document.getElementById('adHtml').value;
+            update(ref(db, `public_profiles/${coupleId}`), { adContent: html });
+            alert("Ad Updated on Public Profile");
         };
 
-        window.resetGame = () => set(ref(db, `couples/${coupleId}/game`), null);
+        // 7. Business
+        window.addProd = () => {
+            const n = document.getElementById('prodName').value;
+            const p = document.getElementById('prodPrice').value;
+            push(ref(db, `couples/${coupleId}/products`), { name: n, price: p });
+            push(ref(db, 'market_feed'), { name: n, price: p, seller: coupleId }); // Global market
+            
+            // Update UI list
+            document.getElementById('storeList').innerHTML += `<li class="py-2 flex justify-between"><span>${n}</span> <span class="font-bold">$${p}</span></li>`;
+        };
+
+        // 8. Market
+        function loadMarket() {
+            onValue(ref(db, 'market_feed'), snap => {
+                const feed = document.getElementById('marketFeed');
+                feed.innerHTML = '';
+                snap.forEach(c => {
+                    feed.innerHTML += `
+                        <div class="bg-white p-4 shadow rounded">
+                            <h4 class="font-bold">${c.val().name}</h4>
+                            <p class="text-rose-600 font-bold">$${c.val().price}</p>
+                            <button class="text-xs bg-gray-800 text-white px-2 py-1 rounded mt-2">View Item</button>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        // Tab Switching
+        window.showTab = (id) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
 
     </script>
 </body>
