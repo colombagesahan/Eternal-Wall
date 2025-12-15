@@ -30,6 +30,7 @@
         body { font-family: 'Nunito', sans-serif; background-color: var(--bg-body); color: var(--text-main); overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
 
+        /* UTILS */
         .hidden { display: none !important; }
         .flex { display: flex; align-items: center; }
         .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 700; transition: 0.2s; font-size: 0.9rem; }
@@ -38,6 +39,19 @@
         .btn-ghost { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
         .input-std { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; background: #fafafa; }
         
+        /* WALLPAPER OVERLAY */
+        #wallpaper-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; background-position: center; 
+            z-index: 9999; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; text-align: center;
+            background-color: #000; color: white; transition: opacity 1s ease;
+        }
+        .wp-content { background: rgba(0,0,0,0.6); padding: 40px; border-radius: 20px; max-width: 80%; backdrop-filter: blur(5px); }
+        .wp-avatar { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--gold); margin-bottom: 20px; object-fit: cover; }
+        .wp-text { font-family: 'Playfair Display'; font-size: 2rem; font-style: italic; line-height: 1.5; }
+
+        /* PUBLIC HOME */
         #view-home { min-height: 100vh; display: flex; flex-direction: column; }
         .nav-header { background: #fff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .brand-logo { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--primary); }
@@ -49,9 +63,12 @@
         .tile-img { width: 100%; height: 100%; object-fit: cover; }
         .tile-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 20px 10px 10px; color: white; }
 
+        /* DASHBOARD */
         #view-dashboard { display: flex; min-height: 100vh; }
         .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid var(--border); position: fixed; height: 100vh; display: flex; flex-direction: column; z-index: 99; }
         .sb-top { padding: 30px 20px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+        
+        /* HEADER AVATARS & BADGES & ONLINE STATUS */
         .couple-circle { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
         .avatar-wrap { position: relative; display: flex; flex-direction: column; align-items: center; }
         .ava { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #eee; transition: 0.3s; }
@@ -67,21 +84,29 @@
 
         .main-pane { margin-left: var(--sidebar-width); flex: 1; padding: 40px; width: calc(100% - var(--sidebar-width)); }
         
+        /* PROFILE CARDS & BADGES */
         .profile-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .profile-card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #eee; position: relative; cursor: pointer; transition: 0.2s; }
         .profile-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .profile-card h3 { color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
         
-        .royal-badge { display: block; text-align: center; font-family: 'Playfair Display', serif; font-weight: bold; color: var(--gold); margin-bottom: 15px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .royal-badge { 
+            display: block; text-align: center; font-family: 'Playfair Display', serif; 
+            font-weight: bold; color: var(--gold); margin-bottom: 15px; font-size: 1.1rem;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
         .form-group { margin-bottom: 12px; }
         .form-label { font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 4px; display: block; }
         .form-select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #fff; }
         .edit-btn { position: absolute; top: 15px; right: 15px; background: #eee; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; z-index: 20; }
         .edit-btn:hover { background: var(--primary); color: white; }
 
+        /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; justify-content: center; align-items: center; }
         .modal-box { background: #fff; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
         
+        /* MOBILE */
         .mobile-nav { display: none; }
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -89,13 +114,8 @@
             .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); justify-content: space-around; padding: 12px 0; z-index: 200; }
             .profile-container { grid-template-columns: 1fr; }
         }
+
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-        
-        /* WALLPAPER OVERLAY */
-        #wallpaper-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-color: #000; color: white; transition: opacity 1s ease; }
-        .wp-content { background: rgba(0,0,0,0.6); padding: 40px; border-radius: 20px; max-width: 80%; backdrop-filter: blur(5px); }
-        .wp-avatar { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--gold); margin-bottom: 20px; object-fit: cover; }
-        .wp-text { font-family: 'Playfair Display'; font-size: 2rem; font-style: italic; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -118,13 +138,17 @@
                 <button class="btn btn-primary" onclick="openAuth('signup')">Create Account</button>
             </div>
         </header>
+
         <section class="hero-section">
             <h1>The Sanctuary of Us</h1>
             <p>A private digital sanctuary for couples.<br>Mutual respect. Shared dreams. Memories that last.</p>
-            <div class="search-wrap"><input type="text" id="search-bar" class="search-input" placeholder="Search for a couple..." onkeyup="filterTiles()"></div>
+            <div class="search-wrap">
+                <input type="text" id="search-bar" class="search-input" placeholder="Search for a couple..." onkeyup="filterTiles()">
+            </div>
         </section>
+
         <section class="tiles-grid" id="public-grid"></section>
-        
+
         <!-- AUTH MODAL -->
         <div id="auth-modal" class="modal-overlay hidden">
             <div class="modal-box">
@@ -147,7 +171,9 @@
         <div class="sidebar">
             <div class="sb-top">
                 <div class="brand-logo">EternalWall</div>
-                <div class="couple-circle" id="avatar-container"></div>
+                <div class="couple-circle" id="avatar-container">
+                    <!-- Injected by JS based on Sex/Order -->
+                </div>
                 <div class="couple-id" id="dash-code">...</div>
             </div>
             <div class="sb-nav">
@@ -160,10 +186,13 @@
                 <div class="nav-item" onclick="nav('goals', this)"><i class="fas fa-star"></i> Our Goals</div>
                 <div class="nav-item" onclick="nav('room', this)"><i class="fas fa-video"></i> Video Room</div>
             </div>
-            <div style="padding: 20px;"><button class="btn btn-ghost" style="width: 100%; border:none;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+            <div style="padding: 20px;">
+                <button class="btn btn-ghost" style="width: 100%; border:none;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
         </div>
 
         <div class="main-pane">
+            <!-- LOCKED STATE -->
             <div id="dash-locked" class="hidden" style="text-align:center; padding-top:100px;">
                 <h2 style="font-family:'Playfair Display';">Waiting for Partner...</h2>
                 <div style="padding:15px; border:2px dashed var(--primary); display:inline-block; margin:20px 0;" onclick="copyInvite()" id="invite-link">...</div>
@@ -171,7 +200,9 @@
                 <button class="btn btn-ghost" onclick="logout()">Logout</button>
             </div>
 
+            <!-- UNLOCKED STATE -->
             <div id="dash-unlocked">
+                <!-- 1. OUR PROFILE TAB -->
                 <div id="tab-profile" class="tab-view">
                     <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Our Profile</h2>
                     <div class="profile-container">
@@ -181,6 +212,7 @@
                             <button class="edit-btn"><i class="fas fa-pen"></i> Edit</button>
                             <fieldset id="fs-me" disabled style="border:none; padding:0;">
                                 <div class="form-group"><label class="form-label">Profile Photo URL</label><input type="text" id="me-photo" class="input-std" placeholder="https://..."></div>
+                                <!-- BADGE AREA -->
                                 <div id="me-badge" class="royal-badge"></div>
                                 <div class="form-group"><label class="form-label">Sex</label><select id="me-sex" class="form-select" onchange="updateBadges('me')"><option value="male">Male (King)</option><option value="female">Female (Queen)</option></select></div>
                                 <div class="flex" style="gap:10px;">
@@ -202,6 +234,7 @@
                             <button class="edit-btn"><i class="fas fa-pen"></i> Suggest Edit</button>
                             <fieldset id="fs-partner" disabled style="border:none; padding:0;">
                                 <div class="form-group"><label class="form-label">Profile Photo URL</label><input type="text" id="p-photo" class="input-std"></div>
+                                <!-- BADGE AREA -->
                                 <div id="p-badge" class="royal-badge"></div>
                                 <div class="form-group"><label class="form-label">Sex</label><select id="p-sex" class="form-select" onchange="updateBadges('p')"><option value="male">Male</option><option value="female">Female</option></select></div>
                                 <div class="flex" style="gap:10px;">
@@ -229,15 +262,27 @@
                     </div>
                     <div id="pending-posts-area"></div>
                 </div>
-                <!-- Chats, Room, Tile, etc. structures preserved but simplified in HTML for brevity -->
-                <div id="tab-chats" class="tab-view hidden"><div style="text-align:center;">Chat Feature Active (See JS)</div></div>
-                <div id="tab-tile" class="tab-view hidden"><div style="text-align:center;">Tile Feature Active</div></div>
-                <div id="tab-page" class="tab-view hidden"><div style="text-align:center;">Page Feature Active</div></div>
-                <div id="tab-alerts" class="tab-view hidden"><div style="text-align:center;">Alerts Feature Active</div></div>
-                <div id="tab-goals" class="tab-view hidden"><div style="text-align:center;">Goals Feature Active</div></div>
-                <div id="tab-room" class="tab-view hidden"><div style="text-align:center;">Room Feature Active</div></div>
+                
+                <div id="tab-chats" class="tab-view hidden">
+                    <div style="height:400px; background:#fff; border:1px solid #eee; border-radius:12px; display:flex; flex-direction:column;">
+                        <div id="chat-feed" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
+                        <div style="padding:10px; border-top:1px solid #eee; display:flex; gap:10px;">
+                            <input id="chat-msg" class="input-std" style="margin:0;" placeholder="Message...">
+                            <button class="btn btn-primary" onclick="sendChat()">Send</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-room" class="tab-view hidden">
+                     <div style="background:#000; border-radius:12px; overflow:hidden; aspect-ratio:16/9; margin-bottom:20px;">
+                        <video id="localVideo" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
+                    </div>
+                    <button class="btn btn-primary" onclick="toggleCam()">Toggle Camera</button>
+                </div>
+                <!-- Other tabs logic preserved in JS -->
             </div>
         </div>
+
         <nav class="mobile-nav">
              <button class="mn-link active" onclick="nav('profile', null)"><i class="fas fa-user"></i></button>
              <button class="mn-link" onclick="nav('wall', null)"><i class="fas fa-globe"></i></button>
@@ -245,6 +290,7 @@
     </div>
 
     <!-- MODALS -->
+    <!-- Partner Offline Modal -->
     <div id="modal-offline" class="modal-overlay hidden">
         <div class="modal-box">
             <h3 style="color:#d32f2f;">Partner Offline</h3>
@@ -253,6 +299,7 @@
         </div>
     </div>
 
+    <!-- Partner Edit Request Modal -->
     <div id="modal-request" class="modal-overlay hidden">
         <div class="modal-box">
             <h3>Update Request</h3>
@@ -263,6 +310,7 @@
         </div>
     </div>
 
+    <!-- Rejection Reason Modal -->
     <div id="modal-reject" class="modal-overlay hidden">
         <div class="modal-box">
             <h3>Why Decline?</h3>
@@ -283,6 +331,7 @@
         </div>
     </div>
     
+    <!-- Notification Modal -->
     <div id="modal-notify" class="modal-overlay hidden">
         <div class="modal-box">
             <h3 id="notify-title">Info</h3>
@@ -292,7 +341,7 @@
     </div>
 
     <script>
-        // FIREBASE SETUP
+        // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4", authDomain: "onlineshop-30cd1.firebaseapp.com", databaseURL: "https://onlineshop-30cd1-default-rtdb.firebaseio.com", projectId: "onlineshop-30cd1", messagingSenderId: "818252574868", appId: "1:818252574868:web:8dd36825db589a886cc481" };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -302,9 +351,11 @@
         let user = null, coupleId = null, partnerId = null;
         let isSignup = false;
         let inviteCode = new URLSearchParams(window.location.search).get('invite');
-        
+        let pendingRequestData = null;
+
         // COUNTRIES
-        const countries = [{code:"+1", name:"USA"}, {code:"+44", name:"UK"}, {code:"+91", name:"India"}, {code:"+94", name:"Sri Lanka"}];
+        const countries = [{code:"+1", name:"USA"}, {code:"+44", name:"UK"}, {code:"+91", name:"India"}, {code:"+94", name:"SL"}, {code:"+86", name:"CN"}, {code:"+61", name:"AU"}, {code:"+81", name:"JP"}, {code:"+49", name:"DE"}, {code:"+33", name:"FR"}, {code:"+7", name:"RU"}, {code:"+55", name:"BR"}];
+
         window.onload = () => {
             const sels = document.querySelectorAll('#me-country, #p-country');
             sels.forEach(s => countries.forEach(c => s.innerHTML += `<option value="${c.code}">${c.code}</option>`));
@@ -354,6 +405,7 @@
             if(page === 'home') loadPublicTiles();
         }
 
+        // DASHBOARD
         function initDashboard() {
             db.ref(`couples/${coupleId}`).on('value', s => {
                 const d = s.val();
@@ -362,35 +414,61 @@
                     document.getElementById('dash-unlocked').classList.remove('hidden');
                     document.getElementById('dash-code').innerText = coupleId;
                     partnerId = (d.user1 === user.uid) ? d.user2 : d.user1;
-                    setupProfile();
-                    setupRequests();
+                    
+                    setupProfileListeners();
+                    setupRequestListeners();
                     checkWallpaper();
                 } else {
                     document.getElementById('dash-locked').classList.remove('hidden');
-                    document.getElementById('invite-link').innerText = window.location.href.split('?')[0] + "?invite=" + coupleId;
+                    const link = window.location.href.split('?')[0] + "?invite=" + coupleId;
+                    document.getElementById('invite-link').innerText = link;
                 }
             });
         }
-        function copyInvite(){ navigator.clipboard.writeText(document.getElementById('invite-link').innerText); alert("Copied!"); }
+        
+        function copyInvite() {
+            navigator.clipboard.writeText(document.getElementById('invite-link').innerText);
+            alert("Copied!");
+        }
 
         // PROFILE LOGIC
-        function setupProfile() {
-            db.ref(`users/${user.uid}/profile`).on('value', s => { if(s.exists()) fill('me', s.val()); updateB('me'); updateHead(); });
-            db.ref(`users/${partnerId}/profile`).on('value', s => { if(s.exists()) fill('p', s.val()); updateB('p'); updateHead(); });
-        }
-        function fill(who, d) {
-            if(!d) return;
-            const fields = ['photo','sex','fname','sname','nname','display','dob','desc','country','phone'];
-            fields.forEach(f => {
-                const el = document.getElementById(f === 'country' || f === 'phone' ? (f === 'country' ? `${who}-country` : `${who}-phone`) : `${who}-${f}`);
-                if(el) el.value = d[f === 'country' ? 'phoneCode' : f === 'phone' ? 'phoneNum' : f] || (f==='sex'?'male':'');
+        function setupProfileListeners() {
+            db.ref(`users/${user.uid}/profile`).on('value', s => {
+                if(s.exists()) fillForm('me', s.val());
+                updateBadges('me');
+                updateHeader();
+            });
+            // FIXED: Partner data filling logic
+            db.ref(`users/${partnerId}/profile`).on('value', s => {
+                if(s.exists()) fillForm('p', s.val()); // Use 'p' prefix for partner fields
+                updateBadges('p');
+                updateHeader();
             });
         }
-        function updateB(who) { document.getElementById(`${who}-badge`).innerText = document.getElementById(`${who}-sex`).value === 'male' ? "Her King 👑" : "His Queen 👑"; }
-        function unlockForm(who) { document.getElementById(`fs-${who}`).disabled = false; }
-        
-        async function saveProfile(who) {
-            const fd = {
+
+        function fillForm(who, data) {
+            if(!data) return;
+            // who is either 'me' or 'p'
+            if(document.getElementById(`${who}-photo`)) document.getElementById(`${who}-photo`).value = data.photo || '';
+            if(document.getElementById(`${who}-sex`)) document.getElementById(`${who}-sex`).value = data.sex || 'male';
+            if(document.getElementById(`${who}-fname`)) document.getElementById(`${who}-fname`).value = data.fname || '';
+            if(document.getElementById(`${who}-sname`)) document.getElementById(`${who}-sname`).value = data.sname || '';
+            if(document.getElementById(`${who}-nname`)) document.getElementById(`${who}-nname`).value = data.nname || '';
+            if(document.getElementById(`${who}-display`)) document.getElementById(`${who}-display`).value = data.display || 'fname';
+            if(document.getElementById(`${who}-dob`)) document.getElementById(`${who}-dob`).value = data.dob || '';
+            if(document.getElementById(`${who}-desc`)) document.getElementById(`${who}-desc`).value = data.desc || '';
+            if(document.getElementById(`${who}-country`)) document.getElementById(`${who}-country`).value = data.phoneCode || '+1';
+            if(document.getElementById(`${who}-phone`)) document.getElementById(`${who}-phone`).value = data.phoneNum || '';
+        }
+
+        function updateBadges(who) {
+            const sex = document.getElementById(`${who}-sex`).value;
+            const badgeText = sex === 'male' ? "Her King 👑" : "His Queen 👑";
+            document.getElementById(`${who}-badge`).innerText = badgeText;
+        }
+
+        function getFormData(who) {
+            return {
                 photo: document.getElementById(`${who}-photo`).value,
                 sex: document.getElementById(`${who}-sex`).value,
                 fname: document.getElementById(`${who}-fname`).value,
@@ -402,9 +480,16 @@
                 phoneCode: document.getElementById(`${who}-country`).value,
                 phoneNum: document.getElementById(`${who}-phone`).value
             };
-            
+        }
+
+        function unlockForm(who) {
+            document.getElementById(`fs-${who}`).disabled = false;
+        }
+
+        async function saveProfile(who) {
+            const data = getFormData(who);
             if(who === 'me') {
-                db.ref(`users/${user.uid}/profile`).set(fd);
+                db.ref(`users/${user.uid}/profile`).set(data);
                 document.getElementById('fs-me').disabled = true;
                 alert("Saved!");
             } else {
@@ -427,36 +512,41 @@
             }
         }
 
-        // REQUEST LOGIC
-        function setupRequests() {
+        // REQUEST LOGIC (Strict Realtime)
+        function setupRequestListeners() {
+            // Watch for request addressed TO ME
             db.ref(`couples/${coupleId}/editRequest`).on('value', s => {
                 const req = s.val();
-                if(req && req.to === user.uid) {
-                    window.pendingRequest = req;
+                if(req && req.to === user.uid) { 
+                    pendingRequestData = req.data;
                     document.getElementById('request-diff').innerText = JSON.stringify(req.data, null, 2).replace(/[{}"]/g,'');
                     document.getElementById('modal-request').classList.remove('hidden');
                 }
             });
+
+            // Watch for declines addressed TO ME
             db.ref(`couples/${coupleId}/editDecline`).on('value', s => {
-                const d = s.val();
-                if(d && d.to === user.uid) {
-                    document.getElementById('notify-msg').innerText = "Reason: " + d.reason;
+                const dec = s.val();
+                if(dec && dec.to === user.uid) { 
+                    document.getElementById('notify-title').innerText = "Partner Declined";
+                    document.getElementById('notify-msg').innerText = "Reason: " + dec.reason;
                     document.getElementById('modal-notify').classList.remove('hidden');
                     db.ref(`couples/${coupleId}/editDecline`).remove();
                 }
             });
         }
+
         function acceptEdit() {
-            if(window.pendingRequest) {
-                db.ref(`users/${user.uid}/profile`).update(window.pendingRequest.data);
-                db.ref(`couples/${coupleId}/editRequest`).remove();
-                document.getElementById('modal-request').classList.add('hidden');
-            }
+            db.ref(`users/${user.uid}/profile`).update(pendingRequestData);
+            db.ref(`couples/${coupleId}/editRequest`).remove();
+            document.getElementById('modal-request').classList.add('hidden');
         }
+
         function showRejectReason() {
             document.getElementById('modal-request').classList.add('hidden');
             document.getElementById('modal-reject').classList.remove('hidden');
         }
+
         function submitReject() {
             const r = document.getElementById('reject-reason').value;
             db.ref(`couples/${coupleId}/editDecline`).set({ to: partnerId, reason: r });
