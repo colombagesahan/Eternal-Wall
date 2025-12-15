@@ -92,7 +92,7 @@
         
         .royal-badge { 
             display: block; text-align: center; font-family: 'Playfair Display', serif; 
-            font-weight: bold; color: var(--gold); margin-bottom: 15px; font-size: 1.2rem;
+            font-weight: bold; color: var(--gold); margin-bottom: 15px; font-size: 1.1rem;
             text-transform: uppercase; letter-spacing: 1px;
         }
 
@@ -214,7 +214,7 @@
                                 <div class="form-group"><label class="form-label">Profile Photo URL</label><input type="text" id="me-photo" class="input-std" placeholder="https://..."></div>
                                 <!-- BADGE AREA -->
                                 <div id="me-badge" class="royal-badge"></div>
-                                <div class="form-group"><label class="form-label">Sex</label><select id="me-sex" class="form-select" onchange="updateBadges('me')"><option value="male">Male (King)</option><option value="female">Female (Queen)</option></select></div>
+                                <div class="form-group"><label class="form-label">Sex</label><select id="me-sex" class="form-select" onchange="updateBadges('me')"><option value="male">Male</option><option value="female">Female</option></select></div>
                                 <div class="flex" style="gap:10px;">
                                     <div class="form-group" style="flex:1;"><label class="form-label">First Name</label><input type="text" id="me-fname" class="input-std"></div>
                                     <div class="form-group" style="flex:1;"><label class="form-label">Second Name</label><input type="text" id="me-sname" class="input-std"></div>
@@ -279,6 +279,7 @@
                     </div>
                     <button class="btn btn-primary" onclick="toggleCam()">Toggle Camera</button>
                 </div>
+                <!-- Other tabs logic preserved in JS -->
             </div>
         </div>
 
@@ -293,7 +294,7 @@
     <div id="modal-offline" class="modal-overlay hidden">
         <div class="modal-box">
             <h3 style="color:#d32f2f;">Partner Offline</h3>
-            <p>Your partner is not logged in now. You can only edit partner profile if your partner is login.</p>
+            <p>Your partner is not logged in right now. You can only edit their profile when they are online to receive the request.</p>
             <button class="btn btn-primary" onclick="document.getElementById('modal-offline').classList.add('hidden')">Close</button>
         </div>
     </div>
@@ -402,12 +403,14 @@
         auth.onAuthStateChanged(u => {
             user = u;
             if(user) {
+                // Presence System
                 db.ref('.info/connected').on('value', (snap) => {
                     if (snap.val()) {
                         db.ref(`users/${user.uid}/status`).onDisconnect().set('offline');
                         db.ref(`users/${user.uid}/status`).set('online');
                     }
                 });
+
                 db.ref(`users/${user.uid}`).once('value', s => {
                     if(s.exists()) {
                         coupleId = s.val().coupleId;
