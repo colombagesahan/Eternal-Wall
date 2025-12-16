@@ -510,17 +510,20 @@
         }
 
         function getFormData(who) {
+            // FIX: Map 'partner' to 'p' if needed to match HTML IDs
+            const prefix = (who === 'partner') ? 'p' : who;
+            
             return {
-                photo: document.getElementById(`${who}-photo`).value,
-                sex: document.getElementById(`${who}-sex`).value,
-                fname: document.getElementById(`${who}-fname`).value,
-                sname: document.getElementById(`${who}-sname`).value,
-                nname: document.getElementById(`${who}-nname`).value,
-                display: document.getElementById(`${who}-display`).value,
-                dob: document.getElementById(`${who}-dob`).value,
-                desc: document.getElementById(`${who}-desc`).value,
-                phoneCode: document.getElementById(`${who}-country`).value,
-                phoneNum: document.getElementById(`${who}-phone`).value
+                photo: document.getElementById(`${prefix}-photo`).value,
+                sex: document.getElementById(`${prefix}-sex`).value,
+                fname: document.getElementById(`${prefix}-fname`).value,
+                sname: document.getElementById(`${prefix}-sname`).value,
+                nname: document.getElementById(`${prefix}-nname`).value,
+                display: document.getElementById(`${prefix}-display`).value,
+                dob: document.getElementById(`${prefix}-dob`).value,
+                desc: document.getElementById(`${prefix}-desc`).value,
+                phoneCode: document.getElementById(`${prefix}-country`).value,
+                phoneNum: document.getElementById(`${prefix}-phone`).value
             };
         }
 
