@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EternalWall | Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root { --primary: #ff4b6e; --bg-body: #f4f7f6; --text-main: #333333; --text-muted: #888888; --border: #e0e0e0; --sidebar-width: 260px; --gold: #d4af37; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Nunito', sans-serif; background-color: var(--bg-body); color: var(--text-main); overflow: hidden; height: 100vh; display: flex; }
+        .hidden { display: none !important; }
+        .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 700; transition: 0.2s; font-size: 0.9rem; }
+        .btn-ghost { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+        .btn-primary { background: var(--primary); color: white; }
+
+        /* WALLPAPER OVERLAY */
+        #wallpaper-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; background-position: center; 
+            z-index: 3000; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; text-align: center;
+            background-color: #000; color: white; transition: opacity 1s ease;
+        }
+        .wp-content { background: rgba(0,0,0,0.6); padding: 40px; border-radius: 20px; max-width: 80%; backdrop-filter: blur(5px); }
+        .wp-avatar { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--gold); margin-bottom: 20px; object-fit: cover; }
+        .wp-text { font-family: 'Playfair Display'; font-size: 2rem; font-style: italic; line-height: 1.5; }
+
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid var(--border); height: 100vh; display: flex; flex-direction: column; z-index: 1001; transition: 0.3s; }
+        .sb-top { padding: 30px 20px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+        .brand-logo { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--primary); }
+        
+        .couple-circle { display: flex; justify-content: center; align-items: center; margin: 25px 0 15px; position: relative; }
+        .avatar-wrap { position: relative; display: flex; flex-direction: column; align-items: center; margin: 0 8px; }
+        .ava { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #eee; transition: 0.3s; z-index: 1; }
+        
+        .crown-svg { position: absolute; top: -24px; width: 32px; height: 32px; fill: var(--gold); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); z-index: 10; }
+        .status-dot { position: absolute; bottom: 20px; right: 2px; width: 12px; height: 12px; background: #cccccc; border: 2px solid #fff; border-radius: 50%; z-index: 5; }
+        .status-dot.online { background: #00c853; }
+        .bday-count { font-size: 0.65rem; color: var(--primary); font-weight: 800; margin-top: 4px; background: #fff0f3; padding: 2px 6px; border-radius: 10px; white-space: nowrap; }
+        .ava-heart { margin: 0 5px; color: var(--primary); font-size: 0.8rem; animation: pulse 1.5s infinite; }
+
+        .sb-nav { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .nav-item { padding: 12px 25px; display: flex; align-items: center; color: #666; font-weight: 600; cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { background: #fff0f3; color: var(--primary); border-left-color: var(--primary); }
+        .nav-item i { width: 25px; }
+
+        /* MAIN PANE (IFRAME CONTAINER) */
+        .main-pane { flex: 1; position: relative; background: var(--bg-body); overflow: hidden; display: flex; flex-direction: column; }
+        #app-frame { width: 100%; height: 100%; border: none; display: block; }
+        
+        /* LOCKED STATE */
+        #dash-locked { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 100; text-align: center; padding-top: 100px; }
+
+        /* MOBILE NAV */
+        .mobile-nav { display: none; }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            body { flex-direction: column; }
+            .main-pane { height: calc(100vh - 60px); }
+            .mobile-nav { 
+                display: flex; position: fixed; bottom: 0; left: 0; width: 100%; 
+                background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); 
+                justify-content: flex-start; overflow-x: auto; padding: 10px 0; z-index: 1500; 
+                -webkit-overflow-scrolling: touch;
+            }
+            .mobile-nav .btn { flex: 0 0 auto; margin: 0 5px; }
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <!-- WALLPAPER OVERLAY -->
+    <div id="wallpaper-overlay" class="hidden">
+        <div class="wp-content">
+            <img src="" id="wp-img" class="wp-avatar">
+            <div id="wp-desc" class="wp-text"></div>
+            <button class="btn btn-ghost" style="color:white; border-color:white; margin-top:30px;" onclick="closeWallpaper()">Enter EternalWall</button>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sb-top">
+            <div class="brand-logo">EternalWall</div>
+            <div class="couple-circle" id="avatar-container">
+                <div class="avatar-wrap"><div class="ava" style="background:#ddd"></div></div>
+            </div>
+            <div class="couple-id" id="dash-code">...</div>
+        </div>
+        <div class="sb-nav">
+            <!-- NEW ORDER AS REQUESTED -->
+            <div class="nav-item active" onclick="loadTab('ourprofile.html', this)"><i class="fas fa-user-circle"></i> Our Profile</div>
+            <div class="nav-item" onclick="loadTab('ourheartstone.html', this)"><i class="fas fa-gem"></i> Our Heartstone</div>
+            <div class="nav-item" onclick="loadTab('ourpage.html', this)"><i class="fas fa-file-alt"></i> Our Page</div>
+            <div class="nav-item" onclick="loadTab('ourwall.html', this)"><i class="fas fa-globe"></i> Our Wall</div>
+            <div class="nav-item" onclick="loadTab('ourchats.html', this)"><i class="fas fa-comments"></i> Our Chats</div>
+            <div class="nav-item" onclick="loadTab('ourdreams.html', this)"><i class="fas fa-cloud"></i> Our Dreams</div>
+            <div class="nav-item" onclick="loadTab('ourmemories.html', this)"><i class="fas fa-camera"></i> Our Memories</div>
+            <div class="nav-item" onclick="loadTab('myfealings.html', this)"><i class="fas fa-heart"></i> My Fealings</div>
+            <div class="nav-item" onclick="loadTab('toolsforsurprise.html', this)"><i class="fas fa-magic"></i> Tools for Surprise</div>
+            <div class="nav-item" onclick="loadTab('loverswall.html', this)"><i class="fas fa-bullhorn"></i> Lovers Wall</div>
+            <div class="nav-item" onclick="loadTab('giftshop.html', this)"><i class="fas fa-gift"></i> Gift shop</div>
+        </div>
+        <div style="padding: 20px;">
+            <button class="btn btn-ghost" style="width: 100%; border:none;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div class="main-pane">
+        <!-- LOCKED STATE OVERLAY -->
+        <div id="dash-locked" class="hidden">
+            <h2 style="font-family:'Playfair Display'; color:var(--primary);">Account Locked</h2>
+            <p style="margin: 15px 0;">To unlock your account connect with your partner.</p>
+            <div style="padding:15px; border:2px dashed var(--gold); background:#fff; display:inline-block; margin:20px 0; font-weight:bold; letter-spacing:1px; cursor:pointer;" onclick="copyInvite()" id="invite-link">Loading...</div>
+            <p style="font-size:0.9rem; color:#888;">Tap the link above to copy and send to your partner.</p>
+            <button class="btn btn-ghost" style="margin-top:20px;" onclick="logout()">Logout</button>
+        </div>
+        
+        <!-- CONTENT IFRAME -->
+        <iframe id="app-frame" src=""></iframe>
+    </div>
+
+    <!-- MOBILE NAV -->
+    <nav class="mobile-nav">
+         <button class="btn btn-ghost" style="border:none" onclick="loadTab('ourprofile.html', null)"><i class="fas fa-user-circle"></i> Profile</button>
+         <button class="btn btn-ghost" style="border:none" onclick="loadTab('ourchats.html', null)"><i class="fas fa-comments"></i> Chat</button>
+         <button class="btn btn-ghost" style="border:none" onclick="loadTab('ourwall.html', null)"><i class="fas fa-globe"></i> Wall</button>
+         <button class="btn btn-ghost" style="border:none" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+    </nav>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4", authDomain: "onlineshop-30cd1.firebaseapp.com", databaseURL: "https://onlineshop-30cd1-default-rtdb.firebaseio.com", projectId: "onlineshop-30cd1", messagingSenderId: "818252574868", appId: "1:818252574868:web:8dd36825db589a886cc481" };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let user = null, coupleId = null, partnerId = null;
+        
+        // SVGs
+        const KING_SVG = `<svg class="crown-svg" viewBox="0 0 640 512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32l-16.7-43.2C331 229.4 353.2 216 378.3 216c39.6 0 76.5 24.3 92.1 63.8l16.2 40.5 48.9-114.2C549.9 174.9 576.4 152 607.4 152c33.5 0 60.7 27.2 60.7 60.7c0 43.6-43.2 75.3-76.3 56l-50.6-29.4-44.8 104.5c-9.2 21.4-30.4 35.2-53.7 35.2H197.3c-23.3 0-44.5-13.8-53.7-35.2L98.9 239.3 48.2 268.7C15.1 287.9-28.1 256.3-28.1 212.7c0-33.5 27.2-60.7 60.7-60.7c31 0 57.5 22.9 71.8 54.1l49 114.2 16.2-40.5C185.2 240.3 222 216 261.7 216c25.1 0 47.3 13.4 81.4 28.8l-16.7 43.2H313.6z"/></svg>`;
+        const QUEEN_SVG = `<svg class="crown-svg" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/></svg>`;
+
+        auth.onAuthStateChanged(u => {
+            user = u;
+            if(user) {
+                db.ref('.info/connected').on('value', (snap) => {
+                    if (snap.val()) {
+                        db.ref(`users/${user.uid}/status`).onDisconnect().set('offline');
+                        db.ref(`users/${user.uid}/status`).set('online');
+                    }
+                });
+                db.ref(`users/${user.uid}`).once('value', s => {
+                    if(s.exists()) {
+                        coupleId = s.val().coupleId;
+                        initDashboard();
+                    }
+                });
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        function initDashboard() {
+            db.ref(`couples/${coupleId}`).on('value', s => {
+                const d = s.val();
+                const link = window.location.href.replace('dashboard.html', 'index.html').split('?')[0] + "?invite=" + coupleId;
+                
+                if(d && d.user1 && d.user2) {
+                    // UNLOCKED
+                    document.getElementById('dash-locked').classList.add('hidden');
+                    document.getElementById('dash-code').innerText = coupleId;
+                    partnerId = (d.user1 === user.uid) ? d.user2 : d.user1;
+                    
+                    // Initial Load: Our Profile
+                    if(!document.getElementById('app-frame').src) {
+                        loadTab('ourprofile.html', document.querySelector('.nav-item.active'));
+                    }
+                    
+                    updateHeader();
+                    checkWallpaper();
+                } else if(d) {
+                    // LOCKED
+                    document.getElementById('dash-locked').classList.remove('hidden');
+                    document.getElementById('invite-link').innerText = link;
+                    document.getElementById('dash-code').innerText = coupleId;
+                }
+            });
+        }
+
+        // NAVIGATION LOGIC - IFRAME SWITCHER
+        function loadTab(filename, el) {
+            if(!coupleId || !user) return;
+            // Pass IDs to iframe so it knows who is who
+            const url = `${filename}?cid=${coupleId}&uid=${user.uid}`;
+            document.getElementById('app-frame').src = url;
+            
+            if(el) {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+            }
+        }
+
+        async function updateHeader() {
+            if(!user || !partnerId) return;
+            const meSnap = await db.ref(`users/${user.uid}/profile`).once('value');
+            const ptSnap = await db.ref(`users/${partnerId}/profile`).once('value');
+            const me = meSnap.val() || {};
+            const pt = ptSnap.val() || {};
+            const cont = document.getElementById('avatar-container');
+            
+            db.ref(`users/${partnerId}/status`).on('value', s => {
+                const dot = document.getElementById('pt-status-dot');
+                if(dot) {
+                    if(s.val() === 'online') dot.classList.add('online');
+                    else dot.classList.remove('online');
+                }
+            });
+
+            const createAva = (p, isPartner) => {
+                if(!p && isPartner) return `<div class="avatar-wrap"><div class="ava" style="background:#ddd"></div></div>`;
+                let name = p.nname || p.fname || "Love";
+                let crown = (p.sex === 'male') ? KING_SVG : QUEEN_SVG;
+                let bday = "";
+                if(p.dob) {
+                    const t = new Date(), b = new Date(p.dob);
+                    b.setFullYear(t.getFullYear());
+                    if(b < t) b.setFullYear(t.getFullYear()+1);
+                    const d = Math.ceil((b - t) / (86400000));
+                    bday = `<div class="bday-count"><i class="fas fa-birthday-cake"></i> ${d} Days</div>`;
+                }
+                let dotHtml = isPartner ? `<div id="pt-status-dot" class="status-dot"></div>` : '';
+                
+                return `<div class="avatar-wrap">${crown}<div style="position:relative;"><img src="${p.photo||'https://via.placeholder.com/50'}" class="ava">${dotHtml}</div><div style="font-size:0.7rem;font-weight:bold;margin-top:5px;">${name}</div>${bday}</div>`;
+            };
+
+            if(me.sex === 'male') {
+                cont.innerHTML = createAva(pt, true) + '<i class="fas fa-heart ava-heart"></i>' + createAva(me, false);
+            } else {
+                cont.innerHTML = createAva(me, false) + '<i class="fas fa-heart ava-heart"></i>' + createAva(pt, true);
+            }
+        }
+
+        function checkWallpaper() {
+            if(!partnerId) return;
+            db.ref(`users/${partnerId}/profile`).once('value', s => {
+                const d = s.val();
+                if(d && d.desc) {
+                    document.getElementById('wp-img').src = d.photo || 'https://via.placeholder.com/150';
+                    document.getElementById('wp-desc').innerText = `"${d.desc}"`;
+                    document.getElementById('wallpaper-overlay').classList.remove('hidden');
+                }
+            });
+        }
+
+        function closeWallpaper() {
+            const wp = document.getElementById('wallpaper-overlay');
+            wp.style.opacity = '0';
+            wp.style.pointerEvents = 'none';
+            setTimeout(() => { wp.classList.add('hidden'); wp.style.pointerEvents = 'auto'; }, 1000);
+        }
+
+        function copyInvite() {
+            navigator.clipboard.writeText(document.getElementById('invite-link').innerText);
+            alert("Invite copied!");
+        }
+        function logout() { 
+            if(user) db.ref(`users/${user.uid}/status`).set('offline').then(() => auth.signOut().then(() => window.location.href="index.html"));
+        }
+    </script>
+</body>
+</html>
