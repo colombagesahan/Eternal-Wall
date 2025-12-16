@@ -81,14 +81,15 @@
 
         let isSignup = false;
         let inviteCode = new URLSearchParams(window.location.search).get('invite');
-        if(inviteCode === 'undefined' || inviteCode === 'null') inviteCode = null; // Safety check
+        // Fix: Ensure string "undefined" is treated as null
+        if(inviteCode === 'undefined' || inviteCode === 'null') inviteCode = null;
 
         window.onload = () => {
             if(inviteCode) openAuth('signup');
             loadPublicTiles();
         };
 
-        // FIX: Prevent redirect if in the middle of signup process
+        // Fix: Do not redirect if we are currently signing up
         auth.onAuthStateChanged(u => {
             if(u && !isSignup) {
                 window.location.href = "dashboard.html";
@@ -115,7 +116,7 @@
                     const cred = await auth.createUserWithEmailAndPassword(e, p);
                     const uid = cred.user.uid;
                     
-                    // Database writes happen HERE. We wait for them.
+                    // Fix: Wait for DB write to complete BEFORE redirecting
                     if(inviteCode) {
                         await db.ref(`couples/${inviteCode}`).update({ user2: uid });
                         await db.ref(`users/${uid}`).set({ coupleId: inviteCode });
@@ -124,13 +125,11 @@
                         await db.ref(`couples/${cid}`).set({ user1: uid, created: Date.now() });
                         await db.ref(`users/${uid}`).set({ coupleId: cid });
                     }
-                    
-                    // FIX: Manual Redirect AFTER DB write success
+                    // Redirect now that data is safe
                     window.location.href = "dashboard.html";
-                    
                 } else {
                     await auth.signInWithEmailAndPassword(e, p);
-                    // Standard login relies on onAuthStateChanged to redirect
+                    // onAuthStateChanged will handle the redirect for login
                 }
                 document.getElementById('auth-modal').classList.add('hidden');
             } catch(err) { alert(err.message); }
