@@ -392,7 +392,54 @@
         const KING_SVG = `<svg class="crown-badge-svg" viewBox="0 0 576 512"><path d="M576 136c0 22.09-17.91 40-40 40c-0.248 0-0.455 0.118-0.702 0.123l-44.486 97.91C468.252 306.478 438.258 328 403.258 328c-18.067 0-35.035-5.748-48.972-15.549L288 191.705l-66.286 120.746C207.777 322.252 190.809 328 172.742 328c-35 0-64.994-21.522-87.552-53.967l-44.486-97.91C40.455 176.118 40.248 176 40 176c-22.09 0-40-17.91-40-40S17.91 96 40 96s40 17.91 40 40c0 8.998-3.521 16.89-9.103 22.863l36.316 79.917c14.654 13.921 33.868 21.22 55.429 21.22c33.084 0 60.168-18.526 73.195-46.108L288 95.666l52.163 118.226c13.027 27.582 40.111 46.108 73.195 46.108c21.56 0 40.774-7.299 55.429-21.22l36.316-79.917C499.521 152.89 496 144.998 496 136c0-22.09 17.91-40 40-40s40 17.91 40 40zM48 432c0 26.51 21.49 48 48 48h384c26.51 0 48-21.49 48-48s-21.49-48-48-48H96c-26.51 0-48 21.49-48 48z"/></svg>`;
         
         // Tiara style (Queen style)
-        const QUEEN_SVG = `<svg class="crown-badge-svg" viewBox="0 0 640 512"><path d="M630.9 202.9l-49.8-82.7c-5.9-9.9-19-12.7-28.5-6.1l-103 71.5c-15.6 10.8-37.4 3.7-44-14L351.3 26.5c-4.3-11.5-19.3-12.8-25.2-2.1L263.3 138c-4.4 7.9-13.7 11.9-22.3 9.6l-109.8-29.3c-10.7-2.8-21.5 5.5-21.5 16.5v.9c0 4.1 1.7 8 4.7 10.9l81.4 79c7.7 7.5 7.1 20-1.2 26.7l-71.3 57.6c-7.8 6.3-19.5 3.1-22.9-6.3L61.6 195.9c-2.3-6.5-9.3-10-15.9-8.3l-28 7.4c-9.6 2.5-15.9 12-14.3 21.7l16.2 97.4c1.3 7.6 7.9 13.2 15.6 13.2H604.8c7.7 0 14.3-5.6 15.6-13.2l16.2-97.4c1.6-9.7-4.7-19.1-14.3-21.7l-28-7.4c-6.6-1.7-13.6 1.8-15.9 8.3L540.3 304c-3.4 9.4-15.1 12.6-22.9 6.3l-71.3-57.6c-8.3-6.7-8.9-19.2-1.2-26.7l81.4-79c3-2.9 4.7-6.8 4.7-10.9v-.9c0-11-10.8-19.3-21.5-16.5l-109.8 29.3c-8.6 2.3-17.9-1.7-22.3-9.6L314.9 24.4c-5.9-10.7-20.9-9.4-25.2 2.1L235.4 171.7c-6.6 17.7-28.4 24.8-44 14l-103-71.5c-9.5-6.6-22.6-3.8-28.5 6.1L9.1 202.9C2.4 214.1 0 227.2 0 240.5V464c0 26.5 21.5 48 48 48H592c26.5 0 48-21.5 48-48V240.5c0-13.3-2.4-26.4-9.1-37.6z"/></svg>`;
+        const QUEEN_SVG = `
+<svg class="crown-badge-svg" viewBox="0 0 640 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFD966"/>
+      <stop offset="100%" stop-color="#C9A227"/>
+    </linearGradient>
+
+    <radialGradient id="ruby">
+      <stop offset="0%" stop-color="#FF6B6B"/>
+      <stop offset="100%" stop-color="#B30000"/>
+    </radialGradient>
+
+    <radialGradient id="emerald">
+      <stop offset="0%" stop-color="#6BFFB3"/>
+      <stop offset="100%" stop-color="#007A44"/>
+    </radialGradient>
+
+    <radialGradient id="sapphire">
+      <stop offset="0%" stop-color="#6BB6FF"/>
+      <stop offset="100%" stop-color="#003A8F"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Crown body -->
+  <path d="M64 320 L128 96 L256 256 L320 64 L384 256 L512 96 L576 320 Z"
+        fill="url(#goldGradient)"
+        stroke="#8B7500"
+        stroke-width="16"/>
+
+  <!-- Base -->
+  <rect x="96" y="320" width="448" height="96" rx="24"
+        fill="url(#goldGradient)"
+        stroke="#8B7500"
+        stroke-width="16"/>
+
+  <!-- Jewels -->
+  <circle cx="192" cy="368" r="20" fill="url(#ruby)"/>
+  <circle cx="320" cy="368" r="20" fill="url(#emerald)"/>
+  <circle cx="448" cy="368" r="20" fill="url(#sapphire)"/>
+
+  <!-- Top jewels -->
+  <circle cx="128" cy="96" r="18" fill="url(#ruby)"/>
+  <circle cx="320" cy="64" r="22" fill="url(#emerald)"/>
+  <circle cx="512" cy="96" r="18" fill="url(#sapphire)"/>
+</svg>
+`;
+
 
         window.onload = () => {
             const sels = document.querySelectorAll('#me-country, #p-country');
