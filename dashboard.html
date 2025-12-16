@@ -58,7 +58,7 @@
         #app-frame { width: 100%; height: 100%; border: none; display: block; }
         
         /* LOCKED STATE */
-        /* FIX: Removed 'hidden' class usage here in CSS, logic moved to JS */
+        /* Note: 'hidden' class removed from HTML. It is now visible by default. */
         #dash-locked { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 100; text-align: center; padding-top: 100px; }
 
         /* MOBILE NAV */
@@ -118,7 +118,7 @@
 
     <!-- MAIN AREA -->
     <div class="main-pane">
-        <!-- LOCKED STATE OVERLAY - FIX: REMOVED CLASS 'hidden' SO IT SHOWS BY DEFAULT -->
+        <!-- LOCKED STATE OVERLAY -->
         <div id="dash-locked">
             <h2 style="font-family:'Playfair Display'; color:var(--primary);">Account Locked</h2>
             <p style="margin: 15px 0;">To unlock your account connect with your partner.</p>
@@ -171,14 +171,17 @@
         });
 
         function initDashboard() {
+            if(!coupleId) return; // Wait until coupleId is defined
+            
             db.ref(`couples/${coupleId}`).on('value', s => {
                 const d = s.val();
-                // FIX: Better URL construction to avoid replacement errors
+                
+                // Construct URL correctly
                 const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
                 const inviteLink = baseUrl + "index.html?invite=" + coupleId;
                 
                 if(d && d.user1 && d.user2) {
-                    // UNLOCKED: Hide the overlay
+                    // UNLOCKED
                     document.getElementById('dash-locked').classList.add('hidden');
                     document.getElementById('dash-code').innerText = coupleId;
                     partnerId = (d.user1 === user.uid) ? d.user2 : d.user1;
@@ -190,7 +193,7 @@
                     updateHeader();
                     checkWallpaper();
                 } else {
-                    // LOCKED: Ensure overlay is visible
+                    // LOCKED
                     document.getElementById('dash-locked').classList.remove('hidden');
                     document.getElementById('invite-link').innerText = inviteLink;
                     document.getElementById('dash-code').innerText = coupleId;
