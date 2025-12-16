@@ -39,11 +39,11 @@
         .btn-ghost { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
         .input-std { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; background: #fafafa; }
         
-        /* WALLPAPER OVERLAY */
+        /* WALLPAPER OVERLAY - Fix: Z-Index and Pointer Events */
         #wallpaper-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background-size: cover; background-position: center; 
-            z-index: 9999; display: flex; flex-direction: column; 
+            z-index: 3000; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; text-align: center;
             background-color: #000; color: white; transition: opacity 1s ease;
         }
@@ -53,41 +53,45 @@
 
         /* PUBLIC HOME */
         #view-home { min-height: 100vh; display: flex; flex-direction: column; }
-        .nav-header { background: #fff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .nav-header { background: #fff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1002; }
         .brand-logo { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--primary); }
         .hero-section { text-align: center; padding: 50px 20px; }
         .hero-section h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #222; margin-bottom: 10px; }
         .search-input { width: 100%; padding: 15px 20px; border-radius: 30px; border: 1px solid #ddd; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); max-width: 500px; margin: 0 auto; display: block;}
-        .tiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        /* Fix: Responsive Grid for 300px */
+        .tiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; max-width: 1200px; margin: 0 auto; padding: 20px; }
         .tile-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; aspect-ratio: 1; position: relative; }
         .tile-img { width: 100%; height: 100%; object-fit: cover; }
         .tile-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 20px 10px 10px; color: white; }
 
         /* DASHBOARD */
         #view-dashboard { display: flex; min-height: 100vh; }
-        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid var(--border); position: fixed; height: 100vh; display: flex; flex-direction: column; z-index: 99; }
+        
+        /* Fix: Sidebar Z-Index */
+        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid var(--border); position: fixed; height: 100vh; display: flex; flex-direction: column; z-index: 1001; }
         .sb-top { padding: 30px 20px; text-align: center; border-bottom: 1px solid #f0f0f0; }
         
         /* HEADER AVATARS & BADGES & ONLINE STATUS */
-        .couple-circle { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
-        .avatar-wrap { position: relative; display: flex; flex-direction: column; align-items: center; }
-        .ava { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #eee; transition: 0.3s; }
+        .couple-circle { display: flex; justify-content: center; align-items: center; margin: 25px 0 15px; position: relative; }
+        .avatar-wrap { position: relative; display: flex; flex-direction: column; align-items: center; margin: 0 8px; }
+        .ava { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #eee; transition: 0.3s; z-index: 1; }
         
-        /* New SVG Crown Styling */
-        .crown-badge-svg {
+        /* UPDATED: High Quality SVG Crown Styling */
+        .crown-svg {
             position: absolute;
-            top: -16px;
-            width: 24px;
-            height: 24px;
+            top: -24px; /* Adjusted for larger SVG */
+            width: 32px;
+            height: 32px;
             fill: var(--gold);
             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
             z-index: 10;
         }
 
-        .status-dot { position: absolute; bottom: 15px; right: 0; width: 12px; height: 12px; background: #cccccc; border: 2px solid #fff; border-radius: 50%; z-index: 5; }
+        .status-dot { position: absolute; bottom: 20px; right: 2px; width: 12px; height: 12px; background: #cccccc; border: 2px solid #fff; border-radius: 50%; z-index: 5; }
         .status-dot.online { background: #00c853; }
         .bday-count { font-size: 0.65rem; color: var(--primary); font-weight: 800; margin-top: 4px; background: #fff0f3; padding: 2px 6px; border-radius: 10px; white-space: nowrap; }
-        .ava-heart { margin: 0 10px; color: var(--primary); font-size: 0.8rem; animation: pulse 1.5s infinite; }
+        .ava-heart { margin: 0 5px; color: var(--primary); font-size: 0.8rem; animation: pulse 1.5s infinite; }
 
         .sb-nav { padding: 20px 0; flex: 1; overflow-y: auto; }
         .nav-item { padding: 12px 25px; display: flex; align-items: center; color: #666; font-weight: 600; cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; }
@@ -104,7 +108,7 @@
         
         .royal-badge { 
             display: block; text-align: center; font-family: 'Playfair Display', serif; 
-            font-weight: bold; color: var(--gold); margin-bottom: 15px; font-size: 1.2rem;
+            font-weight: bold; color: var(--gold); margin-bottom: 15px; font-size: 1.1rem;
             text-transform: uppercase; letter-spacing: 1px;
         }
 
@@ -115,7 +119,7 @@
         .edit-btn:hover { background: var(--primary); color: white; }
 
         /* MODALS */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; }
         .modal-box { background: #fff; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
         
         /* MOBILE */
@@ -123,7 +127,21 @@
         @media (max-width: 768px) {
             .sidebar { display: none; }
             .main-pane { margin-left: 0; width: 100%; padding: 20px 15px 80px; }
-            .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); justify-content: space-around; padding: 12px 0; z-index: 200; }
+            
+            /* Fix: Sliding Bar for Small Screens */
+            .mobile-nav { 
+                display: flex; position: fixed; bottom: 0; left: 0; width: 100%; 
+                background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); 
+                justify-content: flex-start; /* Changed from space-around */
+                overflow-x: auto; /* Enable sliding */
+                padding: 10px 0; z-index: 1500; 
+                -webkit-overflow-scrolling: touch;
+            }
+            .mobile-nav .btn {
+                flex: 0 0 auto; /* Don't shrink */
+                margin: 0 5px;
+            }
+            
             .profile-container { grid-template-columns: 1fr; }
         }
 
@@ -206,14 +224,15 @@
         <div class="main-pane">
             <!-- LOCKED STATE -->
             <div id="dash-locked" class="hidden" style="text-align:center; padding-top:100px;">
-                <h2 style="font-family:'Playfair Display';">Waiting for Partner...</h2>
-                <div style="padding:15px; border:2px dashed var(--primary); display:inline-block; margin:20px 0;" onclick="copyInvite()" id="invite-link">...</div>
-                <p>Send this link to your partner.</p>
-                <button class="btn btn-ghost" onclick="logout()">Logout</button>
+                <h2 style="font-family:'Playfair Display'; color:var(--primary);">Account Locked</h2>
+                <p style="margin: 15px 0;">To unlock your account connect with your partner.</p>
+                <div style="padding:15px; border:2px dashed var(--gold); background:#fff; display:inline-block; margin:20px 0; font-weight:bold; letter-spacing:1px;" onclick="copyInvite()" id="invite-link">Loading...</div>
+                <p style="font-size:0.9rem; color:#888;">Tap the link above to copy and send to your partner.</p>
+                <button class="btn btn-ghost" style="margin-top:20px;" onclick="logout()">Logout</button>
             </div>
 
             <!-- UNLOCKED STATE -->
-            <div id="dash-unlocked">
+            <div id="dash-unlocked" class="hidden">
                 <!-- 1. OUR PROFILE TAB -->
                 <div id="tab-profile" class="tab-view">
                     <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Our Profile</h2>
@@ -226,7 +245,7 @@
                                 <div class="form-group"><label class="form-label">Profile Photo URL</label><input type="text" id="me-photo" class="input-std" placeholder="https://..."></div>
                                 <!-- BADGE AREA -->
                                 <div id="me-badge" class="royal-badge"></div>
-                                <div class="form-group"><label class="form-label">Sex</label><select id="me-sex" class="form-select" onchange="updateBadges('me')"><option value="male">Male (King)</option><option value="female">Female (Queen)</option></select></div>
+                                <div class="form-group"><label class="form-label">Sex</label><select id="me-sex" class="form-select" onchange="updateBadges('me')"><option value="male">Male</option><option value="female">Female</option></select></div>
                                 <div class="flex" style="gap:10px;">
                                     <div class="form-group" style="flex:1;"><label class="form-label">First Name</label><input type="text" id="me-fname" class="input-std"></div>
                                     <div class="form-group" style="flex:1;"><label class="form-label">Second Name</label><input type="text" id="me-sname" class="input-std"></div>
@@ -234,7 +253,7 @@
                                 <div class="form-group"><label class="form-label">Nickname</label><input type="text" id="me-nname" class="input-std"></div>
                                 <div class="form-group"><label class="form-label">Display Name</label><select id="me-display" class="form-select"><option value="fname">First Name</option><option value="sname">Second Name</option><option value="nname">Nickname</option></select></div>
                                 <div class="form-group"><label class="form-label">Birthday</label><input type="date" id="me-dob" class="input-std"></div>
-                                <div class="form-group"><label class="form-label">Phone</label><div class="flex" style="gap:5px;"><select id="me-country" class="form-select" style="width:80px;"></select><input type="tel" id="me-phone" class="input-std" style="margin:0;"></div></div>
+                                <div class="form-group"><label class="form-label">Phone</label><div class="flex" style="gap:5px;"><select id="me-country" class="form-select" style="width:120px;"></select><input type="tel" id="me-phone" class="input-std" style="margin:0;"></div></div>
                                 <div class="form-group"><label class="form-label">Describe Partner (Their Wallpaper)</label><textarea id="me-desc" class="input-std" rows="3" maxlength="100"></textarea></div>
                                 <button class="btn btn-primary" onclick="event.stopPropagation(); saveProfile('me')">Save My Profile</button>
                             </fieldset>
@@ -256,7 +275,7 @@
                                 <div class="form-group"><label class="form-label">Nickname</label><input type="text" id="p-nname" class="input-std"></div>
                                 <div class="form-group"><label class="form-label">Display Name</label><select id="p-display" class="form-select"><option value="fname">First Name</option><option value="sname">Second Name</option><option value="nname">Nickname</option></select></div>
                                 <div class="form-group"><label class="form-label">Birthday</label><input type="date" id="p-dob" class="input-std"></div>
-                                <div class="form-group"><label class="form-label">Phone</label><div class="flex" style="gap:5px;"><select id="p-country" class="form-select" style="width:80px;"></select><input type="tel" id="p-phone" class="input-std" style="margin:0;"></div></div>
+                                <div class="form-group"><label class="form-label">Phone</label><div class="flex" style="gap:5px;"><select id="p-country" class="form-select" style="width:120px;"></select><input type="tel" id="p-phone" class="input-std" style="margin:0;"></div></div>
                                 <div class="form-group"><label class="form-label">Describe Me (My Wallpaper)</label><textarea id="p-desc" class="input-std" rows="3" maxlength="100"></textarea></div>
                                 <button class="btn btn-primary" onclick="event.stopPropagation(); saveProfile('partner')">Request Changes</button>
                             </fieldset>
@@ -300,9 +319,11 @@
         </div>
 
         <nav class="mobile-nav">
-             <button class="btn btn-ghost" style="border:none" onclick="nav('profile', null)"><i class="fas fa-user"></i></button>
-             <button class="btn btn-ghost" style="border:none" onclick="nav('wall', null)"><i class="fas fa-globe"></i></button>
-             <button class="btn btn-ghost" style="border:none" onclick="nav('chats', null)"><i class="fas fa-comments"></i></button>
+             <button class="btn btn-ghost" style="border:none" onclick="nav('profile', null)"><i class="fas fa-user-circle"></i> Profile</button>
+             <button class="btn btn-ghost" style="border:none" onclick="nav('wall', null)"><i class="fas fa-globe"></i> Wall</button>
+             <button class="btn btn-ghost" style="border:none" onclick="nav('chats', null)"><i class="fas fa-comments"></i> Chat</button>
+             <button class="btn btn-ghost" style="border:none" onclick="nav('room', null)"><i class="fas fa-video"></i> Room</button>
+             <button class="btn btn-ghost" style="border:none" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
         </nav>
     </div>
 
@@ -370,8 +391,10 @@
         let inviteCode = new URLSearchParams(window.location.search).get('invite');
         let pendingRequestData = null;
 
-        // COUNTRIES
-        const countries = [{code:"+1", name:"USA"}, {code:"+44", name:"UK"}, {code:"+91", name:"India"}, {code:"+94", name:"SL"}, {code:"+86", name:"CN"}, {code:"+61", name:"AU"}, {code:"+81", name:"JP"}, {code:"+49", name:"DE"}, {code:"+33", name:"FR"}, {code:"+7", name:"RU"}, {code:"+55", name:"BR"}];
+        // ALL COUNTRIES
+        const countries = [
+            { name: "Afghanistan", code: "AF", dial_code: "+93" }, { name: "Albania", code: "AL", dial_code: "+355" }, { name: "Algeria", code: "DZ", dial_code: "+213" }, { name: "AmericanSamoa", code: "AS", dial_code: "+1-684" }, { name: "Andorra", code: "AD", dial_code: "+376" }, { name: "Angola", code: "AO", dial_code: "+244" }, { name: "Anguilla", code: "AI", dial_code: "+1-264" }, { name: "Antarctica", code: "AQ", dial_code: "+672" }, { name: "Antigua and Barbuda", code: "AG", dial_code: "+1-268" }, { name: "Argentina", code: "AR", dial_code: "+54" }, { name: "Armenia", code: "AM", dial_code: "+374" }, { name: "Aruba", code: "AW", dial_code: "+297" }, { name: "Australia", code: "AU", dial_code: "+61" }, { name: "Austria", code: "AT", dial_code: "+43" }, { name: "Azerbaijan", code: "AZ", dial_code: "+994" }, { name: "Bahamas", code: "BS", dial_code: "+1-242" }, { name: "Bahrain", code: "BH", dial_code: "+973" }, { name: "Bangladesh", code: "BD", dial_code: "+880" }, { name: "Barbados", code: "BB", dial_code: "+1-246" }, { name: "Belarus", code: "BY", dial_code: "+375" }, { name: "Belgium", code: "BE", dial_code: "+32" }, { name: "Belize", code: "BZ", dial_code: "+501" }, { name: "Benin", code: "BJ", dial_code: "+229" }, { name: "Bermuda", code: "BM", dial_code: "+1-441" }, { name: "Bhutan", code: "BT", dial_code: "+975" }, { name: "Bolivia", code: "BO", dial_code: "+591" }, { name: "Bosnia and Herzegovina", code: "BA", dial_code: "+387" }, { name: "Botswana", code: "BW", dial_code: "+267" }, { name: "Brazil", code: "BR", dial_code: "+55" }, { name: "British Indian Ocean Territory", code: "IO", dial_code: "+246" }, { name: "British Virgin Islands", code: "VG", dial_code: "+1-284" }, { name: "Brunei", code: "BN", dial_code: "+673" }, { name: "Bulgaria", code: "BG", dial_code: "+359" }, { name: "Burkina Faso", code: "BF", dial_code: "+226" }, { name: "Burundi", code: "BI", dial_code: "+257" }, { name: "Cambodia", code: "KH", dial_code: "+855" }, { name: "Cameroon", code: "CM", dial_code: "+237" }, { name: "Canada", code: "CA", dial_code: "+1" }, { name: "Cape Verde", code: "CV", dial_code: "+238" }, { name: "Cayman Islands", code: "KY", dial_code: "+1-345" }, { name: "Central African Republic", code: "CF", dial_code: "+236" }, { name: "Chad", code: "TD", dial_code: "+235" }, { name: "Chile", code: "CL", dial_code: "+56" }, { name: "China", code: "CN", dial_code: "+86" }, { name: "Christmas Island", code: "CX", dial_code: "+61" }, { name: "Cocos Islands", code: "CC", dial_code: "+61" }, { name: "Colombia", code: "CO", dial_code: "+57" }, { name: "Comoros", code: "KM", dial_code: "+269" }, { name: "Cook Islands", code: "CK", dial_code: "+682" }, { name: "Costa Rica", code: "CR", dial_code: "+506" }, { name: "Croatia", code: "HR", dial_code: "+385" }, { name: "Cuba", code: "CU", dial_code: "+53" }, { name: "Curacao", code: "CW", dial_code: "+599" }, { name: "Cyprus", code: "CY", dial_code: "+357" }, { name: "Czech Republic", code: "CZ", dial_code: "+420" }, { name: "Democratic Republic of the Congo", code: "CD", dial_code: "+243" }, { name: "Denmark", code: "DK", dial_code: "+45" }, { name: "Djibouti", code: "DJ", dial_code: "+253" }, { name: "Dominica", code: "DM", dial_code: "+1-767" }, { name: "Dominican Republic", code: "DO", dial_code: "+1-809, 1-829, 1-849" }, { name: "East Timor", code: "TL", dial_code: "+670" }, { name: "Ecuador", code: "EC", dial_code: "+593" }, { name: "Egypt", code: "EG", dial_code: "+20" }, { name: "El Salvador", code: "SV", dial_code: "+503" }, { name: "Equatorial Guinea", code: "GQ", dial_code: "+240" }, { name: "Eritrea", code: "ER", dial_code: "+291" }, { name: "Estonia", code: "EE", dial_code: "+372" }, { name: "Ethiopia", code: "ET", dial_code: "+251" }, { name: "Falkland Islands", code: "FK", dial_code: "+500" }, { name: "Faroe Islands", code: "FO", dial_code: "+298" }, { name: "Fiji", code: "FJ", dial_code: "+679" }, { name: "Finland", code: "FI", dial_code: "+358" }, { name: "France", code: "FR", dial_code: "+33" }, { name: "French Polynesia", code: "PF", dial_code: "+689" }, { name: "Gabon", code: "GA", dial_code: "+241" }, { name: "Gambia", code: "GM", dial_code: "+220" }, { name: "Georgia", code: "GE", dial_code: "+995" }, { name: "Germany", code: "DE", dial_code: "+49" }, { name: "Ghana", code: "GH", dial_code: "+233" }, { name: "Gibraltar", code: "GI", dial_code: "+350" }, { name: "Greece", code: "GR", dial_code: "+30" }, { name: "Greenland", code: "GL", dial_code: "+299" }, { name: "Grenada", code: "GD", dial_code: "+1-473" }, { name: "Guam", code: "GU", dial_code: "+1-671" }, { name: "Guatemala", code: "GT", dial_code: "+502" }, { name: "Guernsey", code: "GG", dial_code: "+44-1481" }, { name: "Guinea", code: "GN", dial_code: "+224" }, { name: "Guinea-Bissau", code: "GW", dial_code: "+245" }, { name: "Guyana", code: "GY", dial_code: "+592" }, { name: "Haiti", code: "HT", dial_code: "+509" }, { name: "Honduras", code: "HN", dial_code: "+504" }, { name: "Hong Kong", code: "HK", dial_code: "+852" }, { name: "Hungary", code: "HU", dial_code: "+36" }, { name: "Iceland", code: "IS", dial_code: "+354" }, { name: "India", code: "IN", dial_code: "+91" }, { name: "Indonesia", code: "ID", dial_code: "+62" }, { name: "Iran", code: "IR", dial_code: "+98" }, { name: "Iraq", code: "IQ", dial_code: "+964" }, { name: "Ireland", code: "IE", dial_code: "+353" }, { name: "Isle of Man", code: "IM", dial_code: "+44-1624" }, { name: "Israel", code: "IL", dial_code: "+972" }, { name: "Italy", code: "IT", dial_code: "+39" }, { name: "Ivory Coast", code: "CI", dial_code: "+225" }, { name: "Jamaica", code: "JM", dial_code: "+1-876" }, { name: "Japan", code: "JP", dial_code: "+81" }, { name: "Jersey", code: "JE", dial_code: "+44-1534" }, { name: "Jordan", code: "JO", dial_code: "+962" }, { name: "Kazakhstan", code: "KZ", dial_code: "+7" }, { name: "Kenya", code: "KE", dial_code: "+254" }, { name: "Kiribati", code: "KI", dial_code: "+686" }, { name: "Kosovo", code: "XK", dial_code: "+383" }, { name: "Kuwait", code: "KW", dial_code: "+965" }, { name: "Kyrgyzstan", code: "KG", dial_code: "+996" }, { name: "Laos", code: "LA", dial_code: "+856" }, { name: "Latvia", code: "LV", dial_code: "+371" }, { name: "Lebanon", code: "LB", dial_code: "+961" }, { name: "Lesotho", code: "LS", dial_code: "+266" }, { name: "Liberia", code: "LR", dial_code: "+231" }, { name: "Libya", code: "LY", dial_code: "+218" }, { name: "Liechtenstein", code: "LI", dial_code: "+423" }, { name: "Lithuania", code: "LT", dial_code: "+370" }, { name: "Luxembourg", code: "LU", dial_code: "+352" }, { name: "Macau", code: "MO", dial_code: "+853" }, { name: "Macedonia", code: "MK", dial_code: "+389" }, { name: "Madagascar", code: "MG", dial_code: "+261" }, { name: "Malawi", code: "MW", dial_code: "+265" }, { name: "Malaysia", code: "MY", dial_code: "+60" }, { name: "Maldives", code: "MV", dial_code: "+960" }, { name: "Mali", code: "ML", dial_code: "+223" }, { name: "Malta", code: "MT", dial_code: "+356" }, { name: "Marshall Islands", code: "MH", dial_code: "+692" }, { name: "Mauritania", code: "MR", dial_code: "+222" }, { name: "Mauritius", code: "MU", dial_code: "+230" }, { name: "Mayotte", code: "YT", dial_code: "+262" }, { name: "Mexico", code: "MX", dial_code: "+52" }, { name: "Micronesia", code: "FM", dial_code: "+691" }, { name: "Moldova", code: "MD", dial_code: "+373" }, { name: "Monaco", code: "MC", dial_code: "+377" }, { name: "Mongolia", code: "MN", dial_code: "+976" }, { name: "Montenegro", code: "ME", dial_code: "+382" }, { name: "Montserrat", code: "MS", dial_code: "+1-664" }, { name: "Morocco", code: "MA", dial_code: "+212" }, { name: "Mozambique", code: "MZ", dial_code: "+258" }, { name: "Myanmar", code: "MM", dial_code: "+95" }, { name: "Namibia", code: "NA", dial_code: "+264" }, { name: "Nauru", code: "NR", dial_code: "+674" }, { name: "Nepal", code: "NP", dial_code: "+977" }, { name: "Netherlands", code: "NL", dial_code: "+31" }, { name: "Netherlands Antilles", code: "AN", dial_code: "+599" }, { name: "New Caledonia", code: "NC", dial_code: "+687" }, { name: "New Zealand", code: "NZ", dial_code: "+64" }, { name: "Nicaragua", code: "NI", dial_code: "+505" }, { name: "Niger", code: "NE", dial_code: "+227" }, { name: "Nigeria", code: "NG", dial_code: "+234" }, { name: "Niue", code: "NU", dial_code: "+683" }, { name: "North Korea", code: "KP", dial_code: "+850" }, { name: "Northern Mariana Islands", code: "MP", dial_code: "+1-670" }, { name: "Norway", code: "NO", dial_code: "+47" }, { name: "Oman", code: "OM", dial_code: "+968" }, { name: "Pakistan", code: "PK", dial_code: "+92" }, { name: "Palau", code: "PW", dial_code: "+680" }, { name: "Palestine", code: "PS", dial_code: "+970" }, { name: "Panama", code: "PA", dial_code: "+507" }, { name: "Papua New Guinea", code: "PG", dial_code: "+675" }, { name: "Paraguay", code: "PY", dial_code: "+595" }, { name: "Peru", code: "PE", dial_code: "+51" }, { name: "Philippines", code: "PH", dial_code: "+63" }, { name: "Pitcairn", code: "PN", dial_code: "+64" }, { name: "Poland", code: "PL", dial_code: "+48" }, { name: "Portugal", code: "PT", dial_code: "+351" }, { name: "Puerto Rico", code: "PR", dial_code: "+1-787, 1-939" }, { name: "Qatar", code: "QA", dial_code: "+974" }, { name: "Republic of the Congo", code: "CG", dial_code: "+242" }, { name: "Reunion", code: "RE", dial_code: "+262" }, { name: "Romania", code: "RO", dial_code: "+40" }, { name: "Russia", code: "RU", dial_code: "+7" }, { name: "Rwanda", code: "RW", dial_code: "+250" }, { name: "Saint Barthelemy", code: "BL", dial_code: "+590" }, { name: "Saint Helena", code: "SH", dial_code: "+290" }, { name: "Saint Kitts and Nevis", code: "KN", dial_code: "+1-869" }, { name: "Saint Lucia", code: "LC", dial_code: "+1-758" }, { name: "Saint Martin", code: "MF", dial_code: "+590" }, { name: "Saint Pierre and Miquelon", code: "PM", dial_code: "+508" }, { name: "Saint Vincent and the Grenadines", code: "VC", dial_code: "+1-784" }, { name: "Samoa", code: "WS", dial_code: "+685" }, { name: "San Marino", code: "SM", dial_code: "+378" }, { name: "Sao Tome and Principe", code: "ST", dial_code: "+239" }, { name: "Saudi Arabia", code: "SA", dial_code: "+966" }, { name: "Senegal", code: "SN", dial_code: "+221" }, { name: "Serbia", code: "RS", dial_code: "+381" }, { name: "Seychelles", code: "SC", dial_code: "+248" }, { name: "Sierra Leone", code: "SL", dial_code: "+232" }, { name: "Singapore", code: "SG", dial_code: "+65" }, { name: "Sint Maarten", code: "SX", dial_code: "+1-721" }, { name: "Slovakia", code: "SK", dial_code: "+421" }, { name: "Slovenia", code: "SI", dial_code: "+386" }, { name: "Solomon Islands", code: "SB", dial_code: "+677" }, { name: "Somalia", code: "SO", dial_code: "+252" }, { name: "South Africa", code: "ZA", dial_code: "+27" }, { name: "South Korea", code: "KR", dial_code: "+82" }, { name: "South Sudan", code: "SS", dial_code: "+211" }, { name: "Spain", code: "ES", dial_code: "+34" }, { name: "Sri Lanka", code: "LK", dial_code: "+94" }, { name: "Sudan", code: "SD", dial_code: "+249" }, { name: "Suriname", code: "SR", dial_code: "+597" }, { name: "Svalbard and Jan Mayen", code: "SJ", dial_code: "+47" }, { name: "Swaziland", code: "SZ", dial_code: "+268" }, { name: "Sweden", code: "SE", dial_code: "+46" }, { name: "Switzerland", code: "CH", dial_code: "+41" }, { name: "Syria", code: "SY", dial_code: "+963" }, { name: "Taiwan", code: "TW", dial_code: "+886" }, { name: "Tajikistan", code: "TJ", dial_code: "+992" }, { name: "Tanzania", code: "TZ", dial_code: "+255" }, { name: "Thailand", code: "TH", dial_code: "+66" }, { name: "Togo", code: "TG", dial_code: "+228" }, { name: "Tokelau", code: "TK", dial_code: "+690" }, { name: "Tonga", code: "TO", dial_code: "+676" }, { name: "Trinidad and Tobago", code: "TT", dial_code: "+1-868" }, { name: "Tunisia", code: "TN", dial_code: "+216" }, { name: "Turkey", code: "TR", dial_code: "+90" }, { name: "Turkmenistan", code: "TM", dial_code: "+993" }, { name: "Turks and Caicos Islands", code: "TC", dial_code: "+1-649" }, { name: "Tuvalu", code: "TV", dial_code: "+688" }, { name: "U.S. Virgin Islands", code: "VI", dial_code: "+1-340" }, { name: "Uganda", code: "UG", dial_code: "+256" }, { name: "Ukraine", code: "UA", dial_code: "+380" }, { name: "United Arab Emirates", code: "AE", dial_code: "+971" }, { name: "United Kingdom", code: "GB", dial_code: "+44" }, { name: "United States", code: "US", dial_code: "+1" }, { name: "Uruguay", code: "UY", dial_code: "+598" }, { name: "Uzbekistan", code: "UZ", dial_code: "+998" }, { name: "Vanuatu", code: "VU", dial_code: "+678" }, { name: "Vatican", code: "VA", dial_code: "+379" }, { name: "Venezuela", code: "VE", dial_code: "+58" }, { name: "Vietnam", code: "VN", dial_code: "+84" }, { name: "Wallis and Futuna", code: "WF", dial_code: "+681" }, { name: "Western Sahara", code: "EH", dial_code: "+212" }, { name: "Yemen", code: "YE", dial_code: "+967" }, { name: "Zambia", code: "ZM", dial_code: "+260" }, { name: "Zimbabwe", code: "ZW", dial_code: "+263" }
+        ];
 
         // MAPPINGS FOR READABLE LABELS
         const fieldLabels = {
@@ -387,16 +410,14 @@
             phoneNum: "Phone Number"
         };
 
-        // SVGs
-        // Standard Crown (King style)
-        const KING_SVG = `<svg class="crown-badge-svg" viewBox="0 0 576 512"><path d="M576 136c0 22.09-17.91 40-40 40c-0.248 0-0.455 0.118-0.702 0.123l-44.486 97.91C468.252 306.478 438.258 328 403.258 328c-18.067 0-35.035-5.748-48.972-15.549L288 191.705l-66.286 120.746C207.777 322.252 190.809 328 172.742 328c-35 0-64.994-21.522-87.552-53.967l-44.486-97.91C40.455 176.118 40.248 176 40 176c-22.09 0-40-17.91-40-40S17.91 96 40 96s40 17.91 40 40c0 8.998-3.521 16.89-9.103 22.863l36.316 79.917c14.654 13.921 33.868 21.22 55.429 21.22c33.084 0 60.168-18.526 73.195-46.108L288 95.666l52.163 118.226c13.027 27.582 40.111 46.108 73.195 46.108c21.56 0 40.774-7.299 55.429-21.22l36.316-79.917C499.521 152.89 496 144.998 496 136c0-22.09 17.91-40 40-40s40 17.91 40 40zM48 432c0 26.51 21.49 48 48 48h384c26.51 0 48-21.49 48-48s-21.49-48-48-48H96c-26.51 0-48 21.49-48 48z"/></svg>`;
+        // NEW: HIGH QUALITY CROWNS SVGs
+        const KING_SVG = `<svg class="crown-svg" viewBox="0 0 640 512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32l-16.7-43.2C331 229.4 353.2 216 378.3 216c39.6 0 76.5 24.3 92.1 63.8l16.2 40.5 48.9-114.2C549.9 174.9 576.4 152 607.4 152c33.5 0 60.7 27.2 60.7 60.7c0 43.6-43.2 75.3-76.3 56l-50.6-29.4-44.8 104.5c-9.2 21.4-30.4 35.2-53.7 35.2H197.3c-23.3 0-44.5-13.8-53.7-35.2L98.9 239.3 48.2 268.7C15.1 287.9-28.1 256.3-28.1 212.7c0-33.5 27.2-60.7 60.7-60.7c31 0 57.5 22.9 71.8 54.1l49 114.2 16.2-40.5C185.2 240.3 222 216 261.7 216c25.1 0 47.3 13.4 81.4 28.8l-16.7 43.2H313.6z"/></svg>`;
         
-        // Tiara style (Queen style)
-        const QUEEN_SVG = `<svg class="crown-badge-svg" viewBox="0 0 640 512"><path d="M630.9 202.9l-49.8-82.7c-5.9-9.9-19-12.7-28.5-6.1l-103 71.5c-15.6 10.8-37.4 3.7-44-14L351.3 26.5c-4.3-11.5-19.3-12.8-25.2-2.1L263.3 138c-4.4 7.9-13.7 11.9-22.3 9.6l-109.8-29.3c-10.7-2.8-21.5 5.5-21.5 16.5v.9c0 4.1 1.7 8 4.7 10.9l81.4 79c7.7 7.5 7.1 20-1.2 26.7l-71.3 57.6c-7.8 6.3-19.5 3.1-22.9-6.3L61.6 195.9c-2.3-6.5-9.3-10-15.9-8.3l-28 7.4c-9.6 2.5-15.9 12-14.3 21.7l16.2 97.4c1.3 7.6 7.9 13.2 15.6 13.2H604.8c7.7 0 14.3-5.6 15.6-13.2l16.2-97.4c1.6-9.7-4.7-19.1-14.3-21.7l-28-7.4c-6.6-1.7-13.6 1.8-15.9 8.3L540.3 304c-3.4 9.4-15.1 12.6-22.9 6.3l-71.3-57.6c-8.3-6.7-8.9-19.2-1.2-26.7l81.4-79c3-2.9 4.7-6.8 4.7-10.9v-.9c0-11-10.8-19.3-21.5-16.5l-109.8 29.3c-8.6 2.3-17.9-1.7-22.3-9.6L314.9 24.4c-5.9-10.7-20.9-9.4-25.2 2.1L235.4 171.7c-6.6 17.7-28.4 24.8-44 14l-103-71.5c-9.5-6.6-22.6-3.8-28.5 6.1L9.1 202.9C2.4 214.1 0 227.2 0 240.5V464c0 26.5 21.5 48 48 48H592c26.5 0 48-21.5 48-48V240.5c0-13.3-2.4-26.4-9.1-37.6z"/></svg>`;
+        const QUEEN_SVG = `<svg class="crown-svg" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/></svg>`;
 
         window.onload = () => {
             const sels = document.querySelectorAll('#me-country, #p-country');
-            sels.forEach(s => countries.forEach(c => s.innerHTML += `<option value="${c.code}">${c.code} ${c.name}</option>`));
+            sels.forEach(s => countries.forEach(c => s.innerHTML += `<option value="${c.dial_code}">${c.name} (${c.dial_code})</option>`));
             if(inviteCode) openAuth('signup');
         };
 
@@ -469,10 +490,15 @@
 
         // DASHBOARD
         function initDashboard() {
+            // Real-time listener handles the connection logic
             db.ref(`couples/${coupleId}`).on('value', s => {
                 const d = s.val();
+                
+                // IMPORTANT: Immediate check for Invite Link generation to avoid refresh need
+                const link = window.location.href.split('?')[0] + "?invite=" + coupleId;
+                
                 if(d && d.user1 && d.user2) {
-                    // Both users exist
+                    // Both users exist -> UNLOCKED
                     document.getElementById('dash-locked').classList.add('hidden');
                     document.getElementById('dash-unlocked').classList.remove('hidden');
                     document.getElementById('dash-code').innerText = coupleId;
@@ -484,18 +510,23 @@
                     initChat();
                     checkWallpaper();
                 } else if(d) {
-                    // Waiting for partner
+                    // Waiting for partner -> LOCKED
                     document.getElementById('dash-locked').classList.remove('hidden');
                     document.getElementById('dash-unlocked').classList.add('hidden');
-                    const link = window.location.href.split('?')[0] + "?invite=" + coupleId;
-                    document.getElementById('invite-link').innerText = link;
+                    
+                    // Force update the invite link element here
+                    const el = document.getElementById('invite-link');
+                    if(el) el.innerText = link;
+                    
+                    document.getElementById('dash-code').innerText = coupleId;
                 }
             });
         }
         
         function copyInvite() {
-            navigator.clipboard.writeText(document.getElementById('invite-link').innerText);
-            alert("Copied!");
+            const link = window.location.href.split('?')[0] + "?invite=" + coupleId;
+            navigator.clipboard.writeText(link);
+            alert("Invite link copied to clipboard!");
         }
 
         // PROFILE LOGIC
@@ -536,13 +567,13 @@
             const sel = document.getElementById(`${who}-sex`);
             if(sel) {
                 const sex = sel.value;
-                const badgeText = sex === 'male' ? "Her King 👑" : "His Queen 👑";
+                // REMOVED Crown Emoji as requested
+                const badgeText = sex === 'male' ? "Her King" : "His Queen";
                 document.getElementById(`${who}-badge`).innerText = badgeText;
             }
         }
 
         function getFormData(who) {
-            // FIX: Map 'partner' to 'p' if needed to match HTML IDs
             const prefix = (who === 'partner') ? 'p' : who;
             
             return {
@@ -599,7 +630,6 @@
                 if(req && req.to === user.uid) { 
                     pendingRequestData = req.data;
                     
-                    // FIX 3: Readable Labels
                     let readableHtml = '<ul style="list-style:none; padding:0;">';
                     for (const [key, value] of Object.entries(req.data)) {
                         const label = fieldLabels[key] || key; // Fallback to key if not found
@@ -613,7 +643,6 @@
                     document.getElementById('request-diff').innerHTML = readableHtml;
                     document.getElementById('modal-request').classList.remove('hidden');
                 } else {
-                    // FIX 4: If request is removed or not for me, ensure modal is closed
                     document.getElementById('modal-request').classList.add('hidden');
                 }
             });
@@ -632,9 +661,7 @@
 
         function acceptEdit() {
             if(pendingRequestData) {
-                // HIDE IMMEDIATELY (UX)
                 document.getElementById('modal-request').classList.add('hidden');
-                
                 db.ref(`users/${user.uid}/profile`).update(pendingRequestData);
                 db.ref(`couples/${coupleId}/editRequest`).remove();
             }
@@ -646,9 +673,7 @@
         }
 
         function submitReject() {
-            // HIDE IMMEDIATELY (UX)
             document.getElementById('modal-reject').classList.add('hidden');
-
             const r = document.getElementById('reject-reason').value;
             db.ref(`couples/${coupleId}/editDecline`).set({ to: partnerId, reason: r });
             db.ref(`couples/${coupleId}/editRequest`).remove();
@@ -681,9 +706,8 @@
                 
                 let name = p.nname || p.fname || "Love";
                 
-                // FIX 1 & 2: Use SVGs and Exchange Assignments (Male=QueenIcon, Female=KingIcon as requested)
-                // Note: Normally Male=King, Female=Queen. User requested "exchanged".
-                let badge = (p.sex === 'male') ? QUEEN_SVG : KING_SVG;
+                // SVG ASSIGNMENT: Male = King, Female = Queen
+                let crown = (p.sex === 'male') ? KING_SVG : QUEEN_SVG;
                 
                 let bday = "";
                 if(p.dob) {
@@ -698,7 +722,7 @@
                 
                 return `
                 <div class="avatar-wrap">
-                    ${badge}
+                    ${crown}
                     <div style="position:relative;">
                         <img src="${p.photo||'https://via.placeholder.com/50'}" class="ava">
                         ${dotHtml}
@@ -710,8 +734,6 @@
 
             const iAmMale = me.sex === 'male';
             // Male Right, Female Left (Standard Couple Positioning)
-            // If I am Male: Partner (Female) Left - Me (Male) Right
-            // If I am Female: Me (Female) Left - Partner (Male) Right
             if(iAmMale) {
                 cont.innerHTML = createAva(pt, true) + '<i class="fas fa-heart ava-heart"></i>' + createAva(me, false);
             } else {
@@ -719,7 +741,7 @@
             }
         }
 
-        // WALLPAPER
+        // WALLPAPER - Fixed Stuck Issue
         function checkWallpaper() {
             if(!partnerId) return;
             db.ref(`users/${partnerId}/profile`).once('value', s => {
@@ -732,8 +754,13 @@
             });
         }
         function closeWallpaper() {
-            document.getElementById('wallpaper-overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('wallpaper-overlay').classList.add('hidden'), 1000);
+            const wp = document.getElementById('wallpaper-overlay');
+            wp.style.opacity = '0';
+            wp.style.pointerEvents = 'none'; // Fix: Prevent blocking clicks during fade
+            setTimeout(() => {
+                wp.classList.add('hidden');
+                wp.style.pointerEvents = 'auto'; // Reset
+            }, 1000);
         }
 
         // NAV
@@ -808,7 +835,6 @@
                  const t = document.getElementById('post-text').value;
                  const i = document.getElementById('post-img').value;
                  if(t.trim()) {
-                     // Save to public wall for Home View
                      db.ref('publicWall').push({
                          desc: t,
                          image: i || 'https://via.placeholder.com/300/ff4b6e/ffffff?text=EternalLove',
