@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Our Profile</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root { --primary: #ff4b6e; --bg-body: #f4f7f6; --text-main: #333333; --border: #e0e0e0; --gold: #d4af37; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Nunito', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding: 20px; }
+        
+        .hidden { display: none !important; }
+        .flex { display: flex; align-items: center; }
+        .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 700; transition: 0.2s; font-size: 0.9rem; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(255, 75, 110, 0.2); }
+        .btn-ghost { background: transparent; border: 1px solid #888; color: #888; }
+        .input-std { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; background: #fafafa; }
+        
+        .profile-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .profile-card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #eee; position: relative; }
+        .profile-card h3 { color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; font-family:'Playfair Display'; }
+        
+        .royal-badge { display: block; text-align: center; font-family: 'Playfair Display', serif; font-weight: bold; color: var(--gold); margin-bottom: 15px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .form-label { font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 4px; display: block; }
+        .form-select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #fff; }
+        .edit-btn { position: absolute; top: 15px; right: 15px; background: #eee; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; z-index: 20; }
+        
+        /* MODALS */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+        .modal-box { background: #fff; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
+
+        @media (max-width: 768px) { .profile-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    
+    <h2 style="font-family:'Playfair Display'; margin-bottom:20px; text-align:center;">Our Profile</h2>
+    
+    <div class="profile-container">
+        <!-- My Card -->
+        <div class="profile-card" id="card-me">
+            <h3>My Profile</h3>
+            <button class="edit-btn" onclick="unlockForm('me')"><i class="fas fa-pen"></i> Edit</button>
+            <fieldset id="fs-me" disabled style="border:none; padding:0;">
+                <div class="form-group"><label class="form-label">Profile Photo URL</label><input type="text" id="me-photo" class="input-std" placeholder="https://..."></div>
+                <div id="me-badge" class="royal-badge"></div>
+                <div class="form-group"><label class="form-label">Sex</label><select id="me-sex" class="form-select" onchange="updateBadges('me')"><option value="male">Male</option><option value="female">Female</option></select></div>
+                <div class="flex" style="gap:10px;">
+                    <div style="flex:1;"><label class="form-label">First Name</label><input type="text" id="me-fname" class="input-std"></div>
+                    <div style="flex:1;"><label class="form-label">Second Name</label><input type="text" id="me-sname" class="input-std"></div>
+                </div>
+                <div class="form-group"><label class="form-label">Nickname</label><input type="text" id="me-nname" class="input-std"></div>
+                <div class="form-group"><label class="form-label">Display Name</label><select id="me-display" class="form-select"><option value="fname">First Name</option><option value="sname">Second Name</option><option value="nname">Nickname</option></select></div>
+                <div class="form-group"><label class="form-label">Birthday</label><input type="date" id="me-dob" class="input-std"></div>
+                <div class="form-group"><label class="form-label">Phone</label><div class="flex" style="gap:5px;"><select id="me-country" class="form-select" style="width:120px;"></select><input type="tel" id="me-phone" class="input-std" style="margin:0;"></div></div>
+                <div class="form-group"><label class="form-label">Describe Partner (Their Wallpaper)</label><textarea id="me-desc" class="input-std" rows="3" maxlength="100"></textarea></div>
+                <button class="btn btn-primary" onclick="saveProfile('me')">Save My Profile</button>
+            </fieldset>
+        </div>
+
+        <!-- Partner Card -->
+        <div class="profile-card" id="card-partner">
+            <h3>Partner's Profile</h3>
+            <button class="edit-btn" onclick="unlockForm('partner')"><i class="fas fa-pen"></i> Suggest Edit</button>
+            <fieldset id="fs-partner" disabled style="border:none; padding:0;">
+                <div class="form-group"><label class="form-label">Profile Photo URL</label><input type="text" id="p-photo" class="input-std"></div>
+                <div id="p-badge" class="royal-badge"></div>
+                <div class="form-group"><label class="form-label">Sex</label><select id="p-sex" class="form-select" onchange="updateBadges('p')"><option value="male">Male</option><option value="female">Female</option></select></div>
+                <div class="flex" style="gap:10px;">
+                    <div style="flex:1;"><label class="form-label">First Name</label><input type="text" id="p-fname" class="input-std"></div>
+                    <div style="flex:1;"><label class="form-label">Second Name</label><input type="text" id="p-sname" class="input-std"></div>
+                </div>
+                <div class="form-group"><label class="form-label">Nickname</label><input type="text" id="p-nname" class="input-std"></div>
+                <div class="form-group"><label class="form-label">Display Name</label><select id="p-display" class="form-select"><option value="fname">First Name</option><option value="sname">Second Name</option><option value="nname">Nickname</option></select></div>
+                <div class="form-group"><label class="form-label">Birthday</label><input type="date" id="p-dob" class="input-std"></div>
+                <div class="form-group"><label class="form-label">Phone</label><div class="flex" style="gap:5px;"><select id="p-country" class="form-select" style="width:120px;"></select><input type="tel" id="p-phone" class="input-std" style="margin:0;"></div></div>
+                <div class="form-group"><label class="form-label">Describe Me (My Wallpaper)</label><textarea id="p-desc" class="input-std" rows="3" maxlength="100"></textarea></div>
+                <button class="btn btn-primary" onclick="saveProfile('partner')">Request Changes</button>
+            </fieldset>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="modal-offline" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3 style="color:#d32f2f;">Partner Offline</h3>
+            <p>You can only edit partner profile if your partner is login.</p>
+            <button class="btn btn-primary" onclick="document.getElementById('modal-offline').classList.add('hidden')">Close</button>
+        </div>
+    </div>
+
+    <div id="modal-request" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3>Update Request</h3>
+            <p>Your partner wants to update your profile.</p>
+            <div id="request-diff" style="text-align:left; font-size:0.9rem; background:#f9f9f9; padding:10px; margin:10px 0; max-height:150px; overflow-y:auto;"></div>
+            <button class="btn btn-primary" onclick="acceptEdit()">Accept</button>
+            <button class="btn btn-ghost" onclick="showRejectReason()">Decline</button>
+        </div>
+    </div>
+
+    <div id="modal-reject" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3>Why Decline?</h3>
+            <select id="reject-reason" class="input-std" onchange="submitReject()">
+                <option value="" disabled selected>Select Reason...</option>
+                <option>I prefer the previous information.</option>
+                <option>The spelling is incorrect.</option>
+                <option>I want to keep my privacy.</option>
+                <option>This photo doesn't look good.</option>
+                <option>The nickname is too embarrassing.</option>
+                <option>The date is incorrect.</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4", authDomain: "onlineshop-30cd1.firebaseapp.com", databaseURL: "https://onlineshop-30cd1-default-rtdb.firebaseio.com", projectId: "onlineshop-30cd1", messagingSenderId: "818252574868", appId: "1:818252574868:web:8dd36825db589a886cc481" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Get Params from URL (passed by dashboard.html)
+        const params = new URLSearchParams(window.location.search);
+        const coupleId = params.get('cid');
+        const uid = params.get('uid');
+        let partnerId = null;
+        let pendingRequestData = null;
+
+        const countries = [
+             { name: "Afghanistan", code: "AF", dial_code: "+93" }, { name: "United States", code: "US", dial_code: "+1" }, { name: "United Kingdom", code: "GB", dial_code: "+44" }, { name: "India", code: "IN", dial_code: "+91" }, { name: "Sri Lanka", code: "LK", dial_code: "+94" }, { name: "China", code: "CN", dial_code: "+86" }, { name: "Australia", code: "AU", dial_code: "+61" }, { name: "Japan", code: "JP", dial_code: "+81" }, { name: "Germany", code: "DE", dial_code: "+49" }, { name: "France", code: "FR", dial_code: "+33" }, { name: "Russia", code: "RU", dial_code: "+7" }, { name: "Brazil", code: "BR", dial_code: "+55" }
+             // (Add full list here if needed, shortened for brevity but functional)
+        ];
+
+        const fieldLabels = { photo: "Profile Photo", sex: "Sex", fname: "First Name", sname: "Second Name", nname: "Nickname", display: "Display Name", dob: "Birthday", desc: "Partner Description", phoneCode: "Country Code", phoneNum: "Phone Number" };
+
+        window.onload = () => {
+            const sels = document.querySelectorAll('#me-country, #p-country');
+            sels.forEach(s => countries.forEach(c => s.innerHTML += `<option value="${c.dial_code}">${c.name} (${c.dial_code})</option>`));
+            
+            if(coupleId && uid) {
+                db.ref(`couples/${coupleId}`).once('value', s => {
+                    const d = s.val();
+                    partnerId = (d.user1 === uid) ? d.user2 : d.user1;
+                    setupListeners();
+                });
+            }
+        };
+
+        function setupListeners() {
+            db.ref(`users/${uid}/profile`).on('value', s => { if(s.exists()) fillForm('me', s.val()); updateBadges('me'); });
+            if(partnerId) db.ref(`users/${partnerId}/profile`).on('value', s => { if(s.exists()) fillForm('p', s.val()); updateBadges('p'); });
+            
+            // Watch Requests
+            db.ref(`couples/${coupleId}/editRequest`).on('value', s => {
+                const req = s.val();
+                if(req && req.to === uid) {
+                    pendingRequestData = req.data;
+                    let html = '<ul style="list-style:none;padding:0;">';
+                    for(const [k, v] of Object.entries(req.data)) html += `<li style="margin-bottom:5px;"><b>${fieldLabels[k]||k}:</b> <span style="color:var(--primary)">${v}</span></li>`;
+                    html += '</ul>';
+                    document.getElementById('request-diff').innerHTML = html;
+                    document.getElementById('modal-request').classList.remove('hidden');
+                } else {
+                    document.getElementById('modal-request').classList.add('hidden');
+                }
+            });
+        }
+
+        function fillForm(who, data) {
+            if(!data) return;
+            const setVal = (id, v) => { if(document.getElementById(id)) document.getElementById(id).value = v; };
+            setVal(`${who}-photo`, data.photo||''); setVal(`${who}-sex`, data.sex||'male'); setVal(`${who}-fname`, data.fname||''); setVal(`${who}-sname`, data.sname||''); setVal(`${who}-nname`, data.nname||''); setVal(`${who}-display`, data.display||'fname'); setVal(`${who}-dob`, data.dob||''); setVal(`${who}-desc`, data.desc||''); setVal(`${who}-country`, data.phoneCode||'+1'); setVal(`${who}-phone`, data.phoneNum||'');
+        }
+
+        function updateBadges(who) {
+            const sel = document.getElementById(`${who}-sex`);
+            if(sel) document.getElementById(`${who}-badge`).innerText = (sel.value === 'male') ? "Her King" : "His Queen";
+        }
+
+        function getFormData(who) {
+            const p = (who === 'partner') ? 'p' : who;
+            return {
+                photo: document.getElementById(`${p}-photo`).value, sex: document.getElementById(`${p}-sex`).value, fname: document.getElementById(`${p}-fname`).value, sname: document.getElementById(`${p}-sname`).value, nname: document.getElementById(`${p}-nname`).value, display: document.getElementById(`${p}-display`).value, dob: document.getElementById(`${p}-dob`).value, desc: document.getElementById(`${p}-desc`).value, phoneCode: document.getElementById(`${p}-country`).value, phoneNum: document.getElementById(`${p}-phone`).value
+            };
+        }
+
+        function unlockForm(who) {
+            document.getElementById(who === 'me' ? 'fs-me' : 'fs-partner').disabled = false;
+        }
+
+        async function saveProfile(who) {
+            const data = getFormData(who);
+            if(who === 'me') {
+                db.ref(`users/${uid}/profile`).update(data);
+                document.getElementById('fs-me').disabled = true;
+                alert("Saved!");
+            } else {
+                if(!partnerId) return;
+                const snap = await db.ref(`users/${partnerId}/status`).once('value');
+                if(snap.val() !== 'online') { document.getElementById('modal-offline').classList.remove('hidden'); return; }
+                db.ref(`couples/${coupleId}/editRequest`).set({ from: uid, to: partnerId, data: data, timestamp: Date.now() });
+                document.getElementById('fs-partner').disabled = true;
+                alert("Request Sent!");
+            }
+        }
+
+        function acceptEdit() {
+            if(pendingRequestData) {
+                document.getElementById('modal-request').classList.add('hidden');
+                db.ref(`users/${uid}/profile`).update(pendingRequestData);
+                db.ref(`couples/${coupleId}/editRequest`).remove();
+            }
+        }
+
+        function showRejectReason() {
+            document.getElementById('modal-request').classList.add('hidden');
+            document.getElementById('modal-reject').classList.remove('hidden');
+        }
+
+        function submitReject() {
+            document.getElementById('modal-reject').classList.add('hidden');
+            const r = document.getElementById('reject-reason').value;
+            db.ref(`couples/${coupleId}/editDecline`).set({ to: partnerId, reason: r });
+            db.ref(`couples/${coupleId}/editRequest`).remove();
+        }
+    </script>
+</body>
+</html>
