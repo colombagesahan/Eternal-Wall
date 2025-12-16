@@ -3,34 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EternalWall | Couple OS</title>
-
-    <!-- Google Fonts -->
+    <title>EternalWall | Home</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-    <!-- Firebase SDKs -->
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <style>
-        :root {
-            --primary: #ff4b6e; 
-            --bg-body: #f4f7f6;
-            --bg-panel: #ffffff;
-            --text-main: #333333;
-            --text-muted: #888888;
-            --border: #e0e0e0;
-            --sidebar-width: 260px;
-            --gold: #d4af37;
-        }
-
+        :root { --primary: #ff4b6e; --bg-body: #f4f7f6; --text-main: #333333; --text-muted: #888888; --border: #e0e0e0; --gold: #d4af37; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Nunito', sans-serif; background-color: var(--bg-body); color: var(--text-main); overflow-x: hidden; }
-        a { text-decoration: none; color: inherit; }
-
-        /* UTILS */
         .hidden { display: none !important; }
         .flex { display: flex; align-items: center; }
         .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 700; transition: 0.2s; font-size: 0.9rem; }
@@ -38,400 +23,92 @@
         .btn-primary:hover { transform: translateY(-2px); }
         .btn-ghost { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
         .input-std { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; background: #fafafa; }
-        
-        /* WALLPAPER OVERLAY - Fix: Z-Index and Pointer Events */
-        #wallpaper-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background-size: cover; background-position: center; 
-            z-index: 3000; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; text-align: center;
-            background-color: #000; color: white; transition: opacity 1s ease;
-        }
-        .wp-content { background: rgba(0,0,0,0.6); padding: 40px; border-radius: 20px; max-width: 80%; backdrop-filter: blur(5px); }
-        .wp-avatar { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--gold); margin-bottom: 20px; object-fit: cover; }
-        .wp-text { font-family: 'Playfair Display'; font-size: 2rem; font-style: italic; line-height: 1.5; }
 
-        /* PUBLIC HOME */
-        #view-home { min-height: 100vh; display: flex; flex-direction: column; }
+        /* HOME SPECIFIC STYLES */
         .nav-header { background: #fff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1002; }
         .brand-logo { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--primary); }
         .hero-section { text-align: center; padding: 50px 20px; }
         .hero-section h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #222; margin-bottom: 10px; }
         .search-input { width: 100%; padding: 15px 20px; border-radius: 30px; border: 1px solid #ddd; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); max-width: 500px; margin: 0 auto; display: block;}
-        
-        /* Fix: Responsive Grid for 300px */
         .tiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; max-width: 1200px; margin: 0 auto; padding: 20px; }
         .tile-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; aspect-ratio: 1; position: relative; }
         .tile-img { width: 100%; height: 100%; object-fit: cover; }
         .tile-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 20px 10px 10px; color: white; }
-
-        /* DASHBOARD */
-        #view-dashboard { display: flex; min-height: 100vh; }
         
-        /* Fix: Sidebar Z-Index */
-        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid var(--border); position: fixed; height: 100vh; display: flex; flex-direction: column; z-index: 1001; }
-        .sb-top { padding: 30px 20px; text-align: center; border-bottom: 1px solid #f0f0f0; }
-        
-        /* HEADER AVATARS & BADGES & ONLINE STATUS */
-        .couple-circle { display: flex; justify-content: center; align-items: center; margin: 25px 0 15px; position: relative; }
-        .avatar-wrap { position: relative; display: flex; flex-direction: column; align-items: center; margin: 0 8px; }
-        .ava { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #eee; transition: 0.3s; z-index: 1; }
-        
-        /* UPDATED: High Quality SVG Crown Styling */
-        .crown-svg {
-            position: absolute;
-            top: -24px; /* Adjusted for larger SVG */
-            width: 32px;
-            height: 32px;
-            fill: var(--gold);
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
-            z-index: 10;
-        }
-
-        .status-dot { position: absolute; bottom: 20px; right: 2px; width: 12px; height: 12px; background: #cccccc; border: 2px solid #fff; border-radius: 50%; z-index: 5; }
-        .status-dot.online { background: #00c853; }
-        .bday-count { font-size: 0.65rem; color: var(--primary); font-weight: 800; margin-top: 4px; background: #fff0f3; padding: 2px 6px; border-radius: 10px; white-space: nowrap; }
-        .ava-heart { margin: 0 5px; color: var(--primary); font-size: 0.8rem; animation: pulse 1.5s infinite; }
-
-        .sb-nav { padding: 20px 0; flex: 1; overflow-y: auto; }
-        .nav-item { padding: 12px 25px; display: flex; align-items: center; color: #666; font-weight: 600; cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; }
-        .nav-item:hover, .nav-item.active { background: #fff0f3; color: var(--primary); border-left-color: var(--primary); }
-        .nav-item i { width: 25px; }
-
-        .main-pane { margin-left: var(--sidebar-width); flex: 1; padding: 40px; width: calc(100% - var(--sidebar-width)); }
-        
-        /* PROFILE CARDS & BADGES */
-        .profile-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .profile-card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #eee; position: relative; cursor: pointer; transition: 0.2s; }
-        .profile-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .profile-card h3 { color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
-        
-        .royal-badge { 
-            display: block; text-align: center; font-family: 'Playfair Display', serif; 
-            font-weight: bold; color: var(--gold); margin-bottom: 15px; font-size: 1.1rem;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-
-        .form-group { margin-bottom: 12px; }
-        .form-label { font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 4px; display: block; }
-        .form-select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #fff; }
-        .edit-btn { position: absolute; top: 15px; right: 15px; background: #eee; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; z-index: 20; }
-        .edit-btn:hover { background: var(--primary); color: white; }
-
         /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; }
         .modal-box { background: #fff; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
-        
-        /* MOBILE */
-        .mobile-nav { display: none; }
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-pane { margin-left: 0; width: 100%; padding: 20px 15px 80px; }
-            
-            /* Fix: Sliding Bar for Small Screens */
-            .mobile-nav { 
-                display: flex; position: fixed; bottom: 0; left: 0; width: 100%; 
-                background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); 
-                justify-content: flex-start; /* Changed from space-around */
-                overflow-x: auto; /* Enable sliding */
-                padding: 10px 0; z-index: 1500; 
-                -webkit-overflow-scrolling: touch;
-            }
-            .mobile-nav .btn {
-                flex: 0 0 auto; /* Don't shrink */
-                margin: 0 5px;
-            }
-            
-            .profile-container { grid-template-columns: 1fr; }
-        }
-
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <!-- WALLPAPER OVERLAY -->
-    <div id="wallpaper-overlay" class="hidden">
-        <div class="wp-content">
-            <img src="" id="wp-img" class="wp-avatar">
-            <div id="wp-desc" class="wp-text"></div>
-            <button class="btn btn-ghost" style="color:white; border-color:white; margin-top:30px;" onclick="closeWallpaper()">Enter EternalWall</button>
+    <header class="nav-header">
+        <div class="brand-logo">EternalWall</div>
+        <div class="flex" style="gap: 10px;">
+            <button class="btn btn-ghost" onclick="openAuth('login')">Login</button>
+            <button class="btn btn-primary" onclick="openAuth('signup')">Create Account</button>
         </div>
-    </div>
+    </header>
 
-    <!-- VIEW: HOME -->
-    <div id="view-home">
-        <header class="nav-header">
-            <div class="brand-logo">EternalWall</div>
-            <div class="flex" style="gap: 10px;">
-                <button class="btn btn-ghost" onclick="openAuth('login')">Login</button>
-                <button class="btn btn-primary" onclick="openAuth('signup')">Create Account</button>
-            </div>
-        </header>
-
-        <section class="hero-section">
-            <h1>The Sanctuary of Us</h1>
-            <p>A private digital sanctuary for couples.<br>Mutual respect. Shared dreams. Memories that last.</p>
-            <div class="search-wrap">
-                <input type="text" id="search-bar" class="search-input" placeholder="Search for a couple..." onkeyup="filterTiles()">
-            </div>
-        </section>
-
-        <section class="tiles-grid" id="public-grid"></section>
-
-        <!-- AUTH MODAL -->
-        <div id="auth-modal" class="modal-overlay hidden">
-            <div class="modal-box">
-                <h2 id="auth-title" style="margin-bottom: 20px; color: #333;">Login</h2>
-                <div id="invite-alert" class="hidden" style="background: #fff0f3; color: var(--primary); padding: 10px; margin-bottom: 15px;">Joining Partner!</div>
-                <input type="email" id="email" class="input-std" placeholder="Email Address">
-                <input type="password" id="pass" class="input-std" placeholder="Password">
-                <div style="text-align: left; margin-bottom: 15px;">
-                    <input type="checkbox" id="show-pass" onclick="togglePasswordVisibility()">
-                    <label for="show-pass" style="font-size: 0.9rem; color: #666;">Show Password</label>
-                </div>
-                <button class="btn btn-primary" style="width: 100%;" onclick="handleAuth()">Submit</button>
-                <div style="margin-top: 15px; color: #888; cursor: pointer;" onclick="document.getElementById('auth-modal').classList.add('hidden')">Cancel</div>
-            </div>
+    <section class="hero-section">
+        <h1>The Sanctuary of Us</h1>
+        <p>A private digital sanctuary for couples.<br>Mutual respect. Shared dreams. Memories that last.</p>
+        <div class="search-wrap">
+            <input type="text" id="search-bar" class="search-input" placeholder="Search for a couple..." onkeyup="filterTiles()">
         </div>
-    </div>
+    </section>
 
-    <!-- VIEW: DASHBOARD -->
-    <div id="view-dashboard" class="hidden">
-        <div class="sidebar">
-            <div class="sb-top">
-                <div class="brand-logo">EternalWall</div>
-                <div class="couple-circle" id="avatar-container">
-                    <!-- Injected by JS based on Sex/Order -->
-                </div>
-                <div class="couple-id" id="dash-code">...</div>
-            </div>
-            <div class="sb-nav">
-                <div class="nav-item active" onclick="nav('profile', this)"><i class="fas fa-user-circle"></i> Our Profile</div>
-                <div class="nav-item" onclick="nav('wall', this)"><i class="fas fa-globe"></i> Lovers Wall</div>
-                <div class="nav-item" onclick="nav('chats', this)"><i class="fas fa-comments"></i> Our Chats</div>
-                <div class="nav-item" onclick="nav('tile', this)"><i class="fas fa-th-large"></i> Our Tile</div>
-                <div class="nav-item" onclick="nav('page', this)"><i class="fas fa-file-alt"></i> Our Page</div>
-                <div class="nav-item" onclick="nav('alerts', this)"><i class="fas fa-bell"></i> Present/Future Alerts</div>
-                <div class="nav-item" onclick="nav('goals', this)"><i class="fas fa-star"></i> Our Goals</div>
-                <div class="nav-item" onclick="nav('room', this)"><i class="fas fa-video"></i> Video Room</div>
-            </div>
-            <div style="padding: 20px;">
-                <button class="btn btn-ghost" style="width: 100%; border:none;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-            </div>
-        </div>
+    <section class="tiles-grid" id="public-grid"></section>
 
-        <div class="main-pane">
-            <!-- LOCKED STATE -->
-            <div id="dash-locked" class="hidden" style="text-align:center; padding-top:100px;">
-                <h2 style="font-family:'Playfair Display'; color:var(--primary);">Account Locked</h2>
-                <p style="margin: 15px 0;">To unlock your account connect with your partner.</p>
-                <div style="padding:15px; border:2px dashed var(--gold); background:#fff; display:inline-block; margin:20px 0; font-weight:bold; letter-spacing:1px;" onclick="copyInvite()" id="invite-link">Loading...</div>
-                <p style="font-size:0.9rem; color:#888;">Tap the link above to copy and send to your partner.</p>
-                <button class="btn btn-ghost" style="margin-top:20px;" onclick="logout()">Logout</button>
-            </div>
-
-            <!-- UNLOCKED STATE -->
-            <div id="dash-unlocked" class="hidden">
-                <!-- 1. OUR PROFILE TAB -->
-                <div id="tab-profile" class="tab-view">
-                    <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Our Profile</h2>
-                    <div class="profile-container">
-                        <!-- My Card -->
-                        <div class="profile-card" id="card-me" onclick="unlockForm('me')">
-                            <h3>My Profile</h3>
-                            <button class="edit-btn"><i class="fas fa-pen"></i> Edit</button>
-                            <fieldset id="fs-me" disabled style="border:none; padding:0;">
-                                <div class="form-group"><label class="form-label">Profile Photo URL</label><input type="text" id="me-photo" class="input-std" placeholder="https://..."></div>
-                                <!-- BADGE AREA -->
-                                <div id="me-badge" class="royal-badge"></div>
-                                <div class="form-group"><label class="form-label">Sex</label><select id="me-sex" class="form-select" onchange="updateBadges('me')"><option value="male">Male</option><option value="female">Female</option></select></div>
-                                <div class="flex" style="gap:10px;">
-                                    <div class="form-group" style="flex:1;"><label class="form-label">First Name</label><input type="text" id="me-fname" class="input-std"></div>
-                                    <div class="form-group" style="flex:1;"><label class="form-label">Second Name</label><input type="text" id="me-sname" class="input-std"></div>
-                                </div>
-                                <div class="form-group"><label class="form-label">Nickname</label><input type="text" id="me-nname" class="input-std"></div>
-                                <div class="form-group"><label class="form-label">Display Name</label><select id="me-display" class="form-select"><option value="fname">First Name</option><option value="sname">Second Name</option><option value="nname">Nickname</option></select></div>
-                                <div class="form-group"><label class="form-label">Birthday</label><input type="date" id="me-dob" class="input-std"></div>
-                                <div class="form-group"><label class="form-label">Phone</label><div class="flex" style="gap:5px;"><select id="me-country" class="form-select" style="width:120px;"></select><input type="tel" id="me-phone" class="input-std" style="margin:0;"></div></div>
-                                <div class="form-group"><label class="form-label">Describe Partner (Their Wallpaper)</label><textarea id="me-desc" class="input-std" rows="3" maxlength="100"></textarea></div>
-                                <button class="btn btn-primary" onclick="event.stopPropagation(); saveProfile('me')">Save My Profile</button>
-                            </fieldset>
-                        </div>
-
-                        <!-- Partner Card -->
-                        <div class="profile-card" id="card-partner" onclick="unlockForm('partner')">
-                            <h3>Partner's Profile</h3>
-                            <button class="edit-btn"><i class="fas fa-pen"></i> Suggest Edit</button>
-                            <fieldset id="fs-partner" disabled style="border:none; padding:0;">
-                                <div class="form-group"><label class="form-label">Profile Photo URL</label><input type="text" id="p-photo" class="input-std"></div>
-                                <!-- BADGE AREA -->
-                                <div id="p-badge" class="royal-badge"></div>
-                                <div class="form-group"><label class="form-label">Sex</label><select id="p-sex" class="form-select" onchange="updateBadges('p')"><option value="male">Male</option><option value="female">Female</option></select></div>
-                                <div class="flex" style="gap:10px;">
-                                    <div class="form-group" style="flex:1;"><label class="form-label">First Name</label><input type="text" id="p-fname" class="input-std"></div>
-                                    <div class="form-group" style="flex:1;"><label class="form-label">Second Name</label><input type="text" id="p-sname" class="input-std"></div>
-                                </div>
-                                <div class="form-group"><label class="form-label">Nickname</label><input type="text" id="p-nname" class="input-std"></div>
-                                <div class="form-group"><label class="form-label">Display Name</label><select id="p-display" class="form-select"><option value="fname">First Name</option><option value="sname">Second Name</option><option value="nname">Nickname</option></select></div>
-                                <div class="form-group"><label class="form-label">Birthday</label><input type="date" id="p-dob" class="input-std"></div>
-                                <div class="form-group"><label class="form-label">Phone</label><div class="flex" style="gap:5px;"><select id="p-country" class="form-select" style="width:120px;"></select><input type="tel" id="p-phone" class="input-std" style="margin:0;"></div></div>
-                                <div class="form-group"><label class="form-label">Describe Me (My Wallpaper)</label><textarea id="p-desc" class="input-std" rows="3" maxlength="100"></textarea></div>
-                                <button class="btn btn-primary" onclick="event.stopPropagation(); saveProfile('partner')">Request Changes</button>
-                            </fieldset>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- OTHER TABS -->
-                <div id="tab-wall" class="tab-view hidden">
-                    <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Lovers Wall</h2>
-                    <div style="background:#fff; padding:15px; border-radius:8px; border:1px solid #eee; margin-bottom:20px;">
-                        <textarea id="post-text" class="input-std" placeholder="Share a loving moment..."></textarea>
-                        <input type="text" id="post-img" class="input-std" placeholder="Image URL">
-                        <button class="btn btn-primary" onclick="submitProp('post')">Request Post</button>
-                    </div>
-                    <div id="pending-posts-area"></div>
-                </div>
-                
-                <div id="tab-chats" class="tab-view hidden">
-                    <div style="height:400px; background:#fff; border:1px solid #eee; border-radius:12px; display:flex; flex-direction:column;">
-                        <div id="chat-feed" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
-                        <div style="padding:10px; border-top:1px solid #eee; display:flex; gap:10px;">
-                            <input id="chat-msg" class="input-std" style="margin:0;" placeholder="Message...">
-                            <button class="btn btn-primary" onclick="sendChat()">Send</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="tab-room" class="tab-view hidden">
-                     <div style="background:#000; border-radius:12px; overflow:hidden; aspect-ratio:16/9; margin-bottom:20px;">
-                        <video id="localVideo" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
-                    </div>
-                    <button class="btn btn-primary" onclick="toggleCam()">Toggle Camera</button>
-                </div>
-
-                <div id="tab-tile" class="tab-view hidden"><h2>Our Tile (Coming Soon)</h2></div>
-                <div id="tab-page" class="tab-view hidden"><h2>Our Page (Coming Soon)</h2></div>
-                <div id="tab-alerts" class="tab-view hidden"><h2>Alerts (Coming Soon)</h2></div>
-                <div id="tab-goals" class="tab-view hidden"><h2>Goals (Coming Soon)</h2></div>
-            </div>
-        </div>
-
-        <nav class="mobile-nav">
-             <button class="btn btn-ghost" style="border:none" onclick="nav('profile', null)"><i class="fas fa-user-circle"></i> Profile</button>
-             <button class="btn btn-ghost" style="border:none" onclick="nav('wall', null)"><i class="fas fa-globe"></i> Wall</button>
-             <button class="btn btn-ghost" style="border:none" onclick="nav('chats', null)"><i class="fas fa-comments"></i> Chat</button>
-             <button class="btn btn-ghost" style="border:none" onclick="nav('room', null)"><i class="fas fa-video"></i> Room</button>
-             <button class="btn btn-ghost" style="border:none" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
-        </nav>
-    </div>
-
-    <!-- MODALS -->
-    <!-- Partner Offline Modal -->
-    <div id="modal-offline" class="modal-overlay hidden">
+    <!-- AUTH MODAL -->
+    <div id="auth-modal" class="modal-overlay hidden">
         <div class="modal-box">
-            <h3 style="color:#d32f2f;">Partner Offline</h3>
-            <p>Your partner is not logged in now. You can only edit partner profile if your partner is login.</p>
-            <button class="btn btn-primary" onclick="document.getElementById('modal-offline').classList.add('hidden')">Close</button>
-        </div>
-    </div>
-
-    <!-- Partner Edit Request Modal -->
-    <div id="modal-request" class="modal-overlay hidden">
-        <div class="modal-box">
-            <h3>Update Request</h3>
-            <p>Your partner wants to update your profile.</p>
-            <div id="request-diff" style="text-align:left; font-size:0.9rem; background:#f9f9f9; padding:10px; margin:10px 0; max-height:150px; overflow-y:auto; word-break:break-all;"></div>
-            <button class="btn btn-primary" onclick="acceptEdit()">Accept</button>
-            <button class="btn btn-ghost" onclick="showRejectReason()">Decline</button>
-        </div>
-    </div>
-
-    <!-- Rejection Reason Modal -->
-    <div id="modal-reject" class="modal-overlay hidden">
-        <div class="modal-box">
-            <h3>Why Decline?</h3>
-            <p>You must select a reason.</p>
-            <select id="reject-reason" class="input-std" onchange="submitReject()">
-                <option value="" disabled selected>Select Reason...</option>
-                <option>I prefer the previous information.</option>
-                <option>The spelling is incorrect.</option>
-                <option>I want to keep my privacy.</option>
-                <option>This photo doesn't look good.</option>
-                <option>The nickname is too embarrassing.</option>
-                <option>The date is incorrect.</option>
-                <option>I am planning to change this myself later.</option>
-                <option>This description doesn't feel right.</option>
-                <option>I do not use this phone number anymore.</option>
-                <option>Let's discuss this in person first.</option>
-            </select>
-        </div>
-    </div>
-    
-    <!-- Notification Modal -->
-    <div id="modal-notify" class="modal-overlay hidden">
-        <div class="modal-box">
-            <h3 id="notify-title">Info</h3>
-            <p id="notify-msg">...</p>
-            <button class="btn btn-primary" onclick="document.getElementById('modal-notify').classList.add('hidden')">OK</button>
+            <h2 id="auth-title" style="margin-bottom: 20px; color: #333;">Login</h2>
+            <div id="invite-alert" class="hidden" style="background: #fff0f3; color: var(--primary); padding: 10px; margin-bottom: 15px;">Joining Partner!</div>
+            <input type="email" id="email" class="input-std" placeholder="Email Address">
+            <input type="password" id="pass" class="input-std" placeholder="Password">
+            <div style="text-align: left; margin-bottom: 15px;">
+                <input type="checkbox" id="show-pass" onclick="togglePasswordVisibility()">
+                <label for="show-pass" style="font-size: 0.9rem; color: #666;">Show Password</label>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="handleAuth()">Submit</button>
+            <div style="margin-top: 15px; color: #888; cursor: pointer;" onclick="document.getElementById('auth-modal').classList.add('hidden')">Cancel</div>
         </div>
     </div>
 
     <script>
-        // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyBUjzMFao9BS3uXBOW3qYrLVqHaGn8qIk4", authDomain: "onlineshop-30cd1.firebaseapp.com", databaseURL: "https://onlineshop-30cd1-default-rtdb.firebaseio.com", projectId: "onlineshop-30cd1", messagingSenderId: "818252574868", appId: "1:818252574868:web:8dd36825db589a886cc481" };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // STATE
-        let user = null, coupleId = null, partnerId = null;
         let isSignup = false;
         let inviteCode = new URLSearchParams(window.location.search).get('invite');
-        let pendingRequestData = null;
-
-        // ALL COUNTRIES
-        const countries = [
-            { name: "Afghanistan", code: "AF", dial_code: "+93" }, { name: "Albania", code: "AL", dial_code: "+355" }, { name: "Algeria", code: "DZ", dial_code: "+213" }, { name: "AmericanSamoa", code: "AS", dial_code: "+1-684" }, { name: "Andorra", code: "AD", dial_code: "+376" }, { name: "Angola", code: "AO", dial_code: "+244" }, { name: "Anguilla", code: "AI", dial_code: "+1-264" }, { name: "Antarctica", code: "AQ", dial_code: "+672" }, { name: "Antigua and Barbuda", code: "AG", dial_code: "+1-268" }, { name: "Argentina", code: "AR", dial_code: "+54" }, { name: "Armenia", code: "AM", dial_code: "+374" }, { name: "Aruba", code: "AW", dial_code: "+297" }, { name: "Australia", code: "AU", dial_code: "+61" }, { name: "Austria", code: "AT", dial_code: "+43" }, { name: "Azerbaijan", code: "AZ", dial_code: "+994" }, { name: "Bahamas", code: "BS", dial_code: "+1-242" }, { name: "Bahrain", code: "BH", dial_code: "+973" }, { name: "Bangladesh", code: "BD", dial_code: "+880" }, { name: "Barbados", code: "BB", dial_code: "+1-246" }, { name: "Belarus", code: "BY", dial_code: "+375" }, { name: "Belgium", code: "BE", dial_code: "+32" }, { name: "Belize", code: "BZ", dial_code: "+501" }, { name: "Benin", code: "BJ", dial_code: "+229" }, { name: "Bermuda", code: "BM", dial_code: "+1-441" }, { name: "Bhutan", code: "BT", dial_code: "+975" }, { name: "Bolivia", code: "BO", dial_code: "+591" }, { name: "Bosnia and Herzegovina", code: "BA", dial_code: "+387" }, { name: "Botswana", code: "BW", dial_code: "+267" }, { name: "Brazil", code: "BR", dial_code: "+55" }, { name: "British Indian Ocean Territory", code: "IO", dial_code: "+246" }, { name: "British Virgin Islands", code: "VG", dial_code: "+1-284" }, { name: "Brunei", code: "BN", dial_code: "+673" }, { name: "Bulgaria", code: "BG", dial_code: "+359" }, { name: "Burkina Faso", code: "BF", dial_code: "+226" }, { name: "Burundi", code: "BI", dial_code: "+257" }, { name: "Cambodia", code: "KH", dial_code: "+855" }, { name: "Cameroon", code: "CM", dial_code: "+237" }, { name: "Canada", code: "CA", dial_code: "+1" }, { name: "Cape Verde", code: "CV", dial_code: "+238" }, { name: "Cayman Islands", code: "KY", dial_code: "+1-345" }, { name: "Central African Republic", code: "CF", dial_code: "+236" }, { name: "Chad", code: "TD", dial_code: "+235" }, { name: "Chile", code: "CL", dial_code: "+56" }, { name: "China", code: "CN", dial_code: "+86" }, { name: "Christmas Island", code: "CX", dial_code: "+61" }, { name: "Cocos Islands", code: "CC", dial_code: "+61" }, { name: "Colombia", code: "CO", dial_code: "+57" }, { name: "Comoros", code: "KM", dial_code: "+269" }, { name: "Cook Islands", code: "CK", dial_code: "+682" }, { name: "Costa Rica", code: "CR", dial_code: "+506" }, { name: "Croatia", code: "HR", dial_code: "+385" }, { name: "Cuba", code: "CU", dial_code: "+53" }, { name: "Curacao", code: "CW", dial_code: "+599" }, { name: "Cyprus", code: "CY", dial_code: "+357" }, { name: "Czech Republic", code: "CZ", dial_code: "+420" }, { name: "Democratic Republic of the Congo", code: "CD", dial_code: "+243" }, { name: "Denmark", code: "DK", dial_code: "+45" }, { name: "Djibouti", code: "DJ", dial_code: "+253" }, { name: "Dominica", code: "DM", dial_code: "+1-767" }, { name: "Dominican Republic", code: "DO", dial_code: "+1-809, 1-829, 1-849" }, { name: "East Timor", code: "TL", dial_code: "+670" }, { name: "Ecuador", code: "EC", dial_code: "+593" }, { name: "Egypt", code: "EG", dial_code: "+20" }, { name: "El Salvador", code: "SV", dial_code: "+503" }, { name: "Equatorial Guinea", code: "GQ", dial_code: "+240" }, { name: "Eritrea", code: "ER", dial_code: "+291" }, { name: "Estonia", code: "EE", dial_code: "+372" }, { name: "Ethiopia", code: "ET", dial_code: "+251" }, { name: "Falkland Islands", code: "FK", dial_code: "+500" }, { name: "Faroe Islands", code: "FO", dial_code: "+298" }, { name: "Fiji", code: "FJ", dial_code: "+679" }, { name: "Finland", code: "FI", dial_code: "+358" }, { name: "France", code: "FR", dial_code: "+33" }, { name: "French Polynesia", code: "PF", dial_code: "+689" }, { name: "Gabon", code: "GA", dial_code: "+241" }, { name: "Gambia", code: "GM", dial_code: "+220" }, { name: "Georgia", code: "GE", dial_code: "+995" }, { name: "Germany", code: "DE", dial_code: "+49" }, { name: "Ghana", code: "GH", dial_code: "+233" }, { name: "Gibraltar", code: "GI", dial_code: "+350" }, { name: "Greece", code: "GR", dial_code: "+30" }, { name: "Greenland", code: "GL", dial_code: "+299" }, { name: "Grenada", code: "GD", dial_code: "+1-473" }, { name: "Guam", code: "GU", dial_code: "+1-671" }, { name: "Guatemala", code: "GT", dial_code: "+502" }, { name: "Guernsey", code: "GG", dial_code: "+44-1481" }, { name: "Guinea", code: "GN", dial_code: "+224" }, { name: "Guinea-Bissau", code: "GW", dial_code: "+245" }, { name: "Guyana", code: "GY", dial_code: "+592" }, { name: "Haiti", code: "HT", dial_code: "+509" }, { name: "Honduras", code: "HN", dial_code: "+504" }, { name: "Hong Kong", code: "HK", dial_code: "+852" }, { name: "Hungary", code: "HU", dial_code: "+36" }, { name: "Iceland", code: "IS", dial_code: "+354" }, { name: "India", code: "IN", dial_code: "+91" }, { name: "Indonesia", code: "ID", dial_code: "+62" }, { name: "Iran", code: "IR", dial_code: "+98" }, { name: "Iraq", code: "IQ", dial_code: "+964" }, { name: "Ireland", code: "IE", dial_code: "+353" }, { name: "Isle of Man", code: "IM", dial_code: "+44-1624" }, { name: "Israel", code: "IL", dial_code: "+972" }, { name: "Italy", code: "IT", dial_code: "+39" }, { name: "Ivory Coast", code: "CI", dial_code: "+225" }, { name: "Jamaica", code: "JM", dial_code: "+1-876" }, { name: "Japan", code: "JP", dial_code: "+81" }, { name: "Jersey", code: "JE", dial_code: "+44-1534" }, { name: "Jordan", code: "JO", dial_code: "+962" }, { name: "Kazakhstan", code: "KZ", dial_code: "+7" }, { name: "Kenya", code: "KE", dial_code: "+254" }, { name: "Kiribati", code: "KI", dial_code: "+686" }, { name: "Kosovo", code: "XK", dial_code: "+383" }, { name: "Kuwait", code: "KW", dial_code: "+965" }, { name: "Kyrgyzstan", code: "KG", dial_code: "+996" }, { name: "Laos", code: "LA", dial_code: "+856" }, { name: "Latvia", code: "LV", dial_code: "+371" }, { name: "Lebanon", code: "LB", dial_code: "+961" }, { name: "Lesotho", code: "LS", dial_code: "+266" }, { name: "Liberia", code: "LR", dial_code: "+231" }, { name: "Libya", code: "LY", dial_code: "+218" }, { name: "Liechtenstein", code: "LI", dial_code: "+423" }, { name: "Lithuania", code: "LT", dial_code: "+370" }, { name: "Luxembourg", code: "LU", dial_code: "+352" }, { name: "Macau", code: "MO", dial_code: "+853" }, { name: "Macedonia", code: "MK", dial_code: "+389" }, { name: "Madagascar", code: "MG", dial_code: "+261" }, { name: "Malawi", code: "MW", dial_code: "+265" }, { name: "Malaysia", code: "MY", dial_code: "+60" }, { name: "Maldives", code: "MV", dial_code: "+960" }, { name: "Mali", code: "ML", dial_code: "+223" }, { name: "Malta", code: "MT", dial_code: "+356" }, { name: "Marshall Islands", code: "MH", dial_code: "+692" }, { name: "Mauritania", code: "MR", dial_code: "+222" }, { name: "Mauritius", code: "MU", dial_code: "+230" }, { name: "Mayotte", code: "YT", dial_code: "+262" }, { name: "Mexico", code: "MX", dial_code: "+52" }, { name: "Micronesia", code: "FM", dial_code: "+691" }, { name: "Moldova", code: "MD", dial_code: "+373" }, { name: "Monaco", code: "MC", dial_code: "+377" }, { name: "Mongolia", code: "MN", dial_code: "+976" }, { name: "Montenegro", code: "ME", dial_code: "+382" }, { name: "Montserrat", code: "MS", dial_code: "+1-664" }, { name: "Morocco", code: "MA", dial_code: "+212" }, { name: "Mozambique", code: "MZ", dial_code: "+258" }, { name: "Myanmar", code: "MM", dial_code: "+95" }, { name: "Namibia", code: "NA", dial_code: "+264" }, { name: "Nauru", code: "NR", dial_code: "+674" }, { name: "Nepal", code: "NP", dial_code: "+977" }, { name: "Netherlands", code: "NL", dial_code: "+31" }, { name: "Netherlands Antilles", code: "AN", dial_code: "+599" }, { name: "New Caledonia", code: "NC", dial_code: "+687" }, { name: "New Zealand", code: "NZ", dial_code: "+64" }, { name: "Nicaragua", code: "NI", dial_code: "+505" }, { name: "Niger", code: "NE", dial_code: "+227" }, { name: "Nigeria", code: "NG", dial_code: "+234" }, { name: "Niue", code: "NU", dial_code: "+683" }, { name: "North Korea", code: "KP", dial_code: "+850" }, { name: "Northern Mariana Islands", code: "MP", dial_code: "+1-670" }, { name: "Norway", code: "NO", dial_code: "+47" }, { name: "Oman", code: "OM", dial_code: "+968" }, { name: "Pakistan", code: "PK", dial_code: "+92" }, { name: "Palau", code: "PW", dial_code: "+680" }, { name: "Palestine", code: "PS", dial_code: "+970" }, { name: "Panama", code: "PA", dial_code: "+507" }, { name: "Papua New Guinea", code: "PG", dial_code: "+675" }, { name: "Paraguay", code: "PY", dial_code: "+595" }, { name: "Peru", code: "PE", dial_code: "+51" }, { name: "Philippines", code: "PH", dial_code: "+63" }, { name: "Pitcairn", code: "PN", dial_code: "+64" }, { name: "Poland", code: "PL", dial_code: "+48" }, { name: "Portugal", code: "PT", dial_code: "+351" }, { name: "Puerto Rico", code: "PR", dial_code: "+1-787, 1-939" }, { name: "Qatar", code: "QA", dial_code: "+974" }, { name: "Republic of the Congo", code: "CG", dial_code: "+242" }, { name: "Reunion", code: "RE", dial_code: "+262" }, { name: "Romania", code: "RO", dial_code: "+40" }, { name: "Russia", code: "RU", dial_code: "+7" }, { name: "Rwanda", code: "RW", dial_code: "+250" }, { name: "Saint Barthelemy", code: "BL", dial_code: "+590" }, { name: "Saint Helena", code: "SH", dial_code: "+290" }, { name: "Saint Kitts and Nevis", code: "KN", dial_code: "+1-869" }, { name: "Saint Lucia", code: "LC", dial_code: "+1-758" }, { name: "Saint Martin", code: "MF", dial_code: "+590" }, { name: "Saint Pierre and Miquelon", code: "PM", dial_code: "+508" }, { name: "Saint Vincent and the Grenadines", code: "VC", dial_code: "+1-784" }, { name: "Samoa", code: "WS", dial_code: "+685" }, { name: "San Marino", code: "SM", dial_code: "+378" }, { name: "Sao Tome and Principe", code: "ST", dial_code: "+239" }, { name: "Saudi Arabia", code: "SA", dial_code: "+966" }, { name: "Senegal", code: "SN", dial_code: "+221" }, { name: "Serbia", code: "RS", dial_code: "+381" }, { name: "Seychelles", code: "SC", dial_code: "+248" }, { name: "Sierra Leone", code: "SL", dial_code: "+232" }, { name: "Singapore", code: "SG", dial_code: "+65" }, { name: "Sint Maarten", code: "SX", dial_code: "+1-721" }, { name: "Slovakia", code: "SK", dial_code: "+421" }, { name: "Slovenia", code: "SI", dial_code: "+386" }, { name: "Solomon Islands", code: "SB", dial_code: "+677" }, { name: "Somalia", code: "SO", dial_code: "+252" }, { name: "South Africa", code: "ZA", dial_code: "+27" }, { name: "South Korea", code: "KR", dial_code: "+82" }, { name: "South Sudan", code: "SS", dial_code: "+211" }, { name: "Spain", code: "ES", dial_code: "+34" }, { name: "Sri Lanka", code: "LK", dial_code: "+94" }, { name: "Sudan", code: "SD", dial_code: "+249" }, { name: "Suriname", code: "SR", dial_code: "+597" }, { name: "Svalbard and Jan Mayen", code: "SJ", dial_code: "+47" }, { name: "Swaziland", code: "SZ", dial_code: "+268" }, { name: "Sweden", code: "SE", dial_code: "+46" }, { name: "Switzerland", code: "CH", dial_code: "+41" }, { name: "Syria", code: "SY", dial_code: "+963" }, { name: "Taiwan", code: "TW", dial_code: "+886" }, { name: "Tajikistan", code: "TJ", dial_code: "+992" }, { name: "Tanzania", code: "TZ", dial_code: "+255" }, { name: "Thailand", code: "TH", dial_code: "+66" }, { name: "Togo", code: "TG", dial_code: "+228" }, { name: "Tokelau", code: "TK", dial_code: "+690" }, { name: "Tonga", code: "TO", dial_code: "+676" }, { name: "Trinidad and Tobago", code: "TT", dial_code: "+1-868" }, { name: "Tunisia", code: "TN", dial_code: "+216" }, { name: "Turkey", code: "TR", dial_code: "+90" }, { name: "Turkmenistan", code: "TM", dial_code: "+993" }, { name: "Turks and Caicos Islands", code: "TC", dial_code: "+1-649" }, { name: "Tuvalu", code: "TV", dial_code: "+688" }, { name: "U.S. Virgin Islands", code: "VI", dial_code: "+1-340" }, { name: "Uganda", code: "UG", dial_code: "+256" }, { name: "Ukraine", code: "UA", dial_code: "+380" }, { name: "United Arab Emirates", code: "AE", dial_code: "+971" }, { name: "United Kingdom", code: "GB", dial_code: "+44" }, { name: "United States", code: "US", dial_code: "+1" }, { name: "Uruguay", code: "UY", dial_code: "+598" }, { name: "Uzbekistan", code: "UZ", dial_code: "+998" }, { name: "Vanuatu", code: "VU", dial_code: "+678" }, { name: "Vatican", code: "VA", dial_code: "+379" }, { name: "Venezuela", code: "VE", dial_code: "+58" }, { name: "Vietnam", code: "VN", dial_code: "+84" }, { name: "Wallis and Futuna", code: "WF", dial_code: "+681" }, { name: "Western Sahara", code: "EH", dial_code: "+212" }, { name: "Yemen", code: "YE", dial_code: "+967" }, { name: "Zambia", code: "ZM", dial_code: "+260" }, { name: "Zimbabwe", code: "ZW", dial_code: "+263" }
-        ];
-
-        // MAPPINGS FOR READABLE LABELS
-        const fieldLabels = {
-            photo: "Profile Photo",
-            sex: "Sex",
-            fname: "First Name",
-            sname: "Second Name",
-            nname: "Nickname",
-            display: "Display Name Preference",
-            dob: "Birthday",
-            desc: "Partner Description",
-            phoneCode: "Country Code",
-            phoneNum: "Phone Number"
-        };
-
-        // NEW: HIGH QUALITY CROWNS SVGs
-        const KING_SVG = `<svg class="crown-svg" viewBox="0 0 640 512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32l-16.7-43.2C331 229.4 353.2 216 378.3 216c39.6 0 76.5 24.3 92.1 63.8l16.2 40.5 48.9-114.2C549.9 174.9 576.4 152 607.4 152c33.5 0 60.7 27.2 60.7 60.7c0 43.6-43.2 75.3-76.3 56l-50.6-29.4-44.8 104.5c-9.2 21.4-30.4 35.2-53.7 35.2H197.3c-23.3 0-44.5-13.8-53.7-35.2L98.9 239.3 48.2 268.7C15.1 287.9-28.1 256.3-28.1 212.7c0-33.5 27.2-60.7 60.7-60.7c31 0 57.5 22.9 71.8 54.1l49 114.2 16.2-40.5C185.2 240.3 222 216 261.7 216c25.1 0 47.3 13.4 81.4 28.8l-16.7 43.2H313.6z"/></svg>`;
-        
-        const QUEEN_SVG = `<svg class="crown-svg" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/></svg>`;
 
         window.onload = () => {
-            const sels = document.querySelectorAll('#me-country, #p-country');
-            sels.forEach(s => countries.forEach(c => s.innerHTML += `<option value="${c.dial_code}">${c.name} (${c.dial_code})</option>`));
             if(inviteCode) openAuth('signup');
+            loadPublicTiles();
         };
 
-        // AUTH
+        auth.onAuthStateChanged(u => {
+            if(u) {
+                // Redirect to dashboard if logged in
+                window.location.href = "dashboard.html";
+            }
+        });
+
         function openAuth(mode) {
             isSignup = (mode === 'signup');
             document.getElementById('auth-title').innerText = isSignup ? "Create Account" : "Login";
             document.getElementById('auth-modal').classList.remove('hidden');
             if(isSignup && inviteCode) document.getElementById('invite-alert').classList.remove('hidden');
         }
+
         function togglePasswordVisibility() {
             const x = document.getElementById('pass');
             x.type = x.type === "password" ? "text" : "password";
         }
+
         async function handleAuth() {
             const e = document.getElementById('email').value;
             const p = document.getElementById('pass').value;
@@ -453,358 +130,7 @@
                 document.getElementById('auth-modal').classList.add('hidden');
             } catch(err) { alert(err.message); }
         }
-        function logout() { 
-            if(user) {
-                db.ref(`users/${user.uid}/status`).set('offline').then(() => {
-                    auth.signOut().then(() => location.reload());
-                });
-            } else { location.reload(); }
-        }
 
-        auth.onAuthStateChanged(u => {
-            user = u;
-            if(user) {
-                db.ref('.info/connected').on('value', (snap) => {
-                    if (snap.val()) {
-                        db.ref(`users/${user.uid}/status`).onDisconnect().set('offline');
-                        db.ref(`users/${user.uid}/status`).set('online');
-                    }
-                });
-                db.ref(`users/${user.uid}`).once('value', s => {
-                    if(s.exists()) {
-                        coupleId = s.val().coupleId;
-                        route('dashboard');
-                        initDashboard();
-                    }
-                });
-            } else {
-                route('home');
-            }
-        });
-
-        function route(page) {
-            document.querySelectorAll('body > div').forEach(d => { if(d.id.startsWith('view-')) d.classList.add('hidden'); });
-            document.getElementById(`view-${page}`).classList.remove('hidden');
-            if(page === 'home') loadPublicTiles();
-        }
-
-        // DASHBOARD
-        function initDashboard() {
-            // Real-time listener handles the connection logic
-            db.ref(`couples/${coupleId}`).on('value', s => {
-                const d = s.val();
-                
-                // IMPORTANT: Immediate check for Invite Link generation to avoid refresh need
-                const link = window.location.href.split('?')[0] + "?invite=" + coupleId;
-                
-                if(d && d.user1 && d.user2) {
-                    // Both users exist -> UNLOCKED
-                    document.getElementById('dash-locked').classList.add('hidden');
-                    document.getElementById('dash-unlocked').classList.remove('hidden');
-                    document.getElementById('dash-code').innerText = coupleId;
-                    
-                    partnerId = (d.user1 === user.uid) ? d.user2 : d.user1;
-                    
-                    setupProfileListeners();
-                    setupRequestListeners();
-                    initChat();
-                    checkWallpaper();
-                } else if(d) {
-                    // Waiting for partner -> LOCKED
-                    document.getElementById('dash-locked').classList.remove('hidden');
-                    document.getElementById('dash-unlocked').classList.add('hidden');
-                    
-                    // Force update the invite link element here
-                    const el = document.getElementById('invite-link');
-                    if(el) el.innerText = link;
-                    
-                    document.getElementById('dash-code').innerText = coupleId;
-                }
-            });
-        }
-        
-        function copyInvite() {
-            const link = window.location.href.split('?')[0] + "?invite=" + coupleId;
-            navigator.clipboard.writeText(link);
-            alert("Invite link copied to clipboard!");
-        }
-
-        // PROFILE LOGIC
-        function setupProfileListeners() {
-            db.ref(`users/${user.uid}/profile`).on('value', s => {
-                if(s.exists()) fillForm('me', s.val());
-                updateBadges('me');
-                updateHeader();
-            });
-            
-            if(partnerId) {
-                db.ref(`users/${partnerId}/profile`).on('value', s => {
-                    if(s.exists()) fillForm('p', s.val()); // Use 'p' for partner
-                    updateBadges('p');
-                    updateHeader();
-                });
-            }
-        }
-
-        function fillForm(who, data) {
-            if(!data) return;
-            // Helper to safe set value
-            const setVal = (id, v) => { if(document.getElementById(id)) document.getElementById(id).value = v; };
-            
-            setVal(`${who}-photo`, data.photo || '');
-            setVal(`${who}-sex`, data.sex || 'male');
-            setVal(`${who}-fname`, data.fname || '');
-            setVal(`${who}-sname`, data.sname || '');
-            setVal(`${who}-nname`, data.nname || '');
-            setVal(`${who}-display`, data.display || 'fname');
-            setVal(`${who}-dob`, data.dob || '');
-            setVal(`${who}-desc`, data.desc || '');
-            setVal(`${who}-country`, data.phoneCode || '+1');
-            setVal(`${who}-phone`, data.phoneNum || '');
-        }
-
-        function updateBadges(who) {
-            const sel = document.getElementById(`${who}-sex`);
-            if(sel) {
-                const sex = sel.value;
-                // REMOVED Crown Emoji as requested
-                const badgeText = sex === 'male' ? "Her King" : "His Queen";
-                document.getElementById(`${who}-badge`).innerText = badgeText;
-            }
-        }
-
-        function getFormData(who) {
-            const prefix = (who === 'partner') ? 'p' : who;
-            
-            return {
-                photo: document.getElementById(`${prefix}-photo`).value,
-                sex: document.getElementById(`${prefix}-sex`).value,
-                fname: document.getElementById(`${prefix}-fname`).value,
-                sname: document.getElementById(`${prefix}-sname`).value,
-                nname: document.getElementById(`${prefix}-nname`).value,
-                display: document.getElementById(`${prefix}-display`).value,
-                dob: document.getElementById(`${prefix}-dob`).value,
-                desc: document.getElementById(`${prefix}-desc`).value,
-                phoneCode: document.getElementById(`${prefix}-country`).value,
-                phoneNum: document.getElementById(`${prefix}-phone`).value
-            };
-        }
-
-        function unlockForm(who) {
-            const fieldId = (who === 'me') ? 'fs-me' : 'fs-partner';
-            document.getElementById(fieldId).disabled = false;
-        }
-
-        async function saveProfile(who) {
-            const data = getFormData(who);
-            if(who === 'me') {
-                db.ref(`users/${user.uid}/profile`).update(data);
-                document.getElementById('fs-me').disabled = true;
-                alert("Saved!");
-            } else {
-                if(!partnerId) return;
-                // PARTNER EDIT REQUEST
-                const snap = await db.ref(`users/${partnerId}/status`).once('value');
-                // Strict: Partner must be online
-                if(snap.val() !== 'online') {
-                    document.getElementById('modal-offline').classList.remove('hidden');
-                    return;
-                }
-                
-                db.ref(`couples/${coupleId}/editRequest`).set({
-                    from: user.uid,
-                    to: partnerId,
-                    data: data,
-                    timestamp: Date.now()
-                });
-                document.getElementById('fs-partner').disabled = true;
-                alert("Request Sent!");
-            }
-        }
-
-        // REQUEST LOGIC
-        function setupRequestListeners() {
-            // Watch for request addressed TO ME
-            db.ref(`couples/${coupleId}/editRequest`).on('value', s => {
-                const req = s.val();
-                if(req && req.to === user.uid) { 
-                    pendingRequestData = req.data;
-                    
-                    let readableHtml = '<ul style="list-style:none; padding:0;">';
-                    for (const [key, value] of Object.entries(req.data)) {
-                        const label = fieldLabels[key] || key; // Fallback to key if not found
-                        readableHtml += `<li style="margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">
-                            <span style="font-weight:bold; color:#555;">${label}:</span> 
-                            <span style="color:var(--primary);">${value}</span>
-                        </li>`;
-                    }
-                    readableHtml += '</ul>';
-
-                    document.getElementById('request-diff').innerHTML = readableHtml;
-                    document.getElementById('modal-request').classList.remove('hidden');
-                } else {
-                    document.getElementById('modal-request').classList.add('hidden');
-                }
-            });
-
-            // Watch for declines addressed TO ME
-            db.ref(`couples/${coupleId}/editDecline`).on('value', s => {
-                const dec = s.val();
-                if(dec && dec.to === user.uid) { 
-                    document.getElementById('notify-title').innerText = "Partner Declined";
-                    document.getElementById('notify-msg').innerText = "Reason: " + dec.reason;
-                    document.getElementById('modal-notify').classList.remove('hidden');
-                    db.ref(`couples/${coupleId}/editDecline`).remove();
-                }
-            });
-        }
-
-        function acceptEdit() {
-            if(pendingRequestData) {
-                document.getElementById('modal-request').classList.add('hidden');
-                db.ref(`users/${user.uid}/profile`).update(pendingRequestData);
-                db.ref(`couples/${coupleId}/editRequest`).remove();
-            }
-        }
-
-        function showRejectReason() {
-            document.getElementById('modal-request').classList.add('hidden');
-            document.getElementById('modal-reject').classList.remove('hidden');
-        }
-
-        function submitReject() {
-            document.getElementById('modal-reject').classList.add('hidden');
-            const r = document.getElementById('reject-reason').value;
-            db.ref(`couples/${coupleId}/editDecline`).set({ to: partnerId, reason: r });
-            db.ref(`couples/${coupleId}/editRequest`).remove();
-        }
-
-        // HEADER
-        async function updateHeader() {
-            if(!user || !partnerId) return;
-            const meSnap = await db.ref(`users/${user.uid}/profile`).once('value');
-            const ptSnap = await db.ref(`users/${partnerId}/profile`).once('value');
-            
-            const me = meSnap.val() || {};
-            const pt = ptSnap.val() || {};
-            
-            const cont = document.getElementById('avatar-container');
-            
-            // Attach Status Listener separately to avoid innerHTML flickering
-            db.ref(`users/${partnerId}/status`).off(); // Remove old listener
-            db.ref(`users/${partnerId}/status`).on('value', s => {
-                const dot = document.getElementById('pt-status-dot');
-                if(dot) {
-                    if(s.val() === 'online') dot.classList.add('online');
-                    else dot.classList.remove('online');
-                }
-            });
-
-            const createAva = (p, isPartner) => {
-                // If profile is empty/loading
-                if(!p && isPartner) return `<div class="avatar-wrap"><div class="ava" style="background:#ddd"></div></div>`;
-                
-                let name = p.nname || p.fname || "Love";
-                
-                // SVG ASSIGNMENT: Male = King, Female = Queen
-                let crown = (p.sex === 'male') ? KING_SVG : QUEEN_SVG;
-                
-                let bday = "";
-                if(p.dob) {
-                    const t = new Date(), b = new Date(p.dob);
-                    b.setFullYear(t.getFullYear());
-                    if(b < t) b.setFullYear(t.getFullYear()+1);
-                    const d = Math.ceil((b - t) / (86400000));
-                    bday = `<div class="bday-count"><i class="fas fa-birthday-cake"></i> ${d} Days</div>`;
-                }
-                
-                let dotHtml = isPartner ? `<div id="pt-status-dot" class="status-dot"></div>` : '';
-                
-                return `
-                <div class="avatar-wrap">
-                    ${crown}
-                    <div style="position:relative;">
-                        <img src="${p.photo||'https://via.placeholder.com/50'}" class="ava">
-                        ${dotHtml}
-                    </div>
-                    <div style="font-size:0.7rem;font-weight:bold;margin-top:5px;">${name}</div>
-                    ${bday}
-                </div>`;
-            };
-
-            const iAmMale = me.sex === 'male';
-            // Male Right, Female Left (Standard Couple Positioning)
-            if(iAmMale) {
-                cont.innerHTML = createAva(pt, true) + '<i class="fas fa-heart ava-heart"></i>' + createAva(me, false);
-            } else {
-                cont.innerHTML = createAva(me, false) + '<i class="fas fa-heart ava-heart"></i>' + createAva(pt, true);
-            }
-        }
-
-        // WALLPAPER - Fixed Stuck Issue
-        function checkWallpaper() {
-            if(!partnerId) return;
-            db.ref(`users/${partnerId}/profile`).once('value', s => {
-                const d = s.val();
-                if(d && d.desc) {
-                    document.getElementById('wp-img').src = d.photo || 'https://via.placeholder.com/150';
-                    document.getElementById('wp-desc').innerText = `"${d.desc}"`;
-                    document.getElementById('wallpaper-overlay').classList.remove('hidden');
-                }
-            });
-        }
-        function closeWallpaper() {
-            const wp = document.getElementById('wallpaper-overlay');
-            wp.style.opacity = '0';
-            wp.style.pointerEvents = 'none'; // Fix: Prevent blocking clicks during fade
-            setTimeout(() => {
-                wp.classList.add('hidden');
-                wp.style.pointerEvents = 'auto'; // Reset
-            }, 1000);
-        }
-
-        // NAV
-        function nav(tab, el) {
-            document.querySelectorAll('.tab-view').forEach(e => e.classList.add('hidden'));
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            if(el) {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                el.classList.add('active');
-            }
-        }
-
-        // CHAT
-        function initChat() {
-            const feed = document.getElementById('chat-feed');
-            feed.innerHTML = "";
-            db.ref(`couples/${coupleId}/chat`).limitToLast(50).on('child_added', s => {
-                const msg = s.val();
-                const div = document.createElement('div');
-                const isMe = msg.sender === user.uid;
-                
-                div.style.alignSelf = isMe ? 'flex-end' : 'flex-start';
-                div.style.background = isMe ? 'var(--primary)' : '#f1f1f1';
-                div.style.color = isMe ? 'white' : '#333';
-                div.style.padding = '8px 12px';
-                div.style.borderRadius = '15px';
-                div.style.maxWidth = '70%';
-                div.style.fontSize = '0.9rem';
-                div.innerText = msg.text;
-                
-                feed.appendChild(div);
-                feed.scrollTop = feed.scrollHeight;
-            });
-        }
-
-        function sendChat() {
-            const t = document.getElementById('chat-msg').value;
-            if(t.trim()) { 
-                db.ref(`couples/${coupleId}/chat`).push({text:t, sender:user.uid, time: Date.now()}); 
-                document.getElementById('chat-msg').value=""; 
-            }
-        }
-
-        // PUBLIC WALL & TILES
         function loadPublicTiles() {
              db.ref('publicWall').limitToLast(20).on('value', s => {
                 const g = document.getElementById('public-grid'); g.innerHTML = "";
@@ -821,35 +147,13 @@
                 }
             });
         }
-
+        
         function filterTiles() {
             const term = document.getElementById('search-bar').value.toLowerCase();
             document.querySelectorAll('.tile-card').forEach(card => {
                 const txt = card.innerText.toLowerCase();
                 card.style.display = txt.includes(term) ? 'block' : 'none';
             });
-        }
-
-        function submitProp(type) {
-             if(type === 'post') {
-                 const t = document.getElementById('post-text').value;
-                 const i = document.getElementById('post-img').value;
-                 if(t.trim()) {
-                     db.ref('publicWall').push({
-                         desc: t,
-                         image: i || 'https://via.placeholder.com/300/ff4b6e/ffffff?text=EternalLove',
-                         names: "Happy Couple" 
-                     });
-                     alert("Posted to Wall!");
-                     document.getElementById('post-text').value = "";
-                 }
-             }
-        }
-        
-        function toggleCam() {
-             const v = document.getElementById('localVideo');
-             if(v.srcObject) { v.srcObject.getTracks().forEach(t=>t.stop()); v.srcObject=null; }
-             else { navigator.mediaDevices.getUserMedia({video:true}).then(s => v.srcObject=s); }
         }
     </script>
 </body>
