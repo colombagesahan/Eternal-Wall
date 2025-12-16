@@ -33,7 +33,6 @@
         .form-select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #fff; }
         .edit-btn { position: absolute; top: 15px; right: 15px; background: #eee; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; z-index: 20; }
         
-        /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; }
         .modal-box { background: #fff; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
 
@@ -127,7 +126,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Get Params from URL (passed by dashboard.html)
         const params = new URLSearchParams(window.location.search);
         const coupleId = params.get('cid');
         const uid = params.get('uid');
@@ -136,7 +134,6 @@
 
         const countries = [
              { name: "Afghanistan", code: "AF", dial_code: "+93" }, { name: "United States", code: "US", dial_code: "+1" }, { name: "United Kingdom", code: "GB", dial_code: "+44" }, { name: "India", code: "IN", dial_code: "+91" }, { name: "Sri Lanka", code: "LK", dial_code: "+94" }, { name: "China", code: "CN", dial_code: "+86" }, { name: "Australia", code: "AU", dial_code: "+61" }, { name: "Japan", code: "JP", dial_code: "+81" }, { name: "Germany", code: "DE", dial_code: "+49" }, { name: "France", code: "FR", dial_code: "+33" }, { name: "Russia", code: "RU", dial_code: "+7" }, { name: "Brazil", code: "BR", dial_code: "+55" }
-             // (Add full list here if needed, shortened for brevity but functional)
         ];
 
         const fieldLabels = { photo: "Profile Photo", sex: "Sex", fname: "First Name", sname: "Second Name", nname: "Nickname", display: "Display Name", dob: "Birthday", desc: "Partner Description", phoneCode: "Country Code", phoneNum: "Phone Number" };
@@ -158,7 +155,6 @@
             db.ref(`users/${uid}/profile`).on('value', s => { if(s.exists()) fillForm('me', s.val()); updateBadges('me'); });
             if(partnerId) db.ref(`users/${partnerId}/profile`).on('value', s => { if(s.exists()) fillForm('p', s.val()); updateBadges('p'); });
             
-            // Watch Requests
             db.ref(`couples/${coupleId}/editRequest`).on('value', s => {
                 const req = s.val();
                 if(req && req.to === uid) {
